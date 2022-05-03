@@ -43,7 +43,8 @@
                         var img = document.createElement("img")
                         img.setAttribute("id", p_id)
                         img.setAttribute("onclick", "copyToClipBoard(this)")
-                        img.setAttribute("src", element.img+"_430x430q90.jpg")
+                        img_url = element.img+"_430x430q90.jpg"
+                        img.setAttribute("src", img_url)
                         var div_img = document.createElement("div")
                         div_img.setAttribute("class", "img_product")
                         div_img.appendChild(img)

@@ -66,9 +66,15 @@
                         a3.setAttribute("target", "_blank")
                         a3.setAttribute("href", "https://sell.publish.tmall.com/tmall/publish.htm?id=" + p_id)
                         a3.innerText = "编辑"
+                        // 新加标题
+                        var a4 = document.createElement("a")
+                        a4.setAttribute("target", "_blank")
+                        a4.setAttribute("href", "https://sell.publish.tmall.com/tmall/publish.htm?id=" + p_id)
+                        a4.innerText = "标题"
                         div_detail.appendChild(a1)
                         div_detail.appendChild(a2)
                         div_detail.appendChild(a3)
+                        div_detail.appendChild(a4)
                         div_product.appendChild(div_detail)
 
                         var container = document.getElementById('wrap');

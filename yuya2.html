@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon"
+                href="data:image/jpeg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAABYAAD/4QMvaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA3LjItYzAwMCA3OS41NjZlYmM1YjQsIDIwMjIvMDUvMDktMDg6MjU6NTUgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCAyMy40IChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozQkE1REZCODI5MDAxMUVEOTQwQkNDNjhFNzhGN0M4MiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozQkE1REZCOTI5MDAxMUVEOTQwQkNDNjhFNzhGN0M4MiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjNCQTVERkI2MjkwMDExRUQ5NDBCQ0M2OEU3OEY3QzgyIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjNCQTVERkI3MjkwMDExRUQ5NDBCQ0M2OEU3OEY3QzgyIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+/+4ADkFkb2JlAGTAAAAAAf/bAIQAAQEBAQEBAQEBAQIBAQECAgIBAQICAwICAgICAwQDAwMDAwMEBAQEBQQEBAYGBgYGBggICAgICQkJCQkJCQkJCQECAgIDAwMFBAQFCAYFBggJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJ/8AAEQgAUABQAwERAAIRAQMRAf/EAKYAAAICAgIDAAAAAAAAAAAAAAcJAAgCCgMFAQQGAQACAgMBAAAAAAAAAAAAAAAABAMFAgYHARAAAQQABAQCBwQJBQAAAAAAAQIDBAUAEQYHIUESCDFRYXGBImITFDIjMwmRQlJytBUWdjehgpJDFxEAAQIDBAcGBAYDAQAAAAAAAQACEQMEITFBBVFhcYGxEgaRocEiMhPRciMU4UJSYkM0grLCFf/aAAwDAQACEQMRAD8A3+MCFMCEC94+4zavY6Kg61vuu7koK63SMFIlWslP7QYSR0J+NZSn04kZKc+5VmYZtTUY+o7zG5otJ3YbTYlra+/MU3SvHnmNutL1+hK0/gTpw/m1iR4ZlIKGEZ+WS/XhtlK0XmK1Cq6sqX2SWhg1+Y/Diq4WvdD3GXLy35e8lxGKySWoZYgtjPkEsNJyHtxKJLBgqh+dV7zEznboDgFjWdzvcVUOoei7y3T6kEH5ctbM1tRBz4pfaVwwGSw4IZnNe02Tnb4HiFYjQn5iO7lC60zr7T1br+uz+/kxk/yiwCfhKethR9BSn14idStwMFbUvVlUw/Va141eU/DgmS7M9zG1O+LQjaTujC1Kyjrn6MsEiLZtJA95SWySl5Ay+02VDzywpMlOZetvy/OKasEJboO/SbD+O0KwOI1aKYEKYEKgvd13eDaYvbcbbuszdzZbSV21qtIej0DDwzQpaDwW+sHNDZ4Ae8rhkFMyJHNablq+fZ99r9GTbNxODR4nQN5SYrCfYW9lPurmxfubq2cU9a3Mt1T8qS6o5lbjiuKj/oPAZDD4AFy569znOLnElxvJtJ2r1cerFTAhTAhTAhcsaRKgzIVlXzHq2zrXEvVlpGdUxJjPI4pcadQQpCh5g4CIr1pLSHAwIuIvGxOK7Q+8Je4r0Pa3dSW2xuAlJGmtTdKWWb5ttOZbWkZJRJSkZkDgsAlIBBGEJ8jltF3Bb/kOf++RInn6mB/Vq+bimJYVW2IBdym88fYzau51e2lEnUcspgaMrVn3X7SSD8srHNDSQXF/CkjxIxJKl87oKrzjMBR0zpn5jY0aSfhediQNS0eptw723dFrGn6inl6xvLi3s41b9U88v71wvSloQpalKz6Qc8vAZDFmSGjUuXS5cye91oLjaS4gRjjE4r7g7C7jpgt2hXp4Vbr6ojdl/VlR8gykIDqmev6jLrDZCunxy4+GMfdbr7Cmf/LqIc3khGEedsI3wvvhah3qTTNrpKxTVXDsJ6WtpDyVwLCPZsdCyQAXoq1oCswc055j24za4G5KTpLpTuV0I6iCO0LoMeqJEel2p1dqCqg3VdLom4Vkj5kVuXqWsgyQnMj7xh99LjZzHgoA4wMwA49icl0M17Q4FsDpe0HsJiESqvtD7iL2uiW9JoWNcVFggOV9pGvK56O+0rwW2tL+SgeRGMDPYMU4zIK97Q5ssEG4hzYHvXq33alvxpWEmz1VpWv0zWuOJZbsJ+oayKyp5YJS2lS3wCohJIHoOPRPYbrdyxm5HWyhF7A0aS5o8UINR6X1BoWyq0zbCJHtvcm1FlUW0axVGdjOAtuh6I4sNOIWAUgkHn4YyDg5ITpMyS4RIjeC1wMIawTAxT5e1bfBO+m1kC8slto1np9f8t1zDQAlP1zKQQ+hI8ESGyHE+RJTyxXTpfI6GC6bkmZfeUwcfW2x23TsIt7sEuT8wrcB3Um8VRoNh4mq24r0LeZBBSbO2AdWrhzQwlsDy6j54bpWwbHStS6rqjMqhKF0sd7vwgqFrQhwAOICwOIBGfHDK1iCKm1sSPqcam2ikIbQnchltzRziwA3H1bVBb1cczwSJaC5FWefzEjliOZZ5tHBO0TRM5pB/kHl1Pba3ttadoQoZCQ2Olkxz/2MFPQpCxwUlSeRB4EeeJEiFy4F6iRs5tRI3o3O0tt5Fa6I108XdS2CUgqi1MbJct3PkSnJCPiUMYTH8rSU3l9CauoZKFzrzoaLz4DWVsk1NXXUdXXUtRDRXVVQw1FrIDQ6W2I7CQhttI5BKQAMVMYrrzGNY0NaIACAGoJH3fRvAjc3ddWjKt8SNH7VqdiN5Hqbk3ToAmPen5IAZT5EL88WNNL5WxxK5x1LmH3FT7bT5JVm12J3XdqpYhtDYIbQEA8SAMs/0YYWuwV2uwfcF7SO+iNKvP8Ay6bc2C9DeaUrJAsK9KpMVYHgVFAcR7RhaqZFkdC2LpeqMqs5D6ZghvFo8QgJ3A2q7vfneSzW4XQ7qGey0pRzIbhqEZA9QS2MSyhBg2KszV/PWzj+891nghHiRILJDsqO6zKgylwZ8Nxt6vnNnJxiQyoLadQeRQsBQ9IwL0EgggwIuOg4FFPdliNa2lJudVREQ6bd2M5aSYbYyahahjOfIu4gA8AmV98n4HRlwxHLMBDRwwTtcA5zZzRBs0R2OFjx22jUUKvXwHniRIpzP5fmzn9JbfTN1rqJ8rUW5gQacLTk5HoWFExwM+I+oXm6fNPR5Yr6mZF0MAuhdLZf7Ugz3DzTLtTcO2/sR77pd5k7J7R3uoYLqU6tuCKzREdWRKrKWkgO9PNLCAp1X7uXPEcmXzOhgrTOsw+0pXPHrNjdpx3X7lr0pCgD1uKfcUVKefWepbi1nqUtR5lSiST54tFylZYEIgbSXK9O7t7V3refXWaip15A5ZpckoaWPalZGMJgi07E1QTPbqpTtD28V2e+tcqp3x3irVZ5xtSWikkjLNMh0vJP/FYwSjFg2KTM2ctZOH7z3mKFmM0ipgQi7t82vWWktbbTkF62cSvVW2bfipV1TxyJ8Jv0zq8KyH7bSeeI32EO3FP0g96U+Rj62fM0eYf5N72hcewu1b++O5+ldDRwpVHNP12rJyM8maWNkp89WRyL2aWk+lefLBNfyNJXmV0JrKhkoek2uP7Rf23Datj6HDi18ONAgx0RYUJtDMOK2kIbaaaSEoQkDgAkDIDFUuutaGgAWAJDfedvL/63vDNrqmV8/Rm2vz6qhKVZtSJwVlPlDIkHNxIaSR+qjPniyp5fK3WVzHqHMPuqohp8kuwaz+Y+G5VMxOqJTAhfb7YVb15uhtjTR/x7LUVK237Jbaj+gA4weYNOxM0TOeplN0vbxCs/39aEe0rvy5qdtnoqtyK6PMYdCSEfW16UxZKc/PpDSvbiKmdFkNCuuqKUy63nwmAHeLD4KlOGFrimBC7GmvLbS91TaooZH0t7pqXHsKaSfBMmIsOI6vNKiMlDmCRjwiIgs5cx0t7Xtsc0gjaLU9DtK2h0jo+m1Rurp2OGWt7HmLmir1IyXT00lpMhqtB8mn3XeIORHT5YrZzySAcF0rIqCVKY+ez+YhwH6Wm0N3EnuXbd4O9Ctm9obJ2omfTa11oVVOjsj77TzySX5QGYOUdrNQP7XSOeCRL5nagpM/zH7SlPKfO/yt8TuFu2CQK22lptDacylsAAk5k5cyT4nFmuXLPAhTAhW67HNCu607hdP2a2S5V7dxpNzYO55BL60mNETnzJW4VZfCcQVLoM2q+6apTOrmuwlgu33Dj3JoHd5sg9vZtRLiUkdL2uNHuG00Z4AvvNoKXonUfASGiUj4uk8sJyJnI7UVuefZaaumIaPqMtb4jeO+CQGlRUD1NqaWgqS6ytJQ42tB6VIWk8UqSQQQfA4s1y5ZYELjd/Dc/dOBeFbHXbd/gHZz+3Kr+HTiqm+s7V1zKP6Un5BwSzPzIH5C94tBRFyFriRtNKcjxCo/LbcemuJcWlPgCsISCeeQw3Sek7Vp3VxP3csYcniUvzDS1VTAhYOOIaQpxZISnxyGZPkABxJPIYEFPj7L9jpWzm1312o4Zia73AW1Y6mjLGS4bQTlEhH0stklfxqVitnzOd1lwXTenstNLTReITH2nVoG7HWSrg4gV+lb95HaDY3E+03i2kqjNtJfU/r7Q8dP3sxwD3p0NA+08QPvGx9v7Q9/MKckT4eV1y0vqDIXPcaiQIk2uaMdY16RjtvVGhaVglOfukpWkgpUlSTkUqB4gg8CDxGHVo68O/hufunAvCtjrtu/wDs5/blV/DpxUzfWdq65lH9KT8g4JZH5j3+atE/wBrp/jn8OUnoO1ab1d/bl/J/wBFUAw0tWWDjjbSC44sIQMs1HzPAD2nwwLwmCaF2c9n892wqN4t3alUGPBUiVoHQ0lHS8p5PvNz5ravs9Pi00eIPvqyIAwnPn/lat06fyB3M2oniELWtP8AsfAbymxYSW8qYEKYEKoO+3ZptjvNImajhBegtfSiVv6pr20qbmL85sUkIePxjpX8WJ5c9zbLwqHM+nqerJePJMOIx2jHbYdaWPuF2T9wuh1SlQ9Kt7g1SODNpRPB11YI/WhvFDyf9vV68NtqGHGC02q6crpMYM9waW/A28U5Tt7gz6zY3aautIL1ZZQaCsanV0hpTL7DrbCUqQ42sBSVJIyIIwhM9Z2roGVNc2jkhwgQ0RBwsS1/zB9Oam1DvfohnTumLPULn9MpTlAr5EwBf1r56SppCgDlxyJw3SuAYYnFah1VJmPrJfI1zvJgCcToQN0J2Ydw+unmi7o0aErFqydtr55MZSB5iK31vq9RCfWMSuqGDGKrabp6unH0cg0us7r+CZbsV2T7abRSoWpr1w7ia8hkORLucylEOC5l4w4makoUOS1FS/IjCcyoc6y4LcMs6cp6Uh7vqTNJuGweJiVc/EC2FTAhf//Z"
+                type="image/x-icon">
+        <title>超越lululemon</title>
+</head>
+
+<body>
+        <div id="wrap" align="center">
+                <!-- <div class="product">
+                        <div class="img_product">
+                                <img id="642433382984" onclick="copyToClipBoard(this)"
+                                        src="https://img.alicdn.com/bao/uploaded/i2/3533997285/O1CN01CQ0mKv23ga0iBjdtu_!!0-item_pic.jpg">
+                        </div>
+                        <div class="detail">
+                                <a href="https://detail.tmall.com/item.htm?id=642433382984" target="_blank">ST005</a>
+                                <a href="https://sycm.taobao.com/cc/item_archives?activeKey=flow&itemId=642433382984"
+                                        target="_blank">商品360</a>
+                                <a href="https://sell.publish.tmall.com/tmall/publish.htm?id=642433382984"
+                                        target="_blank">编辑</a>
+                        </div>
+                </div> -->
+
+        </div>
+
+</body>
+<script type="text/javascript">
+        window.onload = function () {
+                for (let index = 0; index < data.length; index++) {
+                        const element = data[index];
+                        p_id = element.id
+                        p_code = element.code
+                        var div_product = document.createElement("div")
+
+                        div_product.setAttribute("class", "product")
+
+                        // 图
+                        var img = document.createElement("img")
+                        img.setAttribute("id", p_id)
+                        img.setAttribute("alt", p_code)
+                        img.setAttribute("onclick", "copyToClipBoard(this)")
+                        img.setAttribute("ondblclick", "copyToClipBoardWithCode(this)")
+                        img_url = element.img+"_430x430q90.jpg"
+                        img.setAttribute("src", img_url)
+                        var div_img = document.createElement("div")
+                        div_img.setAttribute("class", "img_product")
+                        div_img.appendChild(img)
+
+                        div_product.appendChild(div_img)
+
+                        // 链接
+                        var div_detail = document.createElement("div")
+                        div_detail.setAttribute("class", "detail")
+                        var a1 = document.createElement("a")
+                        a1.setAttribute("target", "_blank")
+                        a1.setAttribute("href", "https://detail.tmall.com/item.htm?id=" + p_id)
+                        a1.innerText = element.code
+                        var a2 = document.createElement("a")
+                        a2.setAttribute("target", "_blank")
+                        a2.setAttribute("href", "https://sycm.taobao.com/cc/item_archives?activeKey=flow&dateType=day&itemId=" + p_id)
+                        a2.innerText = "商品360"
+                        var a3 = document.createElement("a")
+                        a3.setAttribute("target", "_blank")
+                        a3.setAttribute("href", "https://myseller.taobao.com/home.htm/SellManage/all?current=1&pageSize=20&queryItemId=" + p_id)
+                        a3.innerText = "编辑"
+                        // 新加标题
+                        // var a4 = document.createElement("a")
+                        // a4.setAttribute("target", "_blank")
+                        // a4.setAttribute("href", "https://sycm.taobao.com/cc/item_archives?activeKey=title&dateType=recent30&itemId=" + p_id)
+                        // a4.innerText = "标题"
+                        div_detail.appendChild(a1)
+                        div_detail.appendChild(a2)
+                        div_detail.appendChild(a3)
+                        // div_detail.appendChild(a4)
+                        div_product.appendChild(div_detail)
+
+                        var container = document.getElementById('wrap');
+                        container.appendChild(div_product);
+                }
+        };
+        function copyToClipBoard(obj) {
+                const input = document.createElement('input');
+                document.body.appendChild(input);
+                input.setAttribute('value', obj.id);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+        };
+        function copyToClipBoardWithCode(obj) {
+                const input = document.createElement('input');
+                document.body.appendChild(input);
+                input.setAttribute('value', obj.alt);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+        };
+        //长按并松开只触发一次(点击Home到店铺主页)
+        document.onkeyup = keyboard;
+        function keyboard(eve) {
+                if (eve.key == "Home") {
+                        window.open("https://yuyanvzhuang.world.tmall.com/search.htm?scene=taobao_shop&search=y&orderType=newOn_desc&tsearch=y");
+                }
+	}
+	document.onkeyup = keyboard;
+
+        data = [{"id":"723848507111","code":"Y3033","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01OJyPWL1wmoG7bLuO2_!!2215741276351.jpg"},{"id":"723847983402","code":"Y3019","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01E8VSPf1wmoGHaBxzo_!!2215741276351.jpg"},{"id":"723846775997","code":"Y5001","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01FQTxek1wmoGHuqh1W_!!2215741276351.jpg"},{"id":"723667110535","code":"Y1058","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01UGXOXy1wmoGHurA5W_!!2215741276351.jpg"},{"id":"723666194412","code":"Y1060","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01jeygDj1wmoGKE0CjZ_!!2215741276351.jpg"},{"id":"723320202028","code":"Y3013","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01BKUhRJ1wmoGFk7cLD_!!2215741276351.jpg"},{"id":"723319710248","code":"Y3016","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN014Lw2Ln1wmoGDhWGJ4_!!2215741276351.jpg"},{"id":"723161725534","code":"YXD","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN019PrGtV1wmoGIf0JUK_!!2215741276351.jpg"},{"id":"723161097826","code":"Y5023","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01k5MGLX1wmoGN6F4i0_!!2215741276351.jpg"},{"id":"723106562182","code":"Y1061","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01fxChm01wmoGDhV3Uh_!!2215741276351.jpg"},{"id":"722948365255","code":"Y3021","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN015omWsL1wmoGKkNjEm_!!2215741276351.jpg"},{"id":"722944757401","code":"Y6002","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN018Qsqgy1wmoGBno4sp_!!2215741276351.jpg"},{"id":"722943273980","code":"Y05086","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01fvUYeS1wmoGMHnTuj_!!2215741276351.jpg"},{"id":"722939328188","code":"Y3020","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01j90oxN1wmoGFk9Qah_!!2215741276351.jpg"},{"id":"722939120088","code":"Y2051","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01g8nfjk1wmoGLCOIWK_!!2215741276351.jpg"},{"id":"722723644558","code":"Y5089","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01rsSZy61wmoGHO54cD_!!2215741276351.jpg"},{"id":"722559573409","code":"Y06021","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01XRfbuH1wmoGJhYnDs_!!2215741276351.jpg"},{"id":"722511912655","code":"Y5088","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN013QDlN61wmoGCKT7Ql_!!2215741276351.jpg"},{"id":"722191111833","code":"Y5090","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01rGVPOO1wmoGHukmdx_!!2215741276351.jpg"},{"id":"722187839923","code":"Y5091","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01yMAs721wmoG7bEn6q_!!2215741276351.jpg"},{"id":"722061879711","code":"Y06020","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01rU3DkW1wmoGG2Xmc7_!!2215741276351.jpg"},{"id":"722039071652","code":"Y3039","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN016usp1y1wmoGG2WuY2_!!2215741276351.jpg"},{"id":"722000294051","code":"Y6005","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01qmu0Ik1wmoGFmG0ZI_!!2215741276351.jpg"},{"id":"721855701745","code":"Y5060","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01ZvoQcH1wmoGD1GwVm_!!2215741276351.jpg"},{"id":"721852970877","code":"Y3038","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01omol3G1wmoGG2XBBB_!!2215741276351.jpg"},{"id":"721842365882","code":"Y05026","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01DQoXgL1wmoGFmCSCM_!!2215741276351.jpg"},{"id":"721839438682","code":"Y08017","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01DtmR651wmoGHO6DIs_!!2215741276351.jpg"},{"id":"721635252598","code":"Y5078","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN010M2mLw1wmoGN6F8rv_!!2215741276351.jpg"},{"id":"721622732794","code":"Y5055","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01xhwxVW1wmoGJBJG3f_!!2215741276351.jpg"},{"id":"721608328373","code":"Y06023","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01IJnBpl1wmoGJhaXJT_!!2215741276351.jpg"},{"id":"721606204959","code":"Y06022","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01j7dPFn1wmoGIVBOPI_!!2215741276351.jpg"},{"id":"721449964857","code":"Y3030","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01w91Dee1wmoGGYy3M8_!!2215741276351.jpg"},{"id":"721447436296","code":"Y06019","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01hUHAmA1wmoGKkO8BT_!!2215741276351.jpg"},{"id":"721441236279","code":"Y08001","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01XnvwGy1wmoGHO4CZr_!!2215741276351.jpg"},{"id":"720651983268","code":"Y5011","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN014n5KFE1wmoGDXfCUk_!!2215741276351.jpg"},{"id":"720642675151","code":"Y5020","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN015q5oft1wmoGEE0QTw_!!2215741276351.jpg"},{"id":"720491522838","code":"Y9003","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01KrZ87S1wmoGJhbH5T_!!2215741276351.jpg"},{"id":"720487334023","code":"Y1037","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01Tvm6li1wmoGGImWkB_!!2215741276351.jpg"},{"id":"720099060485","code":"Y3018","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01jSzE3n1wmoGMo8v9q_!!2215741276351.jpg"},{"id":"720081588421","code":"Y3022","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN015m3VY01wmoGNcbBSf_!!2215741276351.jpg"},{"id":"719988958183","code":"Y5056","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01B3GyPy1wmoGJBIBXN_!!2215741276351.jpg"},{"id":"719966926049","code":"Y5019","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01LXqUCs1wmoGBnqUXL_!!2215741276351.jpg"},{"id":"719881636561","code":"Y7001","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN012m5q0Y1wmoGDhVFzU_!!2215741276351.jpg"},{"id":"719790793785","code":"Y8007","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01074Ibf1wmoGG2YWK2_!!2215741276351.jpg"},{"id":"719728031634","code":"Y3015","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01ZEBU5z1wmoGD1H4oJ_!!2215741276351.jpg"},{"id":"719651085070","code":"Y3008","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01lbqNid1wmoGJ8eQUq_!!0-item_pic.jpg"},{"id":"719581523732","code":"Y3003","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01EvgyWC1wmoGH3eZvl_!!2215741276351.jpg"},{"id":"719543774498","code":"Y5003","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01g0eeum1wmoGD1FjfX_!!2215741276351.jpg"},{"id":"719536578485","code":"Y3010","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01i3zBMw1wmoGDhUvC7_!!2215741276351.jpg"},{"id":"719477855973","code":"Y5005","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN0182tedZ1wmoGBnpt8L_!!2215741276351.jpg"},{"id":"719385426348","code":"Y02001","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01BLahvv1wmoG74n6tl_!!2215741276351.jpg"},{"id":"719384284707","code":"Y1059","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01w7FwP41wmoGFmCvIn_!!2215741276351.jpg"},{"id":"719283502625","code":"Y3026","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN0101Rd1u1wmoGJhYOKd_!!2215741276351.jpg"},{"id":"719270658945","code":"Y06017","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01y2zZnb1wmoGIVDTJe_!!2215741276351.jpg"},{"id":"719117749230","code":"Y6018","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01zNCyZN1wmoGN6FkJO_!!2215741276351.jpg"},{"id":"719013903383","code":"Y1006","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01oaPGrS1wmoGFmFjwq_!!2215741276351.jpg"},{"id":"718978674452","code":"Y3031","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01nrj0S11wmoGLCNUcV_!!2215741276351.jpg"},{"id":"718793805320","code":"Y1026","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01Yhlcsy1wmoGJBImwn_!!2215741276351.jpg"},{"id":"718775037579","code":"Y3001","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01a6hrGX1wmoGDhVeuw_!!2215741276351.jpg"},{"id":"718754309149","code":"Y9002","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN015r91081wmoGKDqbgg_!!2215741276351.jpg"},{"id":"718647993202","code":"Y01030","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01Lp4i6u1wmoGHa5JqN_!!2215741276351.jpg"},{"id":"718520336054","code":"Y03029","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01kBYSSp1wmoGJ1SGYT_!!2215741276351.jpg"},{"id":"718477615834","code":"Y8009X","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01lbHais1wmoGFmDzqY_!!2215741276351.jpg"},{"id":"718398628727","code":"Y5079","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01SlW14d1wmoGHuh1nw_!!2215741276351.jpg"},{"id":"718116354766","code":"Y5039","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01gLM0ZK1wmoGHa5edT_!!2215741276351.jpg"},{"id":"718106937568","code":"Y1008X","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01Pclgph1wmoGNGwZAH_!!0-item_pic.jpg"},{"id":"717970341516","code":"Y8002","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01LIpwtE1wmoGMoACA7_!!2215741276351.jpg"},{"id":"717964209246","code":"Y5035","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01kxsPsb1wmoGEDzQ7E_!!2215741276351.jpg"},{"id":"717954535331","code":"Y5057","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01y9Esfg1wmoGKkLmcp_!!2215741276351.jpg"},{"id":"717946579858","code":"Y8003","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01SpEXju1wmoGDhV7ew_!!2215741276351.jpg"},{"id":"717764773883","code":"Y5002","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01zGp4yf1wmoGFmCmzq_!!2215741276351.jpg"},{"id":"717757205518","code":"Y5025","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01B1bEiW1wmoGLGdOMU_!!2215741276351.jpg"},{"id":"717521988504","code":"Y5009","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01dAUIkx1wmoGG2YvFc_!!2215741276351.jpg"},{"id":"717384607644","code":"Y1028","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01i8UxXC1wmoG74pj3A_!!2215741276351.jpg"},{"id":"717335348228","code":"Y5071","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01VpYj8k1wmoGN6ECgX_!!2215741276351.jpg"},{"id":"717191018041","code":"Y1029","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01QrtK581wmoGH3eiEi_!!2215741276351.jpg"},{"id":"717150451219","code":"Y5021","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01BIibef1wmoGLCQNS1_!!2215741276351.jpg"},{"id":"716785869432","code":"Y3012","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01a77Mzh1wmoGMHnoiQ_!!2215741276351.jpg"},{"id":"716725278524","code":"Y9001","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN019aI08q1wmoGFmCzSg_!!2215741276351.jpg"},{"id":"715318482266","code":"Y1020","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01ptNYLi1wmoGG2YvGD_!!2215741276351.jpg"},{"id":"715312583520","code":"Y8005","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01ecXWwK1wmoGH3cyB4_!!2215741276351.jpg"},{"id":"715304347092","code":"Y1007","img":"https://img.alicdn.com/bao/uploaded/i2/2215741276351/O1CN01jGGBOH1wmoGG2ZSVS_!!2215741276351.jpg"},{"id":"715298239690","code":"Y8010","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01B7MW9Q1wmoGHO4jph_!!2215741276351.jpg"},{"id":"715119761401","code":"Y5033","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01ouxhPe1wmoGBnrMdn_!!2215741276351.jpg"},{"id":"715115138200","code":"Y1019","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01PbpsUP1wmoGJBIzQi_!!2215741276351.jpg"},{"id":"715108055640","code":"Y5008","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN01OmhdnQ1wmoGN6ETJa_!!2215741276351.jpg"},{"id":"715103419674","code":"Y1008","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01ZMXpy31wmoGHYrw0W_!!0-item_pic.jpg"},{"id":"714713581042","code":"Y5018","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN011n8ccl1wmoGG2XFLp_!!2215741276351.jpg"},{"id":"714677248147","code":"Y5022","img":"https://img.alicdn.com/bao/uploaded/i4/2215741276351/O1CN01yluKpY1wmoGBnr5za_!!2215741276351.jpg"},{"id":"714475744455","code":"Y5065","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN014ZO0Br1wmoGG2ZBsn_!!2215741276351.jpg"},{"id":"714458340682","code":"Y8001","img":"https://img.alicdn.com/bao/uploaded/i3/2215741276351/O1CN018r17g01wmoGJBHz45_!!2215741276351.jpg"},{"id":"714439848249","code":"Y8009","img":"https://img.alicdn.com/bao/uploaded/i1/2215741276351/O1CN01kco09F1wmoGDhVnEp_!!2215741276351.jpg"}]
+	</script>
+<style>
+        * {
+                padding: 0;
+                margin: 0;
+        }
+
+        body {
+                padding: 0 0 10px 0;
+        }
+
+        #wrap {
+                min-width: 1260px;
+                font-size: 10;
+        }
+
+        img {
+                width: 200px;
+                height: 200px;
+        }
+
+        .product {
+                display: inline-block;
+                padding: 10px 5px 0 5px;
+        }
+
+        .detail {
+                display: flex;
+                justify-content: space-around;
+        }
+
+        a {
+                font-size: 16px;
+                text-decoration: none;
+        }
+
+
+        a:visited {
+                color: #0000FF;
+        }
+
+        /* .a1 {
+        float: left;
+    }
+    .a2 {
+        float: right;
+    } */
+
+        /* 最小宽度 imgW 200 + padingLR 10 *6 = 1280 */
+        /* .img_product {
+    display: table;
+} */
+</style>
+
+</html>

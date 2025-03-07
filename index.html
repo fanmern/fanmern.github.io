@@ -18,22 +18,18 @@
         <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 </body>
 <script type="text/javascript">
-        fmrData = []
         fetch('./fmr.json')
                 .then(response => response.json())
                 .then(data => {
-                        console.log("1")
-                        fmrData = data
-                        // 在这里处理数据并更新页面
+                        loadUIElement(data)
                 })
                 .catch(error => {
                         console.error('Error loading JSON:', error);
                 });
-        console.log("1")
-        console.log(fmrData)
-        window.onload = function () {
-                for (let index = 0; index < fmrData.length; index++) {
-                        const element = fmrData[index];
+
+        function loadUIElement(data) {
+                for (let index = 0; index < data.length; index++) {
+                        const element = data[index];
                         p_id = element.id
                         p_code = element.code
                         var div_product = document.createElement("div")
@@ -138,7 +134,8 @@
                         var container = document.getElementById('wrap');
                         container.appendChild(div_product);
                 }
-        };
+        }
+
         function copyToClipBoard(obj) {
                 const input = document.createElement('input');
                 document.body.appendChild(input);

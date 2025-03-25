@@ -113,6 +113,7 @@
                         var div_detail = document.createElement("div")
                         div_detail.setAttribute("class", "detail")
                         var a1 = document.createElement("a")
+                        a1.setAttribute("class", "a1")
                         a1.setAttribute("target", "_blank")
                         a1.setAttribute("href", "https://detail.tmall.com/item.htm?id=" + p_id)
                         a1.innerText = element.code
@@ -193,6 +194,10 @@
         .detail {
                 display: flex;
                 justify-content: space-around;
+        }
+
+        .a1 {
+                width: 80;
         }
 
         a {

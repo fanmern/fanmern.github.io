@@ -18,7 +18,7 @@
         <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 </body>
 <script type="text/javascript">
-        fetch('./dl.json')
+        fetch('./xyj.json')
                 .then(response => response.json())
                 .then(data => {
                         loadUIElement(data)
@@ -43,7 +43,7 @@
                         img.setAttribute("alt", p_code)
                         img.setAttribute("onclick", "copyToClipBoard(this)")
                         img.setAttribute("ondblclick", "copyToClipBoardWithCode(this)")
-                        img_url = element.img
+                        img_url = element.img + "_430x430q90.jpg"
                         img.setAttribute("src", img_url)
                         var div_img = document.createElement("div")
                         div_img.setAttribute("class", "img_product")

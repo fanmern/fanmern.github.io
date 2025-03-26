@@ -49,7 +49,11 @@
                         div_img.setAttribute("class", "img_product")
                         div_img.appendChild(img)
 
-
+                        // 透明的idCode
+                        var p_container_id = document.createElement("p")
+                        p_container_id.setAttribute("class", "p_container_id")
+                        p_container_id.textContent = p_id
+                        div_product.appendChild(p_container_id)
 
                         //begin
 
@@ -160,7 +164,7 @@
                 }
         }
         document.onkeyup = keyboard;
-        
+
 
 </script>
 <style>
@@ -182,6 +186,16 @@
                 display: inline-block;
                 position: relative;
                 padding: 10px 5px 0 5px;
+        }
+
+        .p_container_id {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color:transparent;
+                font-size: 16px;
+                z-index: 2;
         }
 
         .img-container {

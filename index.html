@@ -18,7 +18,7 @@
         <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 </body>
 <script type="text/javascript">
-        fetch('./fmr.json')
+        fetch('https://fanmern.com/fmr.json')
                 .then(response => response.json())
                 .then(data => {
                         loadUIElement(data)
@@ -32,6 +32,7 @@
                         const element = data[index];
                         p_id = element.id
                         p_code = element.code
+                        p_node = element.node
                         var div_product = document.createElement("div")
 
                         div_product.setAttribute("class", "product")
@@ -61,13 +62,14 @@
                         const qrButton = document.createElement('button');
                         qrButton.classList.add('qr-button');
                         qrButton.setAttribute("id", p_id)
-                        qrButton.innerHTML = '<img src="https://img.alicdn.com/imgextra/i3/O1CN01CkZbKp27arsx4ktdK_!!6000000007814-2-tps-96-96.png" alt="二维码按钮" class="button-icon">';
+                        qrButton.innerHTML = '<img src="https://img.alicdn.com/imgextra/i2/3533997285/O1CN01g1xrZY23gaRXCPS5R_!!3533997285.png" alt="类目按钮" class="button-icon">';
                         div_img.appendChild(qrButton);
 
                         // 创建二维码容器
-                        const qrCodeContainer = document.createElement('div');
+                        const qrCodeContainer = document.createElement('p');
                         qrCodeContainer.classList.add('qr-code', 'right'); // 二维码显示在按钮右侧
                         qrCodeContainer.id = `qr-code-${index}`; // 为每个二维码容器设置唯一 ID
+                        qrCodeContainer.innerText = p_node
                         div_img.appendChild(qrCodeContainer);
 
                         // 将图片容器添加到图片列表
@@ -83,18 +85,19 @@
                         qrButton.addEventListener('mouseenter', () => {
                                 // 设置 1 秒的延迟
                                 timeoutId = setTimeout(() => {
-                                        if (!qrCode) {
-                                                // 如果二维码未生成，则生成二维码
-                                                qrCode = new QRCode(qrCodeContainer, {
-                                                        width: 128,     // 二维码宽度
-                                                        height: 128,    // 二维码高度
-                                                        colorDark: '#000000', // 二维码深色部分颜色
-                                                        colorLight: '#ffffff', // 二维码浅色部分颜色
-                                                        correctLevel: QRCode.CorrectLevel.H // 容错级别（L, M, Q, H）
-                                                });
-                                        }
+                                        
+                                        // if (!qrCode) {
+                                        //         // 如果二维码未生成，则生成二维码
+                                        //         qrCode = new QRCode(qrCodeContainer, {
+                                        //                 width: 128,     // 二维码宽度
+                                        //                 height: 128,    // 二维码高度
+                                        //                 colorDark: '#000000', // 二维码深色部分颜色
+                                        //                 colorLight: '#ffffff', // 二维码浅色部分颜色
+                                        //                 correctLevel: QRCode.CorrectLevel.H // 容错级别（L, M, Q, H）
+                                        //         });
+                                        // }
 
-                                        qrCode.makeCode('https://h5.m.taobao.com/awp/core/detail.htm?id=' + qrButton.id); // 二维码内容
+                                        // qrCode.makeCode('https://h5.m.taobao.com/awp/core/detail.htm?id=' + qrButton.id); // 二维码内容
                                         // 显示二维码
                                         qrCodeContainer.classList.add('visible');
                                 }, 300); // 1 秒延迟
@@ -156,6 +159,7 @@
                 document.execCommand('copy');
                 document.body.removeChild(input);
         };
+
         //长按并松开只触发一次(点击Home到店铺主页)
         document.onkeyup = keyboard;
         function keyboard(eve) {

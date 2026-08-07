@@ -14,6 +14,15 @@
 <body>
         <div id="wrap" align="center">
         </div>
+        <!-- Ctrl+F 搜索定位浮层：匹配到的商品卡片会播放动画并滚动到视野中央 -->
+        <div id="search-overlay" class="search-overlay" style="display:none;">
+                <div id="search-field-toggle" class="search-field-toggle">
+                        <button type="button" class="toggle-btn active" data-field="code">编码</button>
+                        <button type="button" class="toggle-btn" data-field="id">ID</button>
+                </div>
+                <input id="search-input" type="text" placeholder="搜索编码…" autocomplete="off" spellcheck="false" />
+                <span id="search-count" class="search-count"></span>
+        </div>
         <!-- 引入 QRCode.js 库 -->
         <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 </body>
@@ -28,120 +37,227 @@
                 });
 
         function loadUIElement(data) {
-                for (let index = 0; index < data.length; index++) {
-                        const element = data[index];
-                        p_id = element.id
-                        p_code = element.code
-                        p_node = element.node
-                        var div_product = document.createElement("div")
+    for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        p_id = element.id
+        p_code = element.code
+        p_node = element.node
+        var div_product = document.createElement("div")
+        div_product.setAttribute("class", "product")
+        // 记录商品信息，供页内 Ctrl+F 搜索定位使用
+        div_product.setAttribute("data-id", p_id)
+        div_product.setAttribute("data-code", p_code)
+        div_product.setAttribute("data-node", p_node)
 
-                        div_product.setAttribute("class", "product")
+        // ★ 隐藏的 id：Ctrl+F 可以搜到，但页面上不可见、不占布局（放在卡片内，可滚动定位）
+        var hiddenId = document.createElement("span");
+        hiddenId.setAttribute("class", "hidden-id");
+        hiddenId.textContent = p_id;
+        div_product.appendChild(hiddenId);
 
-                        // 图
-                        var img = document.createElement("img")
-                        img.setAttribute("class", "img-container")
-                        img.setAttribute("id", p_id)
-                        img.setAttribute("alt", p_code)
-                        img.setAttribute("onclick", "copyToClipBoard(this)")
-                        img.setAttribute("ondblclick", "copyToClipBoardWithCode(this)")
-                        img_url = element.img + "_430x430q90.jpg"
-                        img.setAttribute("src", img_url)
-                        var div_img = document.createElement("div")
-                        div_img.setAttribute("class", "img_product")
-                        div_img.appendChild(img)
+        // 图
+        var img = document.createElement("img")
+        img.setAttribute("class", "img-container")
+        img.setAttribute("id", p_id)
+        img.setAttribute("alt", p_code)
+        img.setAttribute("onclick", "copyToClipBoard(this)")
+        img.setAttribute("ondblclick", "copyToClipBoardWithCode(this)")
+        img_url = element.img + "_430x430q90.jpg"
+        img.setAttribute("src", img_url)
+        var div_img = document.createElement("div")
+        div_img.setAttribute("class", "img_product")
+        div_img.appendChild(img)
 
-                        // 透明的idCode
-                        // var p_container_id = document.createElement("p")
-                        // p_container_id.setAttribute("class", "p_container_id")
-                        // p_container_id.textContent = p_id
-                        // div_product.appendChild(p_container_id)
+        // 创建二维码按钮（悬停弹出商品二维码）
+        const qrButton = document.createElement('button');
+        qrButton.classList.add('qr-button');
+        qrButton.setAttribute("id", p_id)
+        qrButton.innerHTML = '<img src="https://img.alicdn.com/imgextra/i3/O1CN01CkZbKp27arsx4ktdK_!!6000000007814-2-tps-96-96.png" alt="二维码" class="button-icon">';
+        div_img.appendChild(qrButton);
 
-                        //begin
+        // 创建二维码容器（悬停时在容器内生成并弹出二维码）
+        const qrCodeContainer = document.createElement('div');
+        qrCodeContainer.classList.add('qr-code', 'right');
+        qrCodeContainer.id = `qr-code-${index}`;
+        div_img.appendChild(qrCodeContainer);
 
-                        // 创建二维码按钮
-                        const qrButton = document.createElement('button');
-                        qrButton.classList.add('qr-button');
-                        qrButton.setAttribute("id", p_id)
-                        qrButton.innerHTML = '<img src="https://img.alicdn.com/imgextra/i2/3533997285/O1CN01g1xrZY23gaRXCPS5R_!!3533997285.png" alt="类目按钮" class="button-icon">';
-                        div_img.appendChild(qrButton);
+        div_product.appendChild(div_img);
 
-                        // 创建二维码容器
-                        const qrCodeContainer = document.createElement('p');
-                        qrCodeContainer.classList.add('qr-code', 'right'); // 二维码显示在按钮右侧
-                        qrCodeContainer.id = `qr-code-${index}`; // 为每个二维码容器设置唯一 ID
-                        qrCodeContainer.innerText = p_node
-                        div_img.appendChild(qrCodeContainer);
+        let qrCode = null;
+        let timeoutId = null;
 
-                        // 将图片容器添加到图片列表
-                        div_product.appendChild(div_img);
+        qrButton.addEventListener('mouseenter', () => {
+            timeoutId = setTimeout(() => {
+                if (!qrCode) {
+                    // 首次悬停才生成二维码，内容为商品天猫详情页链接
+                    qrCode = new QRCode(qrCodeContainer, {
+                        text: 'https://detail.tmall.com/item.htm?id=' + p_id,
+                        width: 160,
+                        height: 160,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+                qrCodeContainer.classList.add('visible');
+            }, 300);
+        });
 
-                        // 初始化二维码
-                        let qrCode = null;
+        qrButton.addEventListener('mouseleave', () => {
+            clearTimeout(timeoutId);
+            qrCodeContainer.classList.remove('visible');
+        });
 
-                        // 用于存储 setTimeout 的 ID
-                        let timeoutId = null;
+        // 创建类目按钮（悬停弹出类目名称），与右侧二维码按钮对称
+        const catButton = document.createElement('button');
+        catButton.classList.add('cat-button');
+        catButton.innerHTML = '<img src="https://img.alicdn.com/imgextra/i2/3533997285/O1CN01g1xrZY23gaRXCPS5R_!!3533997285.png" alt="类目" class="button-icon">';
+        div_img.appendChild(catButton);
 
-                        // 鼠标进入按钮时触发
-                        qrButton.addEventListener('mouseenter', () => {
-                                // 设置 1 秒的延迟
-                                timeoutId = setTimeout(() => {
-                                        
-                                        // if (!qrCode) {
-                                        //         // 如果二维码未生成，则生成二维码
-                                        //         qrCode = new QRCode(qrCodeContainer, {
-                                        //                 width: 128,     // 二维码宽度
-                                        //                 height: 128,    // 二维码高度
-                                        //                 colorDark: '#000000', // 二维码深色部分颜色
-                                        //                 colorLight: '#ffffff', // 二维码浅色部分颜色
-                                        //                 correctLevel: QRCode.CorrectLevel.H // 容错级别（L, M, Q, H）
-                                        //         });
-                                        // }
+        // 类目弹出容器
+        const catCodeContainer = document.createElement('div');
+        catCodeContainer.classList.add('qr-code', 'left');
+        catCodeContainer.innerText = p_node;
+        div_img.appendChild(catCodeContainer);
 
-                                        // qrCode.makeCode('https://h5.m.taobao.com/awp/core/detail.htm?id=' + qrButton.id); // 二维码内容
-                                        // 显示二维码
-                                        qrCodeContainer.classList.add('visible');
-                                }, 300); // 1 秒延迟
-                        });
+        let catTimeoutId = null;
+        catButton.addEventListener('mouseenter', () => {
+            catTimeoutId = setTimeout(() => {
+                catCodeContainer.classList.add('visible');
+            }, 300);
+        });
 
-                        // 鼠标离开按钮时触发
-                        qrButton.addEventListener('mouseleave', () => {
-                                // 清除延迟
-                                clearTimeout(timeoutId);
+        catButton.addEventListener('mouseleave', () => {
+            clearTimeout(catTimeoutId);
+            catCodeContainer.classList.remove('visible');
+        });
 
-                                // 隐藏二维码
-                                qrCodeContainer.classList.remove('visible');
-                        });
+        // 链接
+        var div_detail = document.createElement("div")
+        div_detail.setAttribute("class", "detail")
+        var a1 = document.createElement("a")
+        a1.setAttribute("target", "_blank")
+        a1.setAttribute("href", "https://detail.tmall.com/item.htm?id=" + p_id)
+        a1.innerText = element.code
+        var a2 = document.createElement("a")
+        a2.setAttribute("target", "_blank")
+        a2.setAttribute("href", "https://sycm.taobao.com/cc/item_archives?activeKey=flow&dateType=day&itemId=" + p_id)
+        a2.innerText = "商品360"
+        var a3 = document.createElement("a")
+        a3.setAttribute("target", "_blank")
+        a3.setAttribute("href", "https://myseller.taobao.com/home.htm/SellManage/all?current=1&pageSize=20&queryItemId=" + p_id)
+        a3.innerText = "编辑"
 
-                        // end
+        div_detail.appendChild(a1)
+        div_detail.appendChild(a2)
+        div_detail.appendChild(a3)
+        div_product.appendChild(div_detail)
 
-                        // div_product.appendChild(div_img)
+        var container = document.getElementById('wrap');
+        container.appendChild(div_product);
+    }
+}
 
-                        // 链接
-                        var div_detail = document.createElement("div")
-                        div_detail.setAttribute("class", "detail")
-                        var a1 = document.createElement("a")
-                        a1.setAttribute("target", "_blank")
-                        a1.setAttribute("href", "https://detail.tmall.com/item.htm?id=" + p_id)
-                        a1.innerText = element.code
-                        var a2 = document.createElement("a")
-                        a2.setAttribute("target", "_blank")
-                        a2.setAttribute("href", "https://sycm.taobao.com/cc/item_archives?activeKey=flow&dateType=day&itemId=" + p_id)
-                        a2.innerText = "商品360"
-                        var a3 = document.createElement("a")
-                        a3.setAttribute("target", "_blank")
-                        a3.setAttribute("href", "https://myseller.taobao.com/home.htm/SellManage/all?current=1&pageSize=20&queryItemId=" + p_id)
-                        a3.innerText = "编辑"
+        // ============ 页内查找：Ctrl+F / Cmd+F 打开，命中的商品卡片播放动画并滚动到中央 ============
+        var searchOverlay = document.getElementById('search-overlay');
+        var searchInput = document.getElementById('search-input');
+        var searchCount = document.getElementById('search-count');
+        var matchList = [];
+        var currentMatchIndex = -1;
+        var searchField = 'code'; // 默认按编码搜索，可切换为按 id 搜索
 
-                        div_detail.appendChild(a1)
-                        div_detail.appendChild(a2)
-                        div_detail.appendChild(a3)
-                        // div_detail.appendChild(a4)
-                        div_product.appendChild(div_detail)
+        document.addEventListener('keydown', function (eve) {
+                if ((eve.ctrlKey || eve.metaKey) && (eve.key === 'f' || eve.key === 'F')) {
+                        eve.preventDefault();
+                        openSearch();
+                } else if (eve.key === 'Escape') {
+                        closeSearch();
+                }
+        });
 
-                        var container = document.getElementById('wrap');
-                        container.appendChild(div_product);
+        function openSearch() {
+                if (searchOverlay.style.display === 'flex') { searchInput.select(); return; }
+                searchOverlay.style.display = 'flex';
+                searchInput.value = '';
+                searchCount.textContent = '';
+                matchList = [];
+                currentMatchIndex = -1;
+                clearHighlights();
+                searchInput.focus();
+        }
+
+        function closeSearch() {
+                searchOverlay.style.display = 'none';
+                searchInput.value = '';
+                searchCount.textContent = '';
+                matchList = [];
+                currentMatchIndex = -1;
+                clearHighlights();
+        }
+
+        function allCards() {
+                return Array.prototype.slice.call(document.querySelectorAll('.product'));
+        }
+
+        function doSearch() {
+                var q = searchInput.value.trim();
+                clearHighlights();
+                if (!q) {
+                        searchCount.textContent = '';
+                        matchList = [];
+                        currentMatchIndex = -1;
+                        return;
+                }
+                var ql = q.toLowerCase();
+                var attr = searchField === 'code' ? 'data-code' : 'data-id';
+                matchList = allCards().filter(function (card) {
+                        var text = (card.getAttribute(attr) || '').toLowerCase();
+                        return text.indexOf(ql) !== -1;
+                });
+                if (matchList.length > 0) {
+                        currentMatchIndex = 0;
+                        highlightCurrent();
+                } else {
+                        searchCount.textContent = '无匹配';
+                        currentMatchIndex = -1;
                 }
         }
+
+        function highlightCurrent() {
+                if (currentMatchIndex < 0 || currentMatchIndex >= matchList.length) return;
+                matchList.forEach(function (c) { c.classList.remove('found'); });
+                var card = matchList[currentMatchIndex];
+                void card.offsetWidth; // 强制重排，确保每次都能重放动画
+                card.classList.add('found');
+                searchCount.textContent = (currentMatchIndex + 1) + ' / ' + matchList.length;
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function clearHighlights() {
+                allCards().forEach(function (c) { c.classList.remove('found'); });
+        }
+
+        searchInput.addEventListener('input', doSearch);
+        searchInput.addEventListener('keydown', function (eve) {
+                if (eve.key === 'Enter') {
+                        eve.preventDefault();
+                        if (matchList.length > 0) {
+                                currentMatchIndex = (currentMatchIndex + 1) % matchList.length;
+                                highlightCurrent();
+                        }
+                }
+        });
+
+        // 编码 / ID 搜索模式切换
+        document.getElementById('search-field-toggle').addEventListener('click', function (eve) {
+                if (eve.target.classList.contains('toggle-btn')) {
+                        document.querySelectorAll('.toggle-btn').forEach(function (b) { b.classList.remove('active'); });
+                        eve.target.classList.add('active');
+                        searchField = eve.target.getAttribute('data-field');
+                        searchInput.placeholder = (searchField === 'code') ? '搜索编码…' : '搜索 ID…';
+                        doSearch();
+                }
+        });
 
         function copyToClipBoard(obj) {
                 const input = document.createElement('input');
@@ -190,6 +306,99 @@
                 display: inline-block;
                 position: relative;
                 padding: 10px 5px 0 5px;
+        }
+
+        /* 隐藏的 id：Ctrl+F 可搜到，但页面上不可见、不占布局 */
+        .hidden-id {
+                display: block;
+                height: 0;
+                margin: 0;
+                padding: 0;
+                font-size: 0;
+                line-height: 0;
+                color: transparent;
+        }
+
+        /* 页内查找搜索浮层 */
+        .search-overlay {
+                position: fixed;
+                top: 14px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px;
+                background: rgba(105, 105, 105, 0.88);
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                border-radius: 10px;
+                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+                font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        .search-overlay input {
+                border: none;
+                outline: none;
+                font-size: 14px;
+                width: 240px;
+                height: 30px;
+                box-sizing: border-box;
+                padding: 0 10px; /* 与切换按钮同高 */
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.15);
+                color: #fff;
+        }
+        .search-overlay input::placeholder {
+                color: rgba(255, 255, 255, 0.55);
+        }
+        .search-count {
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.75);
+                white-space: nowrap;
+                min-width: 44px;
+                text-align: center;
+        }
+
+        /* 编码 / ID 切换按钮 */
+        .search-field-toggle {
+                display: flex;
+                align-items: center;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 8px;
+                overflow: hidden;
+                background: rgba(255, 255, 255, 0.15);
+        }
+        .toggle-btn {
+                border: none;
+                background: transparent;
+                padding: 0 12px;
+                font-size: 13px;
+                height: 30px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: rgba(255, 255, 255, 0.85);
+                transition: background 0.15s, color 0.15s;
+        }
+        .toggle-btn.active {
+                background: #ff4d4f;
+                color: #fff;
+        }
+
+        /* 命中的商品卡片：脉冲动画 + 圆角半透明高亮环，明确指示是哪一张 */
+        .product.found {
+                border-radius: 12px;
+                animation: foundPulse 1s ease;
+                box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.45), 0 8px 30px rgba(255, 77, 79, 0.25);
+                background: rgba(255, 77, 79, 0.06);
+        }
+        @keyframes foundPulse {
+                0%   { transform: scale(1); }
+                30%  { transform: scale(1.06); }
+                60%  { transform: scale(0.97); }
+                100% { transform: scale(1); }
         }
 
         /* .p_container_id {
@@ -245,6 +454,17 @@
                 padding: 0;
         }
 
+        /* 类目按钮（与二维码按钮对称，位于图片左上角） */
+        .cat-button {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+        }
+
         /* 按钮图标 */
         .button-icon {
                 width: 30px;
@@ -269,6 +489,12 @@
                 right: 20%;
                 /* transform: translate(10px, -50%); */
                 /* 调整间距 */
+        }
+
+        /* 类目显示在左侧按钮旁 */
+        .qr-code.left {
+                top: 20%;
+                left: 20%;
         }
 
         /* 显示二维码 */

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel / CSV 合并工具 · 静态版</title>
+    <!-- 使用 SheetJS (XLSX) 社区版处理 Excel 和 CSV -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f5f9fe;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            max-width: 720px;
+            width: 100%;
+            padding: 32px 30px 40px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 20, 60, 0.12);
+            transition: 0.2s;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 6px;
+            color: #0b1e3a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .subhead {
+            color: #4a5b74;
+            margin-top: -2px;
+            margin-bottom: 28px;
+            font-size: 15px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            background: #f0f6ff;
+            border-radius: 0 12px 12px 0;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .drop-zone {
+            border: 2px dashed #b9cef0;
+            background: #fafcff;
+            border-radius: 20px;
+            padding: 36px 20px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .drop-zone:hover {
+            background: #f2f8ff;
+            border-color: #6b9bf5;
+        }
+        .drop-zone.dragover {
+            background: #e6f0ff;
+            border-color: #2b6ed7;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+        .drop-zone-icon {
+            font-size: 44px;
+            margin-bottom: 8px;
+            display: block;
+            color: #2b6ed7;
+        }
+        .drop-zone-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1a2d4c;
+        }
+        .drop-zone-hint {
+            font-size: 14px;
+            color: #5b6f8c;
+            margin-top: 6px;
+        }
+        .file-list {
+            background: #f8fafd;
+            border-radius: 16px;
+            padding: 8px 12px;
+            margin-bottom: 24px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e3ecf7;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 6px;
+            border-bottom: 1px solid #e9eff6;
+            font-size: 14px;
+        }
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        .file-item .name {
+            font-weight: 500;
+            color: #14273e;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+        .file-item .size {
+            color: #4d6a8f;
+            font-size: 13px;
+        }
+        .file-item .remove-btn {
+            background: none;
+            border: none;
+            color: #9aabc0;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 6px;
+            transition: 0.15s;
+        }
+        .file-item .remove-btn:hover {
+            color: #c43e3e;
+            transform: scale(1.1);
+        }
+        .actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #cfddee;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 15px;
+            color: #1a2d4c;
+            cursor: pointer;
+            transition: 0.15s;
+            flex: 1 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #f5f9ff;
+        }
+        .btn-primary {
+            background: #1e4f8a;
+            border: 1px solid #1a3f6e;
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 79, 138, 0.2);
+        }
+        .btn-primary:hover {
+            background: #17407a;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(30, 79, 138, 0.25);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(0.4);
+            box-shadow: none;
+        }
+        .btn-secondary {
+            background: #ecf3fc;
+            border-color: #c2d6f0;
+        }
+        .btn-secondary:hover {
+            background: #dfeaff;
+        }
+        .btn-success {
+            background: #1f7b4d;
+            border-color: #16633d;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #186a41;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 14px 18px;
+            border-radius: 18px;
+            background: #f3f8ff;
+            border-left: 6px solid #3b82f6;
+            font-size: 14px;
+            color: #1b3452;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .status.success {
+            border-left-color: #21a663;
+            background: #f0f9f4;
+        }
+        .status.error {
+            border-left-color: #d45a5a;
+            background: #fff5f5;
+        }
+        .status .info-badge {
+            background: #dce7fc;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a3f6e;
+        }
+        .status .info-badge.green {
+            background: #c5ebd8;
+            color: #125a34;
+        }
+        .hidden-input {
+            display: none;
+        }
+        .footer {
+            margin-top: 22px;
+            font-size: 13px;
+            color: #6b7f9c;
+            text-align: center;
+            border-top: 1px solid #e2ebf6;
+            padding-top: 18px;
+        }
+        .footer a {
+            color: #1e4f8a;
+            text-decoration: none;
+        }
+        .pill {
+            background: #dce5f2;
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" role="main">
+    <h1>
+        <span>📁 文件合并</span>
+        <span class="pill" style="font-size:14px; background:#dbeafe;">.xls .xlsx .csv</span>
+    </h1>
+    <div class="subhead">
+        ⚡ 上传多个 Excel 或 CSV 文件，合并为一个表格，并自动添加「来源文件名」列
+    </div>
+
+    <!-- 拖拽区域 + 点击上传 -->
+    <div class="drop-zone" id="dropZone">
+        <span class="drop-zone-icon">📤</span>
+        <div class="drop-zone-text">拖拽文件到这里，或点击选择</div>
+        <div class="drop-zone-hint">支持 .xls, .xlsx, .csv (最多同时20个)</div>
+        <input type="file" id="fileInput" class="hidden-input" accept=".xls,.xlsx,.csv" multiple>
+    </div>
+
+    <!-- 已选文件列表 -->
+    <div id="fileListContainer" class="file-list" style="display: none;">
+        <!-- 动态渲染 -->
+    </div>
+
+    <!-- 操作按钮组 -->
+    <div class="actions">
+        <button class="btn btn-secondary" id="clearBtn" type="button">🗑️ 清空列表</button>
+        <button class="btn btn-primary" id="mergeBtn" type="button" disabled>⚡ 合并所有文件</button>
+        <button class="btn btn-success" id="downloadBtn" type="button" disabled>⬇️ 下载合并结果</button>
+    </div>
+
+    <!-- 状态 / 信息 -->
+    <div id="statusArea" class="status">
+        <span>📌 状态</span>
+        <span style="font-weight:400; color:#2c4a70;">等待添加文件</span>
+        <span class="info-badge" id="fileCounter">0 个文件</span>
+    </div>
+
+    <div class="footer">
+        💡 每个文件读取第一个 sheet (Excel) · 合并后添加「来源文件名」列 · 全部在浏览器端完成
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 核心状态 ----------
+        let fileList = [];              // 存储 File 对象
+        let mergedWorkbook = null;      // 暂存合并后的 workbook (用于下载)
+        let mergedFileName = '合并数据';  // 基础名称，下载时会附加时间戳
+
+        // DOM 元素
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusArea = document.getElementById('statusArea');
+        const fileCounter = document.getElementById('fileCounter');
+
+        // ---------- 辅助函数 ----------
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        // 生成带时间戳的文件名: 合并数据20260807110245.xlsx
+        function generateTimestampedFilename() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+            return `合并数据${timestamp}.xlsx`;
+        }
+
+        // 更新状态显示
+        function updateStatus(message, type = 'info', extra = '') {
+            const statusDiv = statusArea;
+            // 清除所有额外的类
+            statusDiv.classList.remove('success', 'error');
+            if (type === 'success') statusDiv.classList.add('success');
+            if (type === 'error') statusDiv.classList.add('error');
+
+            // 保留第一个 span (图标) 和 第二个 span (主信息) 和 badge
+            const spans = statusDiv.querySelectorAll('span');
+            if (spans.length >= 2) {
+                spans[1].textContent = message;
+            }
+            if (extra && spans.length >= 3) {
+                spans[2].textContent = extra;
+            } else if (spans.length >= 3 && !extra) {
+                spans[2].textContent = fileCounter.textContent; 
+            }
+            // 更新计数
+            fileCounter.textContent = `${fileList.length} 个文件`;
+        }
+
+        // 渲染文件列表
+        function renderFileList() {
+            const container = fileListContainer;
+            if (fileList.length === 0) {
+                container.style.display = 'none';
+                container.innerHTML = '';
+                mergeBtn.disabled = true;
+                downloadBtn.disabled = true;
+                updateStatus('等待添加文件', 'info');
+                return;
+            }
+
+            container.style.display = 'block';
+            let html = '';
+            fileList.forEach((file, index) => {
+                const name = file.name;
+                const size = formatFileSize(file.size);
+                html += `
+                    <div class="file-item">
+                        <span class="name" title="${name}">📄 ${name}</span>
+                        <span class="size">${size}</span>
+                        <button class="remove-btn" data-index="${index}" title="移除文件">✕</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // 给移除按钮绑定事件 (委托)
+            container.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const idx = parseInt(this.dataset.index, 10);
+                    if (!isNaN(idx) && idx >= 0 && idx < fileList.length) {
+                        fileList.splice(idx, 1);
+                        renderFileList();
+                        // 清除合并缓存
+                        mergedWorkbook = null;
+                        downloadBtn.disabled = true;
+                        updateStatus(`已移除文件，当前 ${fileList.length} 个`, 'info');
+                    }
+                });
+            });
+
+            mergeBtn.disabled = false;
+            downloadBtn.disabled = true;   // 合并前不可下载
+            fileCounter.textContent = `${fileList.length} 个文件`;
+            updateStatus(`已加载 ${fileList.length} 个文件，点击合并`, 'info');
+        }
+
+        // ---------- 文件读取合并核心 (使用 SheetJS) ----------
+        async function performMerge() {
+            if (fileList.length === 0) {
+                updateStatus('没有文件可合并', 'error');
+                return;
+            }
+
+            // 禁用合并按钮防止重复点击
+            mergeBtn.disabled = true;
+            mergeBtn.textContent = '⏳ 合并中...';
+            updateStatus('正在读取并合并文件...', 'info');
+
+            const allData = [];        // 存放每个文件的数据 (数组对象)
+            let successCount = 0;
+
+            try {
+                for (let i = 0; i < fileList.length; i++) {
+                    const file = fileList[i];
+                    const fileName = file.name;
+                    // 获取文件扩展名 (小写)
+                    const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        let workbook = null;
+
+                        // 根据扩展名选择读取方式：csv 或 xls/xlsx
+                        if (ext === 'csv') {
+                            // CSV 处理: 将 arrayBuffer 转为字符串，尝试多种编码
+                            let csvText = '';
+                            // 尝试 utf-8
+                            try {
+                                const decoder = new TextDecoder('utf-8');
+                                csvText = decoder.decode(arrayBuffer);
+                            } catch (_) {
+                                // 若失败，尝试 gbk
+                                try {
+                                    const decoder = new TextDecoder('gbk');
+                                    csvText = decoder.decode(arrayBuffer);
+                                } catch (__) {
+                                    // 最后尝试 gb2312
+                                    const decoder = new TextDecoder('gb2312');
+                                    csvText = decoder.decode(arrayBuffer);
+                                }
+                            }
+                            // 使用 SheetJS 解析 CSV 字符串
+                            workbook = XLSX.read(csvText, { type: 'string', raw: true });
+                        } else {
+                            // Excel (xls, xlsx) 直接读取
+                            workbook = XLSX.read(arrayBuffer, { type: 'array', raw: true });
+                        }
+
+                        // 获取第一个 sheet
+                        const firstSheetName = workbook.SheetNames[0];
+                        if (!firstSheetName) {
+                            console.warn(`文件 ${fileName} 没有 sheet，跳过`);
+                            continue;
+                        }
+                        const sheet = workbook.Sheets[firstSheetName];
+                        // 转为对象数组 (包含表头)
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                        if (jsonData.length === 0) {
+                            console.warn(`文件 ${fileName} 为空，跳过`);
+                            continue;
+                        }
+
+                        // 添加「来源文件名」(不含扩展名)
+                        const baseName = fileName.includes('.') ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
+                        const enrichedData = jsonData.map(row => {
+                            // 复制行，添加新字段
+                            return { ...row, '来源文件名': baseName };
+                        });
+
+                        allData.push(...enrichedData);
+                        successCount++;
+                    } catch (err) {
+                        console.error(`读取文件 ${fileName} 失败:`, err);
+                        // 继续处理其他文件
+                    }
+                }
+
+                if (allData.length === 0) {
+                    updateStatus('合并失败：没有读取到任何有效数据', 'error');
+                    mergeBtn.disabled = false;
+                    mergeBtn.textContent = '⚡ 合并所有文件';
+                    return;
+                }
+
+                // 构建新的 workbook
+                const newWorkbook = XLSX.utils.book_new();
+                const newSheet = XLSX.utils.json_to_sheet(allData);
+                XLSX.utils.book_append_sheet(newWorkbook, newSheet, '合并数据');
+
+                // 保存到全局
+                mergedWorkbook = newWorkbook;
+
+                // 启用下载按钮
+                downloadBtn.disabled = false;
+                mergeBtn.textContent = '✅ 合并完成';
+                updateStatus(`合并成功！共 ${allData.length} 行数据，来自 ${successCount} 个文件`, 'success', `${allData.length} 行`);
+                // 将状态里的badge更新
+                const badge = statusArea.querySelector('.info-badge');
+                if (badge) badge.textContent = `${allData.length} 行`;
+
+                // 合并完成后可以重新启用合并按钮 (但保留为完成状态)
+                mergeBtn.disabled = false;
+                // 但此时如果用户再点合并，会重新合并，所以保留功能
+                // 修改合并按钮文字，但保留功能
+                mergeBtn.textContent = '🔄 重新合并';
+
+            } catch (err) {
+                console.error('合并过程异常:', err);
+                updateStatus('合并异常: ' + err.message, 'error');
+                mergeBtn.disabled = false;
+                mergeBtn.textContent = '⚡ 合并所有文件';
+                mergedWorkbook = null;
+                downloadBtn.disabled = true;
+            }
+        }
+
+        // ---------- 下载合并文件 (带时间戳) ----------
+        function downloadMerged() {
+            if (!mergedWorkbook) {
+                updateStatus('请先合并文件', 'error');
+                return;
+            }
+            try {
+                // 生成带时间戳的文件名
+                const filename = generateTimestampedFilename();
+
+                // 生成 Excel 文件 (xlsx)
+                const wbout = XLSX.write(mergedWorkbook, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+                updateStatus(`下载已开始 ✅ (${filename})`, 'success', `${mergedWorkbook.Sheets['合并数据'] ? XLSX.utils.sheet_to_json(mergedWorkbook.Sheets['合并数据']).length : 0} 行`);
+            } catch (e) {
+                updateStatus('下载失败: ' + e.message, 'error');
+            }
+        }
+
+        // ---------- 事件绑定 ----------
+        // 点击上传
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            // 限制最多20个
+            const newFiles = Array.from(files).slice(0, 20);
+            // 过滤扩展名
+            const validExts = ['xls', 'xlsx', 'csv'];
+            const validFiles = newFiles.filter(f => {
+                const ext = f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : '';
+                return validExts.includes(ext);
+            });
+            if (validFiles.length === 0) {
+                updateStatus('未选择支持的格式 (.xls, .xlsx, .csv)', 'error');
+                return;
+            }
+            // 合并到 fileList (去重基于名称和大小简单去重)
+            const existingNames = new Set(fileList.map(f => f.name + f.size));
+            for (const f of validFiles) {
+                const key = f.name + f.size;
+                if (!existingNames.has(key)) {
+                    fileList.push(f);
+                    existingNames.add(key);
+                }
+            }
+            renderFileList();
+            // 重置合并缓存
+            mergedWorkbook = null;
+            downloadBtn.disabled = true;
+            // 重置文件input，允许重复选择同一个文件
+            fileInput.value = '';
+            updateStatus(`已添加 ${validFiles.length} 个文件`, 'info');
+        });
+
+        // 拖拽事件
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const items = e.dataTransfer.files;
+            if (items.length === 0) return;
+            const validExts = ['xls', 'xlsx', 'csv'];
+            const files = Array.from(items).slice(0, 20).filter(f => {
+                const ext = f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : '';
+                return validExts.includes(ext);
+            });
+            if (files.length === 0) {
+                updateStatus('拖入的文件格式不支持', 'error');
+                return;
+            }
+            const existingNames = new Set(fileList.map(f => f.name + f.size));
+            for (const f of files) {
+                const key = f.name + f.size;
+                if (!existingNames.has(key)) {
+                    fileList.push(f);
+                    existingNames.add(key);
+                }
+            }
+            renderFileList();
+            mergedWorkbook = null;
+            downloadBtn.disabled = true;
+            updateStatus(`拖入 ${files.length} 个文件`, 'info');
+        });
+
+        // 清空列表
+        clearBtn.addEventListener('click', () => {
+            if (fileList.length === 0) return;
+            fileList = [];
+            mergedWorkbook = null;
+            downloadBtn.disabled = true;
+            renderFileList();
+            updateStatus('已清空所有文件', 'info');
+        });
+
+        // 合并按钮
+        mergeBtn.addEventListener('click', performMerge);
+
+        // 下载按钮
+        downloadBtn.addEventListener('click', downloadMerged);
+
+        // 初始化状态
+        renderFileList();
+    })();
+</script>
+</body>
+</html>

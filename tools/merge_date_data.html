@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据聚合 · 按商品ID + 日期区间汇总</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f5f9fe;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            max-width: 920px;
+            width: 100%;
+            padding: 32px 30px 40px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 20, 60, 0.12);
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 6px;
+            color: #0b1e3a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .subhead {
+            color: #4a5b74;
+            margin-top: -2px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            background: #f0f6ff;
+            border-radius: 0 12px 12px 0;
+            line-height: 1.5;
+            padding: 12px 16px;
+        }
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 18px;
+            background: #f8fafd;
+            padding: 18px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e3ecf7;
+            align-items: flex-end;
+        }
+        .control-item {
+            flex: 1 0 130px;
+            min-width: 110px;
+        }
+        .control-item label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f3a62;
+            margin-bottom: 3px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .control-item input,
+        .control-item select {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 12px;
+            border: 1px solid #cdddee;
+            background: white;
+            font-size: 14px;
+            transition: 0.15s;
+            color: #0b1f3b;
+        }
+        .control-item input:focus,
+        .control-item select:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .control-item input[type="date"] {
+            padding: 8px 10px;
+        }
+        .drop-zone {
+            border: 2px dashed #b9cef0;
+            background: #fafcff;
+            border-radius: 20px;
+            padding: 28px 20px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 18px;
+        }
+        .drop-zone:hover {
+            background: #f2f8ff;
+            border-color: #6b9bf5;
+        }
+        .drop-zone.dragover {
+            background: #e6f0ff;
+            border-color: #2b6ed7;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+        .drop-zone-icon {
+            font-size: 34px;
+            display: block;
+            color: #2b6ed7;
+            margin-bottom: 2px;
+        }
+        .drop-zone-text {
+            font-weight: 500;
+            color: #1a2d4c;
+        }
+        .drop-zone-hint {
+            font-size: 13px;
+            color: #5b6f8c;
+        }
+        .file-info {
+            background: #ecf3fc;
+            border-radius: 30px;
+            padding: 6px 18px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a3f7a;
+            margin-top: 6px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 14px 0 12px;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #cfddee;
+            padding: 11px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #1a2d4c;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f5f9ff;
+            flex: 1 0 auto;
+            justify-content: center;
+        }
+        .btn-primary {
+            background: #1e4f8a;
+            border-color: #1a3f6e;
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 79, 138, 0.18);
+        }
+        .btn-primary:hover {
+            background: #17407a;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+        .btn-secondary {
+            background: #ecf3fc;
+            border-color: #c2d6f0;
+        }
+        .btn-secondary:hover {
+            background: #dfeaff;
+        }
+        .btn-success {
+            background: #1f7b4d;
+            border-color: #16633d;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #186a41;
+        }
+        .btn-success:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+        .btn-danger {
+            background: #f0e6e6;
+            border-color: #dbb8b8;
+            color: #8a3a3a;
+        }
+        .btn-danger:hover {
+            background: #e8d4d4;
+        }
+        .btn-warning {
+            background: #fdf6e3;
+            border-color: #e8d5a0;
+            color: #7a6200;
+        }
+        .btn-warning:hover {
+            background: #fcf0d0;
+        }
+        .status {
+            margin-top: 16px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            background: #f3f8ff;
+            border-left: 6px solid #3b82f6;
+            font-size: 14px;
+            color: #1b3452;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .status.success {
+            border-left-color: #21a663;
+            background: #f0f9f4;
+        }
+        .status.error {
+            border-left-color: #d45a5a;
+            background: #fff5f5;
+        }
+        .status .badge {
+            background: #dce7fc;
+            padding: 3px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a3f6e;
+        }
+        .preview-wrap {
+            margin-top: 18px;
+            border-radius: 16px;
+            border: 1px solid #e3ecf7;
+            overflow: auto;
+            max-height: 340px;
+            background: #fafcff;
+        }
+        .preview-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .preview-wrap th {
+            background: #ecf3fc;
+            color: #14273e;
+            font-weight: 600;
+            padding: 9px 12px;
+            text-align: left;
+            border-bottom: 2px solid #cdddee;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            white-space: nowrap;
+        }
+        .preview-wrap td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #e9eff6;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .preview-wrap tr:hover td {
+            background: #f2f8ff;
+        }
+        .hidden-input {
+            display: none;
+        }
+        .footer {
+            margin-top: 22px;
+            font-size: 13px;
+            color: #6b7f9c;
+            text-align: center;
+            border-top: 1px solid #e2ebf6;
+            padding-top: 16px;
+        }
+        .pill {
+            background: #dce5f2;
+            border-radius: 30px;
+            padding: 2px 14px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .debug-toggle {
+            cursor: pointer;
+            color: #3b82f6;
+            font-size: 13px;
+            text-decoration: underline dotted;
+        }
+        .debug-panel {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: #1a1a2e;
+            color: #a8d8ea;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow: auto;
+            display: none;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .debug-panel.show {
+            display: block;
+        }
+        @media (max-width: 500px) {
+            .control-item {
+                flex: 1 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>
+            <span>📊 区间聚合工具</span>
+            <span class="pill" style="background:#dbeafe;">按商品ID + 日期区间</span>
+        </h1>
+        <div class="subhead">
+            🔹 根据「商品ID」和「日期区间」汇总数据 · 数值列求和 · 文本列去重（保留首次出现）
+            <span class="debug-toggle" id="debugToggle">🐞 调试模式</span>
+        </div>
+
+        <!-- 配置区 -->
+        <div class="control-group">
+            <div class="control-item">
+                <label for="idColSelect">🆔 商品ID列</label>
+                <select id="idColSelect">
+                    <option value="">— 请先上传文件 —</option>
+                </select>
+            </div>
+            <div class="control-item">
+                <label for="dateColSelect">📅 日期列</label>
+                <select id="dateColSelect">
+                    <option value="">— 请先上传文件 —</option>
+                </select>
+            </div>
+            <div class="control-item">
+                <label for="dateStart">📆 开始日期</label>
+                <input type="date" id="dateStart">
+            </div>
+            <div class="control-item">
+                <label for="dateEnd">📆 结束日期</label>
+                <input type="date" id="dateEnd">
+            </div>
+            <div class="control-item" style="flex: 0 0 auto; min-width: auto;">
+                <button class="btn btn-secondary" id="detectColsBtn" type="button" disabled>🔍 识别列</button>
+            </div>
+        </div>
+
+        <!-- 上传区 -->
+        <div class="drop-zone" id="dropZone">
+            <span class="drop-zone-icon">📂</span>
+            <div class="drop-zone-text">拖拽文件到这里，或点击选择</div>
+            <div class="drop-zone-hint">支持 .csv .xlsx .xls · 自动识别编码</div>
+            <input type="file" id="fileInput" class="hidden-input" accept=".csv,.xlsx,.xls">
+            <div id="fileInfo" class="file-info" style="display: none;">未加载</div>
+        </div>
+
+        <!-- 操作 -->
+        <div class="actions">
+            <button class="btn btn-primary" id="aggregateBtn" disabled>⚡ 执行区间聚合</button>
+            <button class="btn btn-success" id="downloadBtn" disabled>⬇️ 下载结果 XLSX</button>
+            <button class="btn btn-danger" id="clearBtn" type="button">🗑️ 清空</button>
+            <button class="btn btn-warning" id="debugBtn" type="button" style="display:none;">🔍 检查数据</button>
+        </div>
+
+        <!-- 状态 -->
+        <div id="statusArea" class="status">
+            <span>📌 状态</span>
+            <span style="font-weight:400; color:#2c4a70;">等待上传文件</span>
+            <span class="badge" id="rowCounter">0 行</span>
+        </div>
+
+        <!-- 调试面板 -->
+        <div id="debugPanel" class="debug-panel"></div>
+
+        <!-- 预览 -->
+        <div id="previewContainer" class="preview-wrap" style="display: none;">
+            <table id="previewTable">
+                <thead id="previewHead"></thead>
+                <tbody id="previewBody"></tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            💡 选择日期区间后，工具会汇总该区间内所有日期的数据 · 按商品ID分组 · 下载为 XLSX 格式
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 状态 ----------
+            let rawData = [];
+            let headers = [];
+            let aggregatedData = [];
+            let currentFileName = '';
+            let debugMode = false;
+
+            // DOM
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const idColSelect = document.getElementById('idColSelect');
+            const dateColSelect = document.getElementById('dateColSelect');
+            const dateStart = document.getElementById('dateStart');
+            const dateEnd = document.getElementById('dateEnd');
+            const detectColsBtn = document.getElementById('detectColsBtn');
+            const aggregateBtn = document.getElementById('aggregateBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const debugBtn = document.getElementById('debugBtn');
+            const statusArea = document.getElementById('statusArea');
+            const rowCounter = document.getElementById('rowCounter');
+            const previewContainer = document.getElementById('previewContainer');
+            const previewHead = document.getElementById('previewHead');
+            const previewBody = document.getElementById('previewBody');
+            const debugPanel = document.getElementById('debugPanel');
+            const debugToggle = document.getElementById('debugToggle');
+
+            // ---------- 辅助 ----------
+            function updateStatus(msg, type = 'info', extra = '') {
+                statusArea.classList.remove('success', 'error');
+                if (type === 'success') statusArea.classList.add('success');
+                if (type === 'error') statusArea.classList.add('error');
+                const spans = statusArea.querySelectorAll('span');
+                if (spans.length >= 2) spans[1].textContent = msg;
+                if (extra && spans.length >= 3) spans[2].textContent = extra;
+                else if (spans.length >= 3 && !extra) spans[2].textContent = rowCounter.textContent;
+            }
+
+            function updateRowCount(count) {
+                rowCounter.textContent = `${count} 行`;
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            function debugLog(msg) {
+                if (debugMode) {
+                    debugPanel.textContent += msg + '\n';
+                    debugPanel.scrollTop = debugPanel.scrollHeight;
+                }
+            }
+
+            function clearDebug() {
+                debugPanel.textContent = '';
+            }
+
+            // 渲染预览
+            function renderPreview(data, headerList, maxRows = 100) {
+                if (!data || data.length === 0 || !headerList || headerList.length === 0) {
+                    previewContainer.style.display = 'none';
+                    return;
+                }
+                previewContainer.style.display = 'block';
+                let theadHtml = '<tr>';
+                for (let h of headerList) {
+                    theadHtml += `<th>${escapeHtml(h)}</th>`;
+                }
+                theadHtml += '</tr>';
+                previewHead.innerHTML = theadHtml;
+
+                let tbodyHtml = '';
+                const limit = Math.min(data.length, maxRows);
+                for (let i = 0; i < limit; i++) {
+                    const row = data[i];
+                    tbodyHtml += '<tr>';
+                    for (let h of headerList) {
+                        let val = row[h] !== undefined && row[h] !== null ? String(row[h]) : '';
+                        tbodyHtml += `<td title="${escapeHtml(val)}">${escapeHtml(val)}</td>`;
+                    }
+                    tbodyHtml += '</tr>';
+                }
+                if (data.length > maxRows) {
+                    tbodyHtml +=
+                        `<tr><td colspan="${headerList.length}" style="text-align:center;color:#6b7f9c;font-style:italic;">... 仅显示前 ${maxRows} 行 ...</td></tr>`;
+                }
+                previewBody.innerHTML = tbodyHtml;
+            }
+
+            // 检测列类型
+            function detectColumnTypes(data, headers) {
+                const typeMap = {};
+                for (let h of headers) typeMap[h] = 'text';
+                if (!data || data.length === 0) return typeMap;
+
+                for (let h of headers) {
+                    let numericCount = 0;
+                    let totalCount = 0;
+                    for (const row of data) {
+                        const val = row[h];
+                        if (val !== undefined && val !== null && val !== '') {
+                            totalCount++;
+                            const num = parseFloat(String(val).replace(/,/g, ''));
+                            if (!isNaN(num)) {
+                                numericCount++;
+                            }
+                        }
+                    }
+                    if (totalCount > 0 && numericCount / totalCount >= 0.3) {
+                        typeMap[h] = 'number';
+                    }
+                }
+                return typeMap;
+            }
+
+            // 解析日期
+            function parseDate(val) {
+                if (!val) return null;
+                const str = String(val).trim();
+                if (str === '') return null;
+
+                let d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    if (d.getFullYear() > 1900 && d.getFullYear() < 2100) {
+                        return d;
+                    }
+                }
+
+                let parts = str.split(/[-/]/);
+                if (parts.length === 3) {
+                    const y = parseInt(parts[0]);
+                    const m = parseInt(parts[1]) - 1;
+                    const day = parseInt(parts[2]);
+                    if (!isNaN(y) && !isNaN(m) && !isNaN(day) && y > 1900 && y < 2100) {
+                        d = new Date(y, m, day);
+                        if (!isNaN(d.getTime())) return d;
+                    }
+                }
+
+                parts = str.split(/[/.]/);
+                if (parts.length === 3) {
+                    let y = parseInt(parts[2]);
+                    let m = parseInt(parts[0]) - 1;
+                    let day = parseInt(parts[1]);
+                    if (!isNaN(y) && !isNaN(m) && !isNaN(day) && y > 1900 && y < 2100) {
+                        d = new Date(y, m, day);
+                        if (!isNaN(d.getTime())) return d;
+                    }
+                    y = parseInt(parts[2]);
+                    m = parseInt(parts[1]) - 1;
+                    day = parseInt(parts[0]);
+                    if (!isNaN(y) && !isNaN(m) && !isNaN(day) && y > 1900 && y < 2100) {
+                        d = new Date(y, m, day);
+                        if (!isNaN(d.getTime())) return d;
+                    }
+                }
+
+                const num = parseFloat(str.replace(/,/g, ''));
+                if (!isNaN(num) && num > 1000 && num < 50000) {
+                    const excelEpoch = new Date(1899, 11, 30);
+                    d = new Date(excelEpoch.getTime() + num * 86400000);
+                    if (!isNaN(d.getTime()) && d.getFullYear() > 1900 && d.getFullYear() < 2100) {
+                        return d;
+                    }
+                }
+
+                return null;
+            }
+
+            function formatDate(d) {
+                if (!d || isNaN(d.getTime())) return '';
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
+
+            function getDateSamples(dateCol) {
+                const samples = [];
+                for (const row of rawData) {
+                    const val = row[dateCol];
+                    if (val !== undefined && val !== null && val !== '') {
+                        samples.push(String(val));
+                        if (samples.length >= 5) break;
+                    }
+                }
+                return samples;
+            }
+
+            // ---------- 核心聚合 ----------
+            function performAggregation(idCol, dateCol, startDate, endDate) {
+                if (!idCol || !dateCol) {
+                    updateStatus('请选择商品ID列和日期列', 'error');
+                    return;
+                }
+                if (!startDate || !endDate) {
+                    updateStatus('请选择日期区间', 'error');
+                    return;
+                }
+                if (rawData.length === 0) {
+                    updateStatus('没有数据，请上传文件', 'error');
+                    return;
+                }
+
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    updateStatus('日期格式无效', 'error');
+                    return;
+                }
+                if (start > end) {
+                    updateStatus('开始日期不能晚于结束日期', 'error');
+                    return;
+                }
+
+                clearDebug();
+                debugLog(`=== 调试信息 ===`);
+                debugLog(`商品ID列: ${idCol}`);
+                debugLog(`日期列: ${dateCol}`);
+                debugLog(`日期区间: ${formatDate(start)} ~ ${formatDate(end)}`);
+                debugLog(`总数据行数: ${rawData.length}`);
+
+                const dateSamples = getDateSamples(dateCol);
+                debugLog(`日期列样例: ${JSON.stringify(dateSamples)}`);
+
+                const filtered = [];
+                const dateParseErrors = [];
+
+                for (let i = 0; i < rawData.length; i++) {
+                    const row = rawData[i];
+                    const dateVal = row[dateCol];
+                    if (dateVal === undefined || dateVal === null || dateVal === '') {
+                        dateParseErrors.push(`行 ${i+1}: 日期为空`);
+                        continue;
+                    }
+                    const d = parseDate(dateVal);
+                    if (!d) {
+                        dateParseErrors.push(`行 ${i+1}: 无法解析日期 "${String(dateVal)}"`);
+                        continue;
+                    }
+                    if (d >= start && d <= end) {
+                        filtered.push(row);
+                    }
+                }
+
+                debugLog(`日期解析错误数: ${dateParseErrors.length}`);
+                if (dateParseErrors.length > 0 && dateParseErrors.length <= 10) {
+                    debugLog(`日期解析错误样例: ${dateParseErrors.slice(0, 5).join('; ')}`);
+                }
+
+                debugLog(`区间内数据行数: ${filtered.length}`);
+
+                if (filtered.length === 0) {
+                    updateStatus(`在日期区间 ${formatDate(start)} ~ ${formatDate(end)} 内没有数据`, 'error');
+                    debugLog('❌ 没有数据在区间内！请检查日期列格式是否正确。');
+                    return;
+                }
+
+                const colTypes = detectColumnTypes(filtered, headers);
+                debugLog(`列类型检测: ${JSON.stringify(colTypes)}`);
+
+                const groupMap = new Map();
+                const groupKeys = [];
+
+                for (const row of filtered) {
+                    const idVal = row[idCol] !== undefined && row[idCol] !== null ? String(row[idCol]).trim() : '(空)';
+                    if (!groupMap.has(idVal)) {
+                        groupMap.set(idVal, { rows: [], id: idVal });
+                        groupKeys.push(idVal);
+                    }
+                    groupMap.get(idVal).rows.push(row);
+                }
+
+                debugLog(`分组数: ${groupKeys.length}`);
+
+                const result = [];
+                for (const key of groupKeys) {
+                    const group = groupMap.get(key);
+                    const rows = group.rows;
+                    const newRow = {};
+
+                    for (const col of headers) {
+                        if (col === idCol) {
+                            newRow[col] = group.id;
+                            continue;
+                        }
+                        if (col === dateCol) {
+                            newRow[col] = `${formatDate(start)} ~ ${formatDate(end)}`;
+                            continue;
+                        }
+
+                        const type = colTypes[col] || 'text';
+                        if (type === 'number') {
+                            let sum = 0;
+                            let hasVal = false;
+                            for (const r of rows) {
+                                const val = r[col];
+                                if (val !== undefined && val !== null && val !== '') {
+                                    const cleanVal = String(val).replace(/,/g, '');
+                                    const num = parseFloat(cleanVal);
+                                    if (!isNaN(num)) {
+                                        sum += num;
+                                        hasVal = true;
+                                    }
+                                }
+                            }
+                            newRow[col] = hasVal ? Math.round(sum * 100) / 100 : 0;
+                        } else {
+                            let firstVal = '';
+                            for (const r of rows) {
+                                const val = r[col];
+                                if (val !== undefined && val !== null && String(val).trim() !== '') {
+                                    firstVal = String(val).trim();
+                                    break;
+                                }
+                            }
+                            newRow[col] = firstVal;
+                        }
+                    }
+                    result.push(newRow);
+                }
+
+                aggregatedData = result;
+
+                const testId = '1000036373174';
+                const found = result.find(r => String(r[idCol]).trim() === testId);
+                if (found) {
+                    debugLog(`✅ 找到商品ID ${testId}:`);
+                    for (const col of headers) {
+                        if (colTypes[col] === 'number') {
+                            debugLog(`  ${col}: ${found[col]}`);
+                        }
+                    }
+                } else {
+                    debugLog(`⚠️ 未找到商品ID ${testId}，请检查ID列是否正确`);
+                    const sampleIds = groupKeys.slice(0, 10);
+                    debugLog(`商品ID样例: ${JSON.stringify(sampleIds)}`);
+                }
+
+                updateStatus(`✅ 聚合完成！区间 ${formatDate(start)} ~ ${formatDate(end)}，共 ${result.length} 组`, 'success',
+                    `${result.length} 组`);
+                downloadBtn.disabled = false;
+                renderPreview(result, headers);
+
+                if (debugMode) {
+                    debugPanel.classList.add('show');
+                }
+            }
+
+            // ---------- 下载 XLSX ----------
+            function downloadAggregated() {
+                if (aggregatedData.length === 0) {
+                    updateStatus('没有聚合数据可下载', 'error');
+                    return;
+                }
+
+                try {
+                    // 构建 workbook
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(aggregatedData);
+
+                    // 设置列宽（自适应）
+                    const colWidths = [];
+                    for (const h of headers) {
+                        let maxLen = h.length;
+                        for (const row of aggregatedData) {
+                            const val = row[h] !== undefined && row[h] !== null ? String(row[h]) : '';
+                            maxLen = Math.max(maxLen, val.length);
+                        }
+                        colWidths.push({ wch: Math.min(Math.max(maxLen + 4, 12), 30) });
+                    }
+                    ws['!cols'] = colWidths;
+
+                    XLSX.utils.book_append_sheet(wb, ws, '聚合结果');
+
+                    // 生成文件
+                    const filename = currentFileName ? `聚合_${currentFileName}.xlsx` : '聚合结果.xlsx';
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+
+                    updateStatus(`⬇️ 下载: ${filename}`, 'success');
+                } catch (err) {
+                    updateStatus('下载失败: ' + err.message, 'error');
+                }
+            }
+
+            // ---------- 加载文件 ----------
+            function loadFile(file) {
+                const reader = new FileReader();
+                const ext = file.name.split('.').pop().toLowerCase();
+
+                reader.onload = function(e) {
+                    try {
+                        let data = [];
+                        let headerList = [];
+                        let workbook = null;
+
+                        if (ext === 'csv') {
+                            let csvText = '';
+                            try {
+                                const decoder = new TextDecoder('utf-8');
+                                csvText = decoder.decode(e.target.result);
+                            } catch (_) {
+                                try {
+                                    const decoder = new TextDecoder('gbk');
+                                    csvText = decoder.decode(e.target.result);
+                                } catch (__) {
+                                    const decoder = new TextDecoder('gb2312');
+                                    csvText = decoder.decode(e.target.result);
+                                }
+                            }
+                            workbook = XLSX.read(csvText, { type: 'string', raw: true });
+                        } else {
+                            const arrayBuffer = e.target.result;
+                            workbook = XLSX.read(arrayBuffer, { type: 'array', raw: true });
+                        }
+
+                        const firstSheetName = workbook.SheetNames[0];
+                        if (!firstSheetName) {
+                            updateStatus('文件没有 sheet', 'error');
+                            return;
+                        }
+                        const sheet = workbook.Sheets[firstSheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                        if (jsonData.length === 0) {
+                            updateStatus('文件为空', 'error');
+                            return;
+                        }
+
+                        data = jsonData;
+                        headerList = Object.keys(data[0] || {});
+                        finishLoad(data, headerList, file.name);
+                    } catch (err) {
+                        updateStatus('文件解析失败: ' + err.message, 'error');
+                    }
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+
+            function finishLoad(data, headerList, fileName) {
+                if (data.length === 0 || headerList.length === 0) {
+                    updateStatus('文件为空或格式不正确', 'error');
+                    return;
+                }
+                rawData = data;
+                headers = headerList;
+                currentFileName = fileName.replace(/\.[^.]+$/, '');
+                fileInfo.textContent = `📄 ${fileName} (${data.length} 行)`;
+                fileInfo.style.display = 'inline-block';
+                updateStatus(`已加载 ${data.length} 行，请选择列和日期区间`, 'info', `${data.length} 行`);
+                updateRowCount(data.length);
+
+                idColSelect.innerHTML = '';
+                dateColSelect.innerHTML = '';
+                const defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = '— 请选择 —';
+                idColSelect.appendChild(defaultOpt.cloneNode(true));
+                dateColSelect.appendChild(defaultOpt.cloneNode(true));
+
+                for (const h of headerList) {
+                    const opt1 = document.createElement('option');
+                    opt1.value = h;
+                    opt1.textContent = h;
+                    idColSelect.appendChild(opt1);
+                    const opt2 = document.createElement('option');
+                    opt2.value = h;
+                    opt2.textContent = h;
+                    dateColSelect.appendChild(opt2);
+                }
+
+                detectColsBtn.disabled = false;
+                aggregateBtn.disabled = false;
+                debugBtn.style.display = 'inline-flex';
+                aggregatedData = [];
+                downloadBtn.disabled = true;
+                renderPreview(data, headerList);
+
+                let autoId = headerList.find(h => /id|商品|sku|编码|编号|产品|货号|item|product/i.test(h)) || '';
+                let autoDate = headerList.find(h => /日期|date|时间|day|日|created|下单/i.test(h)) || '';
+                if (autoId) idColSelect.value = autoId;
+                if (autoDate) dateColSelect.value = autoDate;
+
+                if (autoDate) {
+                    const dates = [];
+                    for (const row of data) {
+                        const d = parseDate(row[autoDate]);
+                        if (d) dates.push(d);
+                    }
+                    if (dates.length > 0) {
+                        const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+                        const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+                        dateStart.value = formatDate(minDate);
+                        dateEnd.value = formatDate(maxDate);
+                    }
+                }
+
+                if (autoId && autoDate) {
+                    updateStatus('已自动识别列和日期范围，可点击执行聚合', 'info');
+                } else {
+                    updateStatus('请手动选择商品ID列和日期列', 'info');
+                }
+
+                clearDebug();
+                debugPanel.classList.remove('show');
+            }
+
+            // ---------- 事件绑定 ----------
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault();
+                dropZone.classList.add('dragover'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const ext = files[0].name.split('.').pop().toLowerCase();
+                    if (['csv', 'xlsx', 'xls'].includes(ext)) {
+                        loadFile(files[0]);
+                    } else {
+                        updateStatus('请上传 .csv .xlsx .xls 文件', 'error');
+                    }
+                }
+            });
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    loadFile(e.target.files[0]);
+                }
+                fileInput.value = '';
+            });
+
+            detectColsBtn.addEventListener('click', () => {
+                if (headers.length === 0) return;
+                let autoId = headers.find(h => /id|商品|sku|编码|编号|产品|货号|item|product/i.test(h)) || '';
+                let autoDate = headers.find(h => /日期|date|时间|day|日|created|下单/i.test(h)) || '';
+                if (autoId) idColSelect.value = autoId;
+                if (autoDate) dateColSelect.value = autoDate;
+                updateStatus(autoId && autoDate ? '已识别列' : '部分列未识别，请手动选择', 'info');
+            });
+
+            debugToggle.addEventListener('click', () => {
+                debugMode = !debugMode;
+                debugToggle.textContent = debugMode ? '🐞 关闭调试' : '🐞 调试模式';
+                if (debugMode) {
+                    debugPanel.classList.add('show');
+                    debugPanel.textContent = '调试模式已开启，执行聚合后将显示详细信息...\n';
+                } else {
+                    debugPanel.classList.remove('show');
+                }
+            });
+
+            debugBtn.addEventListener('click', () => {
+                const idCol = idColSelect.value;
+                const dateCol = dateColSelect.value;
+                if (!idCol || !dateCol) {
+                    updateStatus('请先选择列', 'error');
+                    return;
+                }
+                const testId = '1000036373174';
+                const found = rawData.filter(r => String(r[idCol]).trim() === testId);
+                if (found.length > 0) {
+                    let msg = `找到 ${testId} 的 ${found.length} 条数据:\n`;
+                    for (const row of found) {
+                        msg += `  ${dateCol}: ${row[dateCol]}`;
+                        for (const h of headers) {
+                            const num = parseFloat(String(row[h]).replace(/,/g, ''));
+                            if (!isNaN(num) && num !== 0) {
+                                msg += `, ${h}: ${row[h]}`;
+                            }
+                        }
+                        msg += '\n';
+                    }
+                    alert(msg);
+                } else {
+                    alert(`未找到商品ID: ${testId}\n请确认列名是否正确。当前ID列: ${idCol}`);
+                }
+            });
+
+            aggregateBtn.addEventListener('click', () => {
+                const idCol = idColSelect.value;
+                const dateCol = dateColSelect.value;
+                const start = dateStart.value;
+                const end = dateEnd.value;
+                performAggregation(idCol, dateCol, start, end);
+            });
+
+            downloadBtn.addEventListener('click', downloadAggregated);
+
+            clearBtn.addEventListener('click', () => {
+                rawData = [];
+                headers = [];
+                aggregatedData = [];
+                currentFileName = '';
+                idColSelect.innerHTML = '<option value="">— 请先上传文件 —</option>';
+                dateColSelect.innerHTML = '<option value="">— 请先上传文件 —</option>';
+                dateStart.value = '';
+                dateEnd.value = '';
+                detectColsBtn.disabled = true;
+                aggregateBtn.disabled = true;
+                downloadBtn.disabled = true;
+                debugBtn.style.display = 'none';
+                fileInfo.style.display = 'none';
+                fileInfo.textContent = '未加载';
+                previewContainer.style.display = 'none';
+                updateStatus('已清空', 'info', '0 行');
+                updateRowCount(0);
+                clearDebug();
+                debugPanel.classList.remove('show');
+            });
+
+            // 初始化
+            updateStatus('等待上传文件', 'info', '0 行');
+        })();
+    </script>
+</body>
+</html>

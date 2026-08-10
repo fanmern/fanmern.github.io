@@ -47,7 +47,7 @@
 
         .card-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 24px;
             width: 100%;
         }
@@ -160,7 +160,7 @@
             opacity: 0.8;
         }
 
-        /* 卡片2 特殊颜色 */
+        /* 卡片2 特殊颜色 - 区间聚合 */
         .card-aggregate .icon-wrapper {
             background: linear-gradient(135deg, #059669, #047857);
             box-shadow: 0 12px 24px -8px rgba(5, 150, 105, 0.30);
@@ -180,8 +180,35 @@
             border-color: #6ee7b7;
         }
 
+        /* 卡片3 特殊颜色 - JSON 管理 */
+        .card-json .icon-wrapper {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            box-shadow: 0 12px 24px -8px rgba(124, 58, 237, 0.30);
+        }
+
+        .card-json .badge {
+            background: #f5f3ff;
+            border-color: #c4b5fd;
+            color: #5b21b6;
+        }
+
+        .card-json .enter-hint {
+            color: #7c3aed;
+        }
+
+        .card-json:hover {
+            border-color: #a78bfa;
+        }
+
         /* 响应式 */
-        @media (max-width: 720px) {
+        @media (max-width: 860px) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 560px) {
             .card-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -264,6 +291,26 @@
                     <span class="badge"><i>📊</i> .xlsx</span>
                     <span class="badge"><i>📋</i> .csv</span>
                     <span class="badge"><i>📅</i> 日期区间</span>
+                </div>
+
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- 工具3：JSON 数据管理 -->
+            <a href="tools/json_manager.html" class="nav-card card-json" title="在线管理 GitHub 上的 JSON 数据">
+                <div class="icon-wrapper">📄</div>
+                <h2 class="card-title">
+                    JSON 数据管理
+                    <span class="arrow-hint">→</span>
+                </h2>
+                <p class="card-desc">
+                    在线编辑 GitHub 仓库中的 JSON 文件，使用 Token 免密更新。
+                </p>
+
+                <div class="badge-group">
+                    <span class="badge"><i>📄</i> .json</span>
+                    <span class="badge"><i>🔑</i> Token 认证</span>
+                    <span class="badge"><i>☁️</i> GitHub</span>
                 </div>
 
                 <div class="enter-hint">点击进入 →</div>

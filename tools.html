@@ -200,6 +200,26 @@
             border-color: #a78bfa;
         }
 
+        /* 卡片4 特殊颜色 - 图片嵌入 */
+        .card-image .icon-wrapper {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+            box-shadow: 0 12px 24px -8px rgba(225, 29, 72, 0.30);
+        }
+
+        .card-image .badge {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #9f1239;
+        }
+
+        .card-image .enter-hint {
+            color: #e11d48;
+        }
+
+        .card-image:hover {
+            border-color: #fda4af;
+        }
+
         /* 响应式 */
         @media (max-width: 860px) {
             .card-grid {
@@ -256,7 +276,7 @@
 
         <div class="card-grid">
             <!-- 工具1：文件合并 -->
-            <a href="tools/merge_excel.html" class="nav-card" title="合并多个 Excel 或 CSV 文件">
+            <a href="tools/merge_excel.html" class="nav-card" target="_blank" title="合并多个 Excel 或 CSV 文件">
                 <div class="icon-wrapper">📂</div>
                 <h2 class="card-title">
                     文件合并工具
@@ -276,7 +296,7 @@
             </a>
 
             <!-- 工具2：区间聚合 -->
-            <a href="tools/merge_date_data.html" class="nav-card card-aggregate" title="按商品ID和日期区间汇总数据">
+            <a href="tools/merge_date_data.html" class="nav-card card-aggregate" target="_blank" title="按商品ID和日期区间汇总数据">
                 <div class="icon-wrapper">📊</div>
                 <h2 class="card-title">
                     区间聚合工具
@@ -297,7 +317,7 @@
             </a>
 
             <!-- 工具3：JSON 数据管理 -->
-            <a href="tools/json_manager.html" class="nav-card card-json" title="在线管理 GitHub 上的 JSON 数据">
+            <a href="tools/json_manager.html" class="nav-card card-json" target="_blank" title="在线管理 GitHub 上的 JSON 数据">
                 <div class="icon-wrapper">📄</div>
                 <h2 class="card-title">
                     JSON 数据管理
@@ -311,6 +331,26 @@
                     <span class="badge"><i>📄</i> .json</span>
                     <span class="badge"><i>🔑</i> Token 认证</span>
                     <span class="badge"><i>☁️</i> GitHub</span>
+                </div>
+
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- 工具4：Excel 图片嵌入 -->
+            <a href="tools/excel_image_preview.html" class="nav-card card-image" target="_blank" title="将图片链接嵌入为单元格图片">
+                <div class="icon-wrapper">🖼️</div>
+                <h2 class="card-title">
+                    图片嵌入工具
+                    <span class="arrow-hint">→</span>
+                </h2>
+                <p class="card-desc">
+                    将 Excel B列 的图片链接下载并嵌入为单元格内图片（非浮动）。
+                </p>
+
+                <div class="badge-group">
+                    <span class="badge"><i>📊</i> .xlsx</span>
+                    <span class="badge"><i>🖼️</i> 图片嵌入</span>
+                    <span class="badge"><i>📌</i> 锚定单元格</span>
                 </div>
 
                 <div class="enter-hint">点击进入 →</div>

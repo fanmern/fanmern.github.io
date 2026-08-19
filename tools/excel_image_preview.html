@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel 图片列预览工具</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #4f7cff 0%, #6c5ce7 100%);
+    color: #fff;
+    padding: 24px 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .header h1 { font-size: 22px; font-weight: 600; }
+  .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+  .upload-zone {
+    border: 2px dashed #c0ccda;
+    border-radius: 12px;
+    background: #fff;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: #4f7cff;
+    background: #f0f4ff;
+  }
+  .upload-zone .icon { font-size: 48px; margin-bottom: 12px; }
+  .upload-zone .title { font-size: 16px; font-weight: 500; color: #333; }
+  .upload-zone .hint { font-size: 13px; color: #999; margin-top: 6px; }
+  .upload-zone input { display: none; }
+
+  .toolbar {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .toolbar .file-info { font-size: 14px; color: #666; }
+  .toolbar .file-info strong { color: #333; }
+  .toolbar label { font-size: 13px; color: #666; display: flex; align-items: center; gap: 6px; }
+  .toolbar select, .toolbar input[type="number"] {
+    padding: 6px 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+  }
+  .toolbar select:focus { border-color: #4f7cff; }
+  .btn {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .btn-primary { background: #4f7cff; color: #fff; }
+  .btn-primary:hover { background: #3d6bff; }
+  .btn-success { background: #27ae60; color: #fff; }
+  .btn-success:hover { background: #219a52; }
+  .btn-outline { background: #fff; color: #4f7cff; border: 1px solid #4f7cff; }
+  .btn-outline:hover { background: #f0f4ff; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .spacer { flex: 1; }
+
+  .table-wrap {
+    background: #fff;
+    border-radius: 10px;
+    overflow: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    max-height: calc(100vh - 280px);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead {
+    position: sticky;
+    top: 0;
+    background: #f8f9fc;
+    z-index: 2;
+  }
+  th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #e8ecf1;
+    white-space: nowrap;
+  }
+  th .col-tag {
+    display: inline-block;
+    background: #e8f0fe;
+    color: #4f7cff;
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 500;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f2f5;
+    vertical-align: middle;
+  }
+  tr:hover td { background: #fafbfd; }
+  td.img-cell { text-align: center; width: 120px; }
+  td.img-cell img {
+    width: 80px; height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+  }
+  td.img-cell img:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  td.img-cell .img-fail {
+    width: 80px; height: 80px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f5f5f5; border-radius: 6px; color: #bbb; font-size: 11px;
+    border: 1px dashed #ddd;
+  }
+  td.text-cell { max-width: 300px; word-break: break-all; }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .modal.show { display: flex; }
+  .modal img {
+    max-width: 90vw; max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .modal .close {
+    position: absolute; top: 20px; right: 28px;
+    color: #fff; font-size: 32px; cursor: pointer; line-height: 1;
+  }
+
+  .empty {
+    text-align: center; padding: 60px 20px;
+    color: #999; font-size: 14px;
+  }
+  .empty .icon { font-size: 56px; margin-bottom: 12px; opacity: 0.5; }
+
+  .stats {
+    display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #fff; border-radius: 8px; padding: 14px 20px;
+    flex: 1; min-width: 140px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .stat-card .label { font-size: 12px; color: #999; }
+  .stat-card .value { font-size: 22px; font-weight: 600; color: #333; margin-top: 4px; }
+  .stat-card .value.blue { color: #4f7cff; }
+  .stat-card .value.green { color: #27ae60; }
+  .stat-card .value.red { color: #e74c3c; }
+
+  .loading {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid #ddd; border-top-color: #4f7cff;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: #333; color: #fff;
+    padding: 10px 20px; border-radius: 6px;
+    font-size: 13px; z-index: 2000;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  .progress-bar {
+    width: 100%; height: 6px; background: #eee; border-radius: 3px;
+    margin-top: 8px; overflow: hidden; display: none;
+  }
+  .progress-bar .fill {
+    height: 100%; background: #4f7cff; border-radius: 3px;
+    transition: width 0.3s; width: 0%;
+  }
+  .export-panel {
+    background: #fff; border-radius: 10px; padding: 16px 20px;
+    margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: none;
+  }
+  .export-panel .title { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #333; }
+  .export-panel .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 Excel 图片列预览工具</h1>
+  <p>上传 Excel 文件，自动识别图片 URL 列并渲染为可预览的缩略图，支持导出带嵌入图片的 xlsx</p>
+</div>
+
+<div class="container">
+  <div class="upload-zone" id="uploadZone">
+    <div class="icon">📤</div>
+    <div class="title">点击或拖拽 Excel 文件到此处</div>
+    <div class="hint">支持 .xlsx / .xls 格式，图片列可为 URL 或 base64 数据</div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls">
+  </div>
+
+  <div class="stats" id="stats" style="display:none;">
+    <div class="stat-card"><div class="label">总行数</div><div class="value" id="statRows">0</div></div>
+    <div class="stat-card"><div class="label">列数</div><div class="value blue" id="statCols">0</div></div>
+    <div class="stat-card"><div class="label">图片列</div><div class="value green" id="statImgCols">0</div></div>
+    <div class="stat-card"><div class="label">图片加载失败</div><div class="value red" id="statFail">0</div></div>
+  </div>
+
+  <div class="toolbar" id="toolbar" style="display:none;">
+    <span class="file-info">文件：<strong id="fileName">-</strong></span>
+    <label>工作表：<select id="sheetSelect"></select></label>
+    <label>图片列：<select id="imgColSelect"></select></label>
+    <label>缩略图大小：<input type="number" id="thumbSize" value="80" min="40" max="200" style="width:60px;"> px</label>
+    <div class="spacer"></div>
+    <button class="btn btn-success" id="btnExportXlsx">导出带图 XLSX</button>
+    <button class="btn btn-outline" id="btnExportHtml">导出 HTML</button>
+  </div>
+
+  <div class="export-panel" id="exportPanel">
+    <div class="title">导出带图 XLSX 设置</div>
+    <div class="row">
+      <label>图片宽度：<input type="number" id="exportImgW" value="100" min="30" max="400" style="width:70px;"> px</label>
+      <label>图片高度：<input type="number" id="exportImgH" value="100" min="30" max="400" style="width:70px;"> px</label>
+      <label><input type="checkbox" id="keepUrl" > 图片单元格保留 URL 文字</label>
+      <button class="btn btn-primary" id="btnDoExport">开始导出</button>
+      <button class="btn btn-outline" id="btnCancelExport">取消</button>
+    </div>
+    <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+    <div id="progressText" style="font-size:12px;color:#999;margin-top:6px;"></div>
+  </div>
+
+  <div class="table-wrap" id="tableWrap" style="display:none;">
+    <table id="dataTable">
+      <thead><tr id="tableHead"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="empty" id="emptyState">
+    <div class="icon">📁</div>
+    <div>请先上传 Excel 文件</div>
+  </div>
+</div>
+
+<div class="modal" id="imgModal">
+  <span class="close" id="modalClose">&times;</span>
+  <img id="modalImg" src="" alt="preview">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  let workbook = null;
+  let currentSheet = '';
+  let headers = [];
+  let rows = [];
+  let imgColumns = [];
+  let selectedImgCol = -1;
+  let failCount = 0;
+  let fileName = '';
+
+  const $ = id => document.getElementById(id);
+  const uploadZone = $('uploadZone');
+  const fileInput = $('fileInput');
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function isImageUrl(val) {
+    if (!val || typeof val !== 'string') return false;
+    const v = val.trim();
+    if (v.startsWith('data:image/')) return true;
+    if (/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|bmp|svg|ico)(\?.*)?$/i.test(v)) return true;
+    if (/^https?:\/\/.*(alicdn|img\.alicdn|gd-hbimg|qpic|bdimg|sinaimg|wx\.qlogo|cloudinary|imgur|unsplash|pexels|pixabay).*/i.test(v)) return true;
+    if (/^https?:\/\/.*\/(imgextra|images|img|pic|photo|upload)\/.*/i.test(v)) return true;
+    return false;
+  }
+
+  function detectImageColumns(hdrs, data) {
+    const cols = [];
+    if (data.length === 0) return cols;
+    const sampleSize = Math.min(data.length, 20);
+    for (let c = 0; c < hdrs.length; c++) {
+      let imgCount = 0, nonEmpty = 0;
+      for (let r = 0; r < sampleSize; r++) {
+        const val = data[r][c];
+        if (val !== null && val !== undefined && val !== '') {
+          nonEmpty++;
+          if (isImageUrl(String(val))) imgCount++;
+        }
+      }
+      const headerName = String(hdrs[c] || '').toLowerCase();
+      const nameMatch = /(图片|image|img|photo|pic|封面|头像|logo|图标|thumbnail)/i.test(headerName);
+      if (nonEmpty > 0 && (imgCount / nonEmpty >= 0.6 || (nameMatch && imgCount > 0))) {
+        cols.push(c);
+      }
+    }
+    return cols;
+  }
+
+  // 图片 URL 转 base64（带跨域处理）
+  async function urlToBase64(url) {
+    // base64 直接返回
+    if (url.startsWith('data:image/')) {
+      const match = url.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (match) return { base64: match[2], ext: match[1] };
+    }
+    // 尝试 fetch
+    try {
+      const resp = await fetch(url, { mode: 'cors' });
+      if (!resp.ok) throw new Error('fetch failed');
+      const blob = await resp.blob();
+      const ext = blob.type.split('/')[1] || 'jpeg';
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      const b64 = dataUrl.split(',')[1];
+      return { base64: b64, ext: ext === 'jpeg' ? 'jpg' : ext };
+    } catch (e) {
+      // 回退到 canvas
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || 100;
+          canvas.height = img.naturalHeight || 100;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          resolve({ base64: dataUrl.split(',')[1], ext: 'jpg' });
+        };
+        img.onerror = () => reject(new Error('image load failed'));
+        img.src = url;
+      });
+    }
+  }
+
+  // ===== 文件上传 =====
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files.length) handleFile(e.target.files[0]);
+  });
+
+  function handleFile(file) {
+    fileName = file.name;
+    $('fileName').textContent = fileName;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        workbook = XLSX.read(data, { type: 'array' });
+        $('sheetSelect').innerHTML = '';
+        workbook.SheetNames.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name; opt.textContent = name;
+          $('sheetSelect').appendChild(opt);
+        });
+        currentSheet = workbook.SheetNames[0];
+        $('sheetSelect').value = currentSheet;
+        loadSheet(currentSheet);
+        showToast('文件加载成功');
+      } catch (err) {
+        showToast('文件解析失败：' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function loadSheet(sheetName) {
+    const ws = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    if (jsonData.length === 0) { headers = []; rows = []; renderTable(); return; }
+    headers = jsonData[0].map(h => String(h || ''));
+    rows = jsonData.slice(1).filter(r => r.some(c => c !== '' && c !== null && c !== undefined));
+    imgColumns = detectImageColumns(headers, rows);
+    selectedImgCol = imgColumns.length > 0 ? imgColumns[0] : -1;
+
+    $('imgColSelect').innerHTML = '';
+    const autoOpt = document.createElement('option');
+    autoOpt.value = '-1'; autoOpt.textContent = '自动检测（全部图片列）';
+    $('imgColSelect').appendChild(autoOpt);
+    headers.forEach((h, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = h + (imgColumns.includes(i) ? ' 🔍' : '');
+      $('imgColSelect').appendChild(opt);
+    });
+    $('imgColSelect').value = '-1';
+    renderTable();
+  }
+
+  $('sheetSelect').addEventListener('change', e => { currentSheet = e.target.value; loadSheet(currentSheet); });
+  $('imgColSelect').addEventListener('change', e => { selectedImgCol = parseInt(e.target.value); renderTable(); });
+  $('thumbSize').addEventListener('change', renderTable);
+
+  function renderTable() {
+    const thead = $('tableHead');
+    const tbody = $('tableBody');
+    thead.innerHTML = ''; tbody.innerHTML = '';
+    failCount = 0;
+
+    if (headers.length === 0) {
+      $('emptyState').style.display = 'block';
+      $('tableWrap').style.display = 'none';
+      $('toolbar').style.display = 'none';
+      $('stats').style.display = 'none';
+      return;
+    }
+    $('emptyState').style.display = 'none';
+    $('tableWrap').style.display = 'block';
+    $('toolbar').style.display = 'flex';
+    $('stats').style.display = 'flex';
+
+    const activeImgCols = selectedImgCol === -1 ? imgColumns : [selectedImgCol];
+    const size = parseInt($('thumbSize').value) || 80;
+
+    headers.forEach((h, i) => {
+      const th = document.createElement('th');
+      th.textContent = h;
+      if (activeImgCols.includes(i)) {
+        const tag = document.createElement('span');
+        tag.className = 'col-tag'; tag.textContent = '图片';
+        th.appendChild(tag);
+      }
+      thead.appendChild(th);
+    });
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      headers.forEach((_, colIdx) => {
+        const td = document.createElement('td');
+        const val = row[colIdx];
+        if (activeImgCols.includes(colIdx) && isImageUrl(String(val))) {
+          td.className = 'img-cell';
+          const img = document.createElement('img');
+          img.src = String(val); img.alt = '图片';
+          img.style.width = size + 'px'; img.style.height = size + 'px';
+          img.loading = 'lazy';
+          img.addEventListener('click', () => openModal(String(val)));
+          img.addEventListener('error', () => {
+            failCount++; $('statFail').textContent = failCount;
+            const failDiv = document.createElement('div');
+            failDiv.className = 'img-fail'; failDiv.textContent = '加载失败';
+            failDiv.style.width = size + 'px'; failDiv.style.height = size + 'px';
+            img.replaceWith(failDiv);
+          });
+          td.appendChild(img);
+        } else {
+          td.className = 'text-cell';
+          td.textContent = val !== undefined && val !== null ? String(val) : '';
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    $('statRows').textContent = rows.length;
+    $('statCols').textContent = headers.length;
+    $('statImgCols').textContent = activeImgCols.length;
+    $('statFail').textContent = '0';
+  }
+
+  // ===== 图片预览弹窗 =====
+  const modal = $('imgModal');
+  function openModal(src) { $('modalImg').src = src; modal.classList.add('show'); }
+  modal.addEventListener('click', () => modal.classList.remove('show'));
+  $('modalClose').addEventListener('click', e => { e.stopPropagation(); modal.classList.remove('show'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('show'); });
+
+  // ===== 导出带图 XLSX =====
+  $('btnExportXlsx').addEventListener('click', () => {
+    if (rows.length === 0) { showToast('没有数据可导出'); return; }
+    $('exportPanel').style.display = 'block';
+    $('progressBar').style.display = 'none';
+    $('progressText').textContent = '';
+  });
+  $('btnCancelExport').addEventListener('click', () => { $('exportPanel').style.display = 'none'; });
+
+  $('btnDoExport').addEventListener('click', async () => {
+    const activeImgCols = selectedImgCol === -1 ? imgColumns : [selectedImgCol];
+    if (activeImgCols.length === 0) { showToast('未检测到图片列'); return; }
+
+    const imgW = parseInt($('exportImgW').value) || 100;
+    const imgH = parseInt($('exportImgH').value) || 100;
+    const keepUrl = $('keepUrl').checked;
+    const btn = $('btnDoExport');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>导出中...';
+    $('progressBar').style.display = 'block';
+
+    try {
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'Excel图片列预览工具';
+      const ws = wb.addWorksheet(currentSheet || 'Sheet1');
+
+      // 写表头
+      const headerRow = ws.addRow(headers);
+      headerRow.font = { bold: true };
+      headerRow.alignment = { vertical: 'middle', horizontal: 'left' };
+      headerRow.height = 24;
+
+      // 列宽设置
+      headers.forEach((_, ci) => {
+        const col = ws.getColumn(ci + 1);
+        if (activeImgCols.includes(ci)) {
+          col.width = Math.max(15, imgW / 7); // 粗略换算
+        } else {
+          col.width = 20;
+        }
+      });
+
+      // 收集所有需要下载的图片 URL（去重）
+      const urlSet = new Map(); // url -> { base64, ext }
+      const totalImgCells = [];
+      rows.forEach((row, ri) => {
+        activeImgCols.forEach(ci => {
+          const val = row[ci];
+          if (isImageUrl(String(val))) {
+            totalImgCells.push({ rowIdx: ri, colIdx: ci, url: String(val) });
+          }
+        });
+      });
+
+      // 写数据行（先写文字）
+      rows.forEach(row => {
+        const rowData = headers.map((_, ci) => {
+          const val = row[ci];
+          if (activeImgCols.includes(ci) && isImageUrl(String(val))) {
+            return keepUrl ? String(val) : '';
+          }
+          return val !== undefined && val !== null ? val : '';
+        });
+        const excelRow = ws.addRow(rowData);
+        excelRow.height = imgH * 0.75 + 8; // 行高适配图片
+        excelRow.alignment = { vertical: 'middle', wrapText: true };
+      });
+
+      // 逐张下载并插入图片
+      let done = 0, failed = 0;
+      const total = totalImgCells.length;
+      const concurrency = 3;
+
+      async function processItem(item) {
+        try {
+          const result = await urlToBase64(item.url);
+          const imageId = wb.addImage({
+            base64: result.base64,
+            extension: result.ext === 'jpg' ? 'jpeg' : result.ext,
+          });
+          ws.addImage(imageId, {
+            tl: { col: item.colIdx, row: item.rowIdx + 1 }, // +1 因为表头占第1行
+            ext: { width: imgW, height: imgH },
+            editAs: 'oneCell',
+          });
+        } catch (e) {
+          failed++;
+          console.warn('图片下载失败:', item.url, e.message);
+        }
+        done++;
+        const pct = Math.round(done / total * 100);
+        $('progressFill').style.width = pct + '%';
+        $('progressText').textContent = `正在处理图片 ${done}/${total}${failed > 0 ? `（${failed}张失败）` : ''}`;
+      }
+
+      // 并发控制
+      const queue = [...totalImgCells];
+      async function worker() {
+        while (queue.length > 0) {
+          const item = queue.shift();
+          await processItem(item);
+        }
+      }
+      await Promise.all(Array.from({ length: concurrency }, () => worker()));
+
+      // 导出
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName.replace(/\.(xlsx|xls)$/i, '') + '_带图片.xlsx';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      $('progressText').textContent = `导出完成！共 ${total} 张图片，成功 ${total - failed} 张，失败 ${failed} 张`;
+      showToast(failed > 0 ? `导出完成，${failed}张图片失败` : '导出完成');
+    } catch (err) {
+      console.error(err);
+      showToast('导出失败：' + err.message);
+      $('progressText').textContent = '导出失败：' + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '开始导出';
+      setTimeout(() => { $('exportPanel').style.display = 'none'; }, 3000);
+    }
+  });
+
+  // ===== 导出 HTML =====
+  $('btnExportHtml').addEventListener('click', () => {
+    if (rows.length === 0) return;
+    const activeImgCols = selectedImgCol === -1 ? imgColumns : [selectedImgCol];
+    const size = parseInt($('thumbSize').value) || 80;
+    let html = `<!DOCTYPE html>\n<html lang="zh-CN"><head><meta charset="UTF-8"><title>${fileName} - 图片预览</title>\n<style>\nbody{font-family:sans-serif;background:#f5f7fa;padding:24px;}\nh2{color:#333;margin-bottom:16px;}\ntable{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-radius:8px;overflow:hidden;}\nth{background:#f8f9fc;padding:12px;text-align:left;border-bottom:2px solid #e8ecf1;font-size:13px;}\ntd{padding:10px 12px;border-bottom:1px solid #f0f2f5;font-size:13px;vertical-align:middle;}\ntd.img{text-align:center;}\ntd.img img{width:${size}px;height:${size}px;object-fit:cover;border-radius:6px;cursor:pointer;}\ntr:hover{background:#fafbfd;}\n</style></head><body>\n<h2>${fileName} - ${currentSheet}</h2>\n<table><thead><tr>`;
+    headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+    html += '</tr></thead><tbody>';
+    rows.forEach(row => {
+      html += '<tr>';
+      headers.forEach((_, ci) => {
+        const val = row[ci];
+        if (activeImgCols.includes(ci) && isImageUrl(String(val))) {
+          html += `<td class="img"><img src="${escapeHtml(String(val))}" alt=""></td>`;
+        } else {
+          html += `<td>${escapeHtml(val !== undefined && val !== null ? String(val) : '')}</td>`;
+        }
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></body></html>';
+    downloadFile(html, fileName.replace(/\.(xlsx|xls)$/i, '') + '_图片预览.html', 'text/html');
+    showToast('HTML 已导出');
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  function downloadFile(content, name, type) {
+    const blob = new Blob([content], { type: type + ';charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name; a.click();
+    URL.revokeObjectURL(url);
+  }
+})();
+</script>
+</body>
+</html>

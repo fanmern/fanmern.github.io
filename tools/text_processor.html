@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文本处理工具箱 · 增强版</title>
+    <style>
+        /* ---------- 全局重置 & 基础 ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f0f4f9;
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .app {
+            max-width: 1500px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
+            padding: 28px 32px 32px;
+        }
+
+        /* ---------- 头部 ---------- */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-left .icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+        .header-left h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a2639;
+            letter-spacing: -0.3px;
+        }
+        .header-left .sub {
+            font-size: 14px;
+            color: #6b7a8f;
+            font-weight: 400;
+            margin-left: 6px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header-actions button {
+            background: #eef2f7;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-actions button:hover {
+            background: #dce3ed;
+        }
+        .header-actions button.primary {
+            background: #2a6df4;
+            color: #fff;
+        }
+        .header-actions button.primary:hover {
+            background: #1a5adf;
+        }
+
+        /* ---------- 工具栏 - 折叠面板 ---------- */
+        .toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #f7faff;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            border: 1px solid #e6edf6;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .toolbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .toolbar::-webkit-scrollbar-thumb {
+            background: #c8d8ea;
+            border-radius: 8px;
+        }
+
+        .tool-category {
+            border-bottom: 1px solid #eef2f7;
+            padding: 4px 0;
+        }
+        .tool-category:last-child {
+            border-bottom: none;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .category-header:hover {
+            background: #eaf0fa;
+        }
+        .category-header .arrow {
+            font-size: 12px;
+            transition: transform 0.25s;
+            color: #6b7f96;
+        }
+        .category-header .arrow.open {
+            transform: rotate(90deg);
+        }
+        .category-header .cat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2a3a;
+        }
+        .category-header .cat-badge {
+            font-size: 11px;
+            background: #eef2f7;
+            padding: 0 10px;
+            border-radius: 20px;
+            color: #4a5a72;
+            line-height: 22px;
+        }
+
+        .category-body {
+            display: none;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            padding: 6px 8px 10px 32px;
+        }
+        .category-body.open {
+            display: flex;
+        }
+
+        .category-body .btn {
+            background: #ffffff;
+            border: 1px solid #d0dbe8;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #1f2a3a;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            line-height: 26px;
+            height: 34px;
+        }
+        .category-body .btn:hover {
+            background: #eaf0fa;
+            border-color: #b0c4db;
+            transform: translateY(-1px);
+        }
+        .category-body .btn.primary-btn {
+            background: #2a6df4;
+            border-color: #2a6df4;
+            color: #fff;
+        }
+        .category-body .btn.primary-btn:hover {
+            background: #1a5adf;
+            border-color: #1a5adf;
+        }
+        .category-body .btn.danger-btn {
+            background: #f05454;
+            border-color: #f05454;
+            color: #fff;
+        }
+        .category-body .btn.danger-btn:hover {
+            background: #d94343;
+            border-color: #d94343;
+        }
+        .category-body input[type="text"],
+        .category-body input[type="number"],
+        .category-body input[type="search"] {
+            border: 1px solid #d0dbe8;
+            border-radius: 30px;
+            padding: 0 12px;
+            height: 34px;
+            font-size: 12px;
+            background: #fff;
+            outline: none;
+            transition: 0.2s;
+            min-width: 60px;
+            max-width: 130px;
+            color: #1a2639;
+        }
+        .category-body input:focus {
+            border-color: #2a6df4;
+            box-shadow: 0 0 0 3px rgba(42, 109, 244, 0.12);
+        }
+        .category-body .inline-label {
+            font-size: 12px;
+            color: #3e5268;
+            font-weight: 500;
+        }
+        .category-body .sep {
+            color: #c8d6e5;
+            font-size: 12px;
+            user-select: none;
+        }
+
+        /* ---------- 面板 ---------- */
+        .panels {
+            display: flex;
+            gap: 20px;
+            min-height: 420px;
+        }
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fafcff;
+            border-radius: 16px;
+            border: 1px solid #e6edf6;
+            overflow: hidden;
+            transition: border 0.2s;
+        }
+        .panel:hover {
+            border-color: #c8d8ea;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px;
+            background: #f7faff;
+            border-bottom: 1px solid #e6edf6;
+            flex-shrink: 0;
+        }
+        .panel-header .title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f2a3a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-header .title .count {
+            font-weight: 400;
+            font-size: 12px;
+            color: #6b7f96;
+            background: #eef2f7;
+            padding: 0 10px;
+            border-radius: 20px;
+            line-height: 22px;
+        }
+        .panel-header .actions {
+            display: flex;
+            gap: 4px;
+        }
+        .panel-header .actions button {
+            background: transparent;
+            border: none;
+            color: #6b7f96;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .panel-header .actions button:hover {
+            background: #eaf0fa;
+            color: #1f2a3a;
+        }
+        .panel textarea {
+            flex: 1;
+            border: none;
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+            resize: none;
+            outline: none;
+            background: transparent;
+            color: #1a2639;
+            min-height: 320px;
+            tab-size: 2;
+        }
+        .panel textarea::placeholder {
+            color: #b0c4db;
+        }
+        .panel-footer {
+            padding: 6px 18px;
+            background: #f7faff;
+            border-top: 1px solid #e6edf6;
+            font-size: 12px;
+            color: #6b7f96;
+            display: flex;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .panel-footer .stats span {
+            margin-right: 14px;
+        }
+        .panel-footer .stats .num {
+            font-weight: 600;
+            color: #1f2a3a;
+        }
+
+        /* ---------- Toast ---------- */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1f2a3a;
+            color: #fff;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+            z-index: 999;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+        }
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @keyframes flash-border {
+            0%,
+            100% {
+                border-color: #e6edf6;
+            }
+            50% {
+                border-color: #2a6df4;
+            }
+        }
+        .panel.flash {
+            animation: flash-border 0.5s ease 2;
+        }
+
+        @media (max-width: 1024px) {
+            .app {
+                padding: 16px 14px;
+            }
+            .panels {
+                flex-direction: column;
+                min-height: 260px;
+            }
+            .panel textarea {
+                min-height: 180px;
+            }
+            .toolbar {
+                max-height: 300px;
+            }
+        }
+        @media (max-width: 600px) {
+            .header-left h1 {
+                font-size: 18px;
+            }
+            .header-left .sub {
+                font-size: 11px;
+                display: block;
+                margin-left: 0;
+            }
+            .category-body {
+                padding-left: 12px;
+            }
+            .category-body .btn {
+                font-size: 11px;
+                padding: 3px 10px;
+                height: 30px;
+            }
+            .category-body input {
+                height: 30px;
+                font-size: 11px;
+                min-width: 50px;
+                max-width: 90px;
+                padding: 0 8px;
+            }
+            .panel textarea {
+                font-size: 13px;
+                min-height: 140px;
+                padding: 12px 14px;
+            }
+            .app {
+                padding: 10px 8px;
+                border-radius: 16px;
+            }
+        }
+
+        textarea::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f0f4f9;
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #c8d8ea;
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #b0c4db;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app" id="app">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-left">
+                <span class="icon">📝</span>
+                <h1>文本处理工具箱 <span class="sub">· 50+ 种功能</span></h1>
+            </div>
+            <div class="header-actions">
+                <button onclick="swapPanels()">🔄 交换</button>
+                <button onclick="clearAll()">🗑️ 清空</button>
+                <button class="primary" onclick="copyResult()">📋 复制结果</button>
+            </div>
+        </div>
+
+        <!-- 工具栏 - 折叠分类 -->
+        <div class="toolbar" id="toolbar">
+
+            <!-- ===== 分类1: 大小写与命名 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow open">▶</span>
+                    <span class="cat-label">🔤 大小写与命名</span>
+                    <span class="cat-badge">10 种</span>
+                </div>
+                <div class="category-body open">
+                    <button class="btn" onclick="applyTransform('uppercase')">全大写</button>
+                    <button class="btn" onclick="applyTransform('lowercase')">全小写</button>
+                    <button class="btn" onclick="applyTransform('capitalize')">首字母大写</button>
+                    <button class="btn" onclick="applyTransform('sentence')">句首大写</button>
+                    <button class="btn" onclick="applyTransform('toggle')">切换大小写</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('camel')">驼峰</button>
+                    <button class="btn" onclick="applyTransform('pascal')">帕斯卡</button>
+                    <button class="btn" onclick="applyTransform('snake')">下划线</button>
+                    <button class="btn" onclick="applyTransform('constant')">常量</button>
+                    <button class="btn" onclick="applyTransform('kebab')">连字符</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类2: 行操作 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">📋 行操作</span>
+                    <span class="cat-badge">14 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('addNumber')">添加序号</button>
+                    <button class="btn" onclick="applyTransform('reverseLines')">行反转</button>
+                    <button class="btn" onclick="applyTransform('shuffleLines')">行打乱</button>
+                    <button class="btn" onclick="applyTransform('sortAlpha')">字母排序 A→Z</button>
+                    <button class="btn" onclick="applyTransform('sortAlphaDesc')">字母排序 Z→A</button>
+                    <button class="btn" onclick="applyTransform('sortLength')">按长度升序</button>
+                    <button class="btn" onclick="applyTransform('sortLengthDesc')">按长度降序</button>
+                    <button class="btn" onclick="applyTransform('mergeLines')">合并为一行</button>
+                    <span class="sep">|</span>
+                    <span class="inline-label">行前加</span>
+                    <input type="text" id="prefixText" placeholder="前缀" value="" style="max-width:90px;" />
+                    <button class="btn" onclick="applyPrefixSuffix('prefix')">执行</button>
+                    <span class="sep">|</span>
+                    <span class="inline-label">行后加</span>
+                    <input type="text" id="suffixText" placeholder="后缀" value="" style="max-width:90px;" />
+                    <button class="btn" onclick="applyPrefixSuffix('suffix')">执行</button>
+                    <span class="sep">|</span>
+                    <span class="inline-label">第N字添加</span>
+                    <input type="number" id="insertPos" placeholder="位置" value="1" min="1" style="max-width:60px;" />
+                    <input type="text" id="insertText" placeholder="内容" value="" style="max-width:80px;" />
+                    <button class="btn" onclick="applyInsertAt()">执行</button>
+                    <span class="sep">|</span>
+                    <span class="inline-label">第N字删除</span>
+                    <input type="number" id="delPos" placeholder="位置" value="1" min="1" style="max-width:60px;" />
+                    <input type="number" id="delLen" placeholder="长度" value="1" min="1" style="max-width:60px;" />
+                    <button class="btn" onclick="applyDeleteAt()">执行</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类3: 清理与净化 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">🧹 清理与净化</span>
+                    <span class="cat-badge">10 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('trimLines')">去除首尾空格</button>
+                    <button class="btn" onclick="applyTransform('removeEmpty')">删除空行</button>
+                    <button class="btn" onclick="applyTransform('dedupe')">删除重复行</button>
+                    <button class="btn" onclick="applyTransform('collapseSpaces')">合并多个空格</button>
+                    <button class="btn" onclick="applyTransform('removeAllSpaces')">删除所有空格</button>
+                    <button class="btn" onclick="applyTransform('removeLineBreaks')">删除换行符</button>
+                    <button class="btn" onclick="applyTransform('stripHtml')">去除HTML标签</button>
+                    <button class="btn" onclick="applyTransform('stripSpecial')">删除特殊字符</button>
+                    <button class="btn" onclick="applyTransform('stripNumbers')">删除数字</button>
+                    <button class="btn" onclick="applyTransform('stripLetters')">删除字母</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类4: 查找替换与提取 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">🔄 查找替换与提取</span>
+                    <span class="cat-badge">6 种</span>
+                </div>
+                <div class="category-body">
+                    <span class="inline-label">查找</span>
+                    <input type="text" id="findText" placeholder="文本或正则" value="" style="max-width:120px;" />
+                    <span class="inline-label">→ 替换为</span>
+                    <input type="text" id="replaceText" placeholder="替换内容" value="" style="max-width:100px;" />
+                    <button class="btn primary-btn" onclick="applyReplace()">替换</button>
+                    <button class="btn danger-btn" onclick="applyDelete()">删除</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('extractEmails')">提取邮箱</button>
+                    <button class="btn" onclick="applyTransform('extractUrls')">提取网址</button>
+                    <button class="btn" onclick="applyTransform('extractNumbers')">提取数字</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类5: 编码与转换 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">🔐 编码与转换</span>
+                    <span class="cat-badge">8 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('base64Encode')">Base64 编码</button>
+                    <button class="btn" onclick="applyTransform('base64Decode')">Base64 解码</button>
+                    <button class="btn" onclick="applyTransform('urlEncode')">URL 编码</button>
+                    <button class="btn" onclick="applyTransform('urlDecode')">URL 解码</button>
+                    <button class="btn" onclick="applyTransform('htmlEscape')">HTML 转义</button>
+                    <button class="btn" onclick="applyTransform('htmlUnescape')">HTML 反转义</button>
+                    <button class="btn" onclick="applyTransform('unicodeEncode')">→ Unicode</button>
+                    <button class="btn" onclick="applyTransform('unicodeDecode')">Unicode →</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类6: 加密与解密 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">🔒 加密与解密</span>
+                    <span class="cat-badge">4 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('morseEncode')">→ 摩斯电码</button>
+                    <button class="btn" onclick="applyTransform('morseDecode')">摩斯电码 →</button>
+                    <button class="btn" onclick="applyTransform('caesarEncode')">凯撒加密</button>
+                    <button class="btn" onclick="applyTransform('caesarDecode')">凯撒解密</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类7: 生成工具 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">✨ 生成工具</span>
+                    <span class="cat-badge">4 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('loremIpsum')">Lorem Ipsum</button>
+                    <button class="btn" onclick="applyTransform('slugify')">生成 Slug</button>
+                    <button class="btn" onclick="applyTransform('reverseText')">文本反转</button>
+                    <button class="btn" onclick="applyTransform('s2t')">简体 → 繁体</button>
+                    <button class="btn" onclick="applyTransform('t2s')">繁体 → 简体</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类8: 统计与分析 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">📊 统计与分析</span>
+                    <span class="cat-badge">5 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('wordCount')">字数统计</button>
+                    <button class="btn" onclick="applyTransform('charCount')">字符统计</button>
+                    <button class="btn" onclick="applyTransform('paraCount')">段落统计</button>
+                    <button class="btn" onclick="applyTransform('freqCount')">词频统计</button>
+                    <button class="btn" onclick="applyTransform('sentenceCount')">句子统计</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 面板 -->
+        <div class="panels">
+            <div class="panel" id="inputPanel">
+                <div class="panel-header">
+                    <span class="title">📥 输入 <span class="count" id="inputStats">0 行 · 0 字</span></span>
+                    <div class="actions">
+                        <button onclick="clearInput()">清空</button>
+                        <button onclick="pasteFromClipboard()">📥 粘贴</button>
+                    </div>
+                </div>
+                <textarea id="inputArea" placeholder="在此输入或粘贴文本…&#10;每行作为一个条目处理。">hello world
+JavaScript is awesome
+文本处理工具箱
+支持多行文本
+</textarea>
+                <div class="panel-footer">
+                    <div class="stats">
+                        <span>行数: <span class="num" id="inputLineCount">0</span></span>
+                        <span>字符: <span class="num" id="inputCharCount">0</span></span>
+                    </div>
+                    <span style="font-size:11px; color:#9aabbf;">输入面板</span>
+                </div>
+            </div>
+
+            <div class="panel" id="outputPanel">
+                <div class="panel-header">
+                    <span class="title">📤 输出 <span class="count" id="outputStats">0 行 · 0 字</span></span>
+                    <div class="actions">
+                        <button onclick="clearOutput()">清空</button>
+                        <button onclick="copyResult()">📋 复制</button>
+                    </div>
+                </div>
+                <textarea id="outputArea" placeholder="处理结果将显示在这里…" readonly></textarea>
+                <div class="panel-footer">
+                    <div class="stats">
+                        <span>行数: <span class="num" id="outputLineCount">0</span></span>
+                        <span>字符: <span class="num" id="outputCharCount">0</span></span>
+                    </div>
+                    <span style="font-size:11px; color:#9aabbf;">结果面板 · 只读</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-message" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  DOM 引用
+        // ============================================================
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+        const inputStats = document.getElementById('inputStats');
+        const outputStats = document.getElementById('outputStats');
+        const inputLineCount = document.getElementById('inputLineCount');
+        const inputCharCount = document.getElementById('inputCharCount');
+        const outputLineCount = document.getElementById('outputLineCount');
+        const outputCharCount = document.getElementById('outputCharCount');
+        const findText = document.getElementById('findText');
+        const replaceText = document.getElementById('replaceText');
+        const prefixText = document.getElementById('prefixText');
+        const suffixText = document.getElementById('suffixText');
+        const insertPos = document.getElementById('insertPos');
+        const insertText = document.getElementById('insertText');
+        const delPos = document.getElementById('delPos');
+        const delLen = document.getElementById('delLen');
+
+        // ============================================================
+        //  工具函数
+        // ============================================================
+        function getLines(text) { return text.split(/\n/); }
+
+        function joinLines(lines) { return lines.join('\n'); }
+
+        function updateStats() {
+            const inText = inputArea.value;
+            const outText = outputArea.value;
+            const inLines = getLines(inText);
+            const outLines = getLines(outText);
+            inputLineCount.textContent = inLines.length;
+            inputCharCount.textContent = inText.length;
+            outputLineCount.textContent = outLines.length;
+            outputCharCount.textContent = outText.length;
+            inputStats.textContent = `${inLines.length} 行 · ${inText.length} 字`;
+            outputStats.textContent = `${outLines.length} 行 · ${outText.length} 字`;
+        }
+        inputArea.addEventListener('input', updateStats);
+
+        function showToast(msg, duration = 1600) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
+        function flashPanel(panelId) {
+            const panel = document.getElementById(panelId);
+            panel.classList.remove('flash');
+            void panel.offsetWidth;
+            panel.classList.add('flash');
+            setTimeout(() => panel.classList.remove('flash'), 600);
+        }
+
+        function getInputText() { return inputArea.value; }
+
+        function setOutputText(text) {
+            outputArea.value = text;
+            updateStats();
+            flashPanel('outputPanel');
+        }
+
+        function transformLines(fn) {
+            const text = getInputText();
+            if (!text && text !== '') { showToast('输入内容为空', 1200); return; }
+            const lines = getLines(text);
+            const result = lines.map((line, index) => fn(line, index, lines));
+            setOutputText(joinLines(result));
+            showToast('✅ 处理完成', 1000);
+        }
+
+        // ============================================================
+        //  折叠面板
+        // ============================================================
+        function toggleCategory(header) {
+            const body = header.nextElementSibling;
+            const arrow = header.querySelector('.arrow');
+            body.classList.toggle('open');
+            arrow.classList.toggle('open');
+        }
+
+        // ============================================================
+        //  核心功能实现
+        // ============================================================
+
+        // ---- 大小写与命名 ----
+        function toUpper(line) { return line.toUpperCase(); }
+
+        function toLower(line) { return line.toLowerCase(); }
+
+        function toCapitalize(line) {
+            return line.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        function toSentence(line) {
+            if (!line) return line;
+            return line.charAt(0).toUpperCase() + line.slice(1).toLowerCase();
+        }
+
+        function toToggle(line) {
+            return line.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('');
+        }
+
+        function toCamel(line) {
+            const parts = line.split(/[\s_\-]+/).filter(p => p.length > 0);
+            if (parts.length === 0) return '';
+            const first = parts[0].toLowerCase();
+            const rest = parts.slice(1).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase());
+            return first + rest.join('');
+        }
+
+        function toPascal(line) {
+            const parts = line.split(/[\s_\-]+/).filter(p => p.length > 0);
+            return parts.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('');
+        }
+
+        function toSnake(line) { return line.replace(/[\s\-]+/g, '_').toLowerCase(); }
+
+        function toConstant(line) {
+            return line.replace(/[\s\-]+/g, '_').toUpperCase();
+        }
+
+        function toKebab(line) { return line.replace(/[\s_]+/g, '-').toLowerCase(); }
+
+        // ---- 行操作 ----
+        function addNumber(line, index) { return `${index + 1}. ${line}`; }
+
+        function reverseLines(line, idx, lines) { return lines[lines.length - 1 - idx]; }
+
+        function shuffleLines(line, idx, lines) {
+            // 在 transformLines 中特殊处理
+            return line;
+        }
+
+        function sortAlpha(lines) { return lines.sort((a, b) => a.localeCompare(b)); }
+
+        function sortAlphaDesc(lines) { return lines.sort((a, b) => b.localeCompare(a)); }
+
+        function sortLength(lines) { return lines.sort((a, b) => a.length - b.length); }
+
+        function sortLengthDesc(lines) { return lines.sort((a, b) => b.length - a.length); }
+
+        function mergeLines(lines) { return [lines.join(' ')]; }
+
+        // ---- 清理 ----
+        function trimLines(line) { return line.trim(); }
+
+        function collapseSpaces(line) { return line.replace(/[ \t]+/g, ' '); }
+
+        function removeAllSpaces(line) { return line.replace(/\s+/g, ''); }
+
+        function removeLineBreaks(line, idx, lines) { return line; }
+
+        function stripHtml(line) { return line.replace(/<[^>]*>/g, ''); }
+
+        function stripSpecial(line) { return line.replace(/[^a-zA-Z0-9\u4e00-\u9fa5\s\.\,\!\?\-\'\"]/g, ''); }
+
+        function stripNumbers(line) { return line.replace(/[0-9]/g, ''); }
+
+        function stripLetters(line) { return line.replace(/[a-zA-Z]/g, ''); }
+
+        // ---- 提取 ----
+        function extractEmails(line) {
+            const matches = line.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g);
+            return matches ? matches.join('\n') : '';
+        }
+
+        function extractUrls(line) {
+            const matches = line.match(/(https?:\/\/[^\s]+)/g);
+            return matches ? matches.join('\n') : '';
+        }
+
+        function extractNumbers(line) {
+            const matches = line.match(/\d+/g);
+            return matches ? matches.join('\n') : '';
+        }
+
+        // ---- 编码 ----
+        function base64Encode(line) { try { return btoa(unescape(encodeURIComponent(line))); } catch (e) { return line; } }
+
+        function base64Decode(line) { try { return decodeURIComponent(escape(atob(line))); } catch (e) { return line; } }
+
+        function urlEncode(line) { return encodeURIComponent(line); }
+
+        function urlDecode(line) { try { return decodeURIComponent(line); } catch (e) { return line; } }
+
+        function htmlEscape(line) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return line.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function htmlUnescape(line) {
+            const map = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" };
+            return line.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m => map[m]);
+        }
+
+        function unicodeEncode(line) {
+            return line.split('').map(c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')).join('');
+        }
+
+        function unicodeDecode(line) {
+            return line.replace(/\\u([0-9a-fA-F]{4})/g, (m, hex) => String.fromCharCode(parseInt(hex, 16)));
+        }
+
+        // ---- 加密 ----
+        function morseEncode(line) {
+            const morse = {
+                'a': '.-',
+                'b': '-...',
+                'c': '-.-.',
+                'd': '-..',
+                'e': '.',
+                'f': '..-.',
+                'g': '--.',
+                'h': '....',
+                'i': '..',
+                'j': '.---',
+                'k': '-.-',
+                'l': '.-..',
+                'm': '--',
+                'n': '-.',
+                'o': '---',
+                'p': '.--.',
+                'q': '--.-',
+                'r': '.-.',
+                's': '...',
+                't': '-',
+                'u': '..-',
+                'v': '...-',
+                'w': '.--',
+                'x': '-..-',
+                'y': '-.--',
+                'z': '--..',
+                '0': '-----',
+                '1': '.----',
+                '2': '..---',
+                '3': '...--',
+                '4': '....-',
+                '5': '.....',
+                '6': '-....',
+                '7': '--...',
+                '8': '---..',
+                '9': '----.'
+            };
+            return line.toLowerCase().split('').map(c => morse[c] || c).join(' ');
+        }
+
+        function morseDecode(line) {
+            const morse = {
+                '.-': 'a',
+                '-...': 'b',
+                '-.-.': 'c',
+                '-..': 'd',
+                '.': 'e',
+                '..-.': 'f',
+                '--.': 'g',
+                '....': 'h',
+                '..': 'i',
+                '.---': 'j',
+                '-.-': 'k',
+                '.-..': 'l',
+                '--': 'm',
+                '-.': 'n',
+                '---': 'o',
+                '.--.': 'p',
+                '--.-': 'q',
+                '.-.': 'r',
+                '...': 's',
+                '-': 't',
+                '..-': 'u',
+                '...-': 'v',
+                '.--': 'w',
+                '-..-': 'x',
+                '-.--': 'y',
+                '--..': 'z',
+                '-----': '0',
+                '.----': '1',
+                '..---': '2',
+                '...--': '3',
+                '....-': '4',
+                '.....': '5',
+                '-....': '6',
+                '--...': '7',
+                '---..': '8',
+                '----.': '9'
+            };
+            return line.split(' ').map(c => morse[c] || c).join('');
+        }
+
+        function caesarEncode(line, shift = 3) {
+            return line.split('').map(c => {
+                if (c >= 'a' && c <= 'z') return String.fromCharCode((c.charCodeAt(0) - 97 + shift) % 26 + 97);
+                if (c >= 'A' && c <= 'Z') return String.fromCharCode((c.charCodeAt(0) - 65 + shift) % 26 + 65);
+                return c;
+            }).join('');
+        }
+
+        function caesarDecode(line, shift = 3) { return caesarEncode(line, 26 - shift); }
+
+        // ---- 生成 ----
+        function loremIpsum() {
+            const words = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do',
+                'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'ut', 'enim', 'ad',
+                'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'ut', 'aliquip', 'ex',
+                'ea', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'dolor', 'in', 'reprehenderit', 'in', 'voluptate',
+                'velit', 'esse', 'cillum', 'dolore', 'eu', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint', 'occaecat',
+                'cupidatat', 'non', 'proident', 'sunt', 'in', 'culpa', 'qui', 'officia', 'deserunt', 'mollit', 'anim', 'id',
+                'est', 'laborum'
+            ];
+            let result = [];
+            for (let i = 0; i < 50; i++) {
+                let sentence = [];
+                let len = 3 + Math.floor(Math.random() * 8);
+                for (let j = 0; j < len; j++) {
+                    sentence.push(words[Math.floor(Math.random() * words.length)]);
+                }
+                result.push(sentence.join(' ') + '.');
+            }
+            return result.join(' ');
+        }
+
+        function slugify(line) {
+            return line.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+
+        function reverseText(line) { return line.split('').reverse().join(''); }
+
+        // ---- 简繁转换（简化版） ----
+        const s2tMap = { '简': '簡', '体': '體', '中': '中', '文': '文', '转': '轉', '换': '換' };
+
+        function s2t(line) {
+            return line.split('').map(c => s2tMap[c] || c).join('');
+        }
+
+        function t2s(line) {
+            const t2sMap = {};
+            for (let k in s2tMap) t2sMap[s2tMap[k]] = k;
+            return line.split('').map(c => t2sMap[c] || c).join('');
+        }
+
+        // ---- 统计 ----
+        function wordCount(line) { return line.split(/\s+/).filter(w => w.length > 0).length; }
+
+        function charCount(line) { return line.length; }
+
+        function paraCount(line, idx, lines) { return line; }
+
+        function freqCount(line) {
+            const words = line.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+            const freq = {};
+            words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+            return Object.entries(freq).sort((a, b) => b[1] - a[1]).map(([w, c]) => `${w}: ${c}`).join('\n');
+        }
+
+        function sentenceCount(line) {
+            const sentences = line.match(/[^.!?]+[.!?]+/g);
+            return sentences ? sentences.length : 0;
+        }
+
+        // ============================================================
+        //  统一分发
+        // ============================================================
+        function applyTransform(type) {
+            const text = getInputText();
+            if (!text && text !== '') { showToast('输入内容为空', 1200); return; }
+
+            const lines = getLines(text);
+
+            switch (type) {
+                case 'uppercase':
+                    transformLines(toUpper);
+                    break;
+                case 'lowercase':
+                    transformLines(toLower);
+                    break;
+                case 'capitalize':
+                    transformLines(toCapitalize);
+                    break;
+                case 'sentence':
+                    transformLines(toSentence);
+                    break;
+                case 'toggle':
+                    transformLines(toToggle);
+                    break;
+                case 'camel':
+                    transformLines(toCamel);
+                    break;
+                case 'pascal':
+                    transformLines(toPascal);
+                    break;
+                case 'snake':
+                    transformLines(toSnake);
+                    break;
+                case 'constant':
+                    transformLines(toConstant);
+                    break;
+                case 'kebab':
+                    transformLines(toKebab);
+                    break;
+                case 'addNumber':
+                    transformLines(addNumber);
+                    break;
+                case 'reverseLines': {
+                    const result = lines.reverse();
+                    setOutputText(joinLines(result));
+                    showToast('✅ 行已反转', 1000);
+                    break;
+                }
+                case 'shuffleLines': {
+                    const shuffled = [...lines];
+                    for (let i = shuffled.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                    }
+                    setOutputText(joinLines(shuffled));
+                    showToast('✅ 行已打乱', 1000);
+                    break;
+                }
+                case 'sortAlpha': {
+                    const sorted = sortAlpha(lines);
+                    setOutputText(joinLines(sorted));
+                    showToast('✅ 已按字母排序 A→Z', 1000);
+                    break;
+                }
+                case 'sortAlphaDesc': {
+                    const sorted = sortAlphaDesc(lines);
+                    setOutputText(joinLines(sorted));
+                    showToast('✅ 已按字母排序 Z→A', 1000);
+                    break;
+                }
+                case 'sortLength': {
+                    const sorted = sortLength(lines);
+                    setOutputText(joinLines(sorted));
+                    showToast('✅ 已按长度升序', 1000);
+                    break;
+                }
+                case 'sortLengthDesc': {
+                    const sorted = sortLengthDesc(lines);
+                    setOutputText(joinLines(sorted));
+                    showToast('✅ 已按长度降序', 1000);
+                    break;
+                }
+                case 'mergeLines': {
+                    const merged = mergeLines(lines);
+                    setOutputText(joinLines(merged));
+                    showToast('✅ 已合并为一行', 1000);
+                    break;
+                }
+                case 'trimLines':
+                    transformLines(trimLines);
+                    break;
+                case 'removeEmpty': {
+                    const result = lines.filter(line => line.trim().length > 0);
+                    setOutputText(joinLines(result));
+                    showToast('✅ 已删除空行', 1000);
+                    break;
+                }
+                case 'dedupe': {
+                    const unique = [];
+                    const seen = new Set();
+                    lines.forEach(line => {
+                        if (!seen.has(line)) { seen.add(line);
+                            unique.push(line); }
+                    });
+                    setOutputText(joinLines(unique));
+                    showToast('✅ 已删除重复行', 1000);
+                    break;
+                }
+                case 'collapseSpaces':
+                    transformLines(collapseSpaces);
+                    break;
+                case 'removeAllSpaces':
+                    transformLines(removeAllSpaces);
+                    break;
+                case 'removeLineBreaks': {
+                    setOutputText(lines.join(' '));
+                    showToast('✅ 已删除换行符', 1000);
+                    break;
+                }
+                case 'stripHtml':
+                    transformLines(stripHtml);
+                    break;
+                case 'stripSpecial':
+                    transformLines(stripSpecial);
+                    break;
+                case 'stripNumbers':
+                    transformLines(stripNumbers);
+                    break;
+                case 'stripLetters':
+                    transformLines(stripLetters);
+                    break;
+                case 'extractEmails': {
+                    const all = lines.map(extractEmails).filter(s => s);
+                    setOutputText(all.join('\n'));
+                    showToast('✅ 已提取邮箱', 1000);
+                    break;
+                }
+                case 'extractUrls': {
+                    const all = lines.map(extractUrls).filter(s => s);
+                    setOutputText(all.join('\n'));
+                    showToast('✅ 已提取网址', 1000);
+                    break;
+                }
+                case 'extractNumbers': {
+                    const all = lines.map(extractNumbers).filter(s => s);
+                    setOutputText(all.join('\n'));
+                    showToast('✅ 已提取数字', 1000);
+                    break;
+                }
+                case 'base64Encode':
+                    transformLines(base64Encode);
+                    break;
+                case 'base64Decode':
+                    transformLines(base64Decode);
+                    break;
+                case 'urlEncode':
+                    transformLines(urlEncode);
+                    break;
+                case 'urlDecode':
+                    transformLines(urlDecode);
+                    break;
+                case 'htmlEscape':
+                    transformLines(htmlEscape);
+                    break;
+                case 'htmlUnescape':
+                    transformLines(htmlUnescape);
+                    break;
+                case 'unicodeEncode':
+                    transformLines(unicodeEncode);
+                    break;
+                case 'unicodeDecode':
+                    transformLines(unicodeDecode);
+                    break;
+                case 'morseEncode':
+                    transformLines(morseEncode);
+                    break;
+                case 'morseDecode':
+                    transformLines(morseDecode);
+                    break;
+                case 'caesarEncode':
+                    transformLines(line => caesarEncode(line, 3));
+                    break;
+                case 'caesarDecode':
+                    transformLines(line => caesarDecode(line, 3));
+                    break;
+                case 'loremIpsum': {
+                    setOutputText(loremIpsum());
+                    showToast('✅ 已生成 Lorem Ipsum', 1000);
+                    break;
+                }
+                case 'slugify':
+                    transformLines(slugify);
+                    break;
+                case 'reverseText':
+                    transformLines(reverseText);
+                    break;
+                case 's2t':
+                    transformLines(s2t);
+                    break;
+                case 't2s':
+                    transformLines(t2s);
+                    break;
+                case 'wordCount': {
+                    const total = lines.reduce((sum, l) => sum + wordCount(l), 0);
+                    setOutputText(`总字数: ${total}\n每行字数:\n` + lines.map((l, i) => `第${i+1}行: ${wordCount(l)}`).join(
+                    '\n'));
+                    showToast('✅ 字数统计完成', 1000);
+                    break;
+                }
+                case 'charCount': {
+                    const total = lines.reduce((sum, l) => sum + l.length, 0);
+                    setOutputText(`总字符数: ${total}\n每行字符数:\n` + lines.map((l, i) => `第${i+1}行: ${l.length}`).join(
+                    '\n'));
+                    showToast('✅ 字符统计完成', 1000);
+                    break;
+                }
+                case 'paraCount': {
+                    const paras = text.split(/\n\s*\n/).filter(p => p.trim());
+                    setOutputText(`段落数: ${paras.length}\n\n` + paras.map((p, i) => `段落 ${i+1}:\n${p}`).join('\n\n'));
+                    showToast('✅ 段落统计完成', 1000);
+                    break;
+                }
+                case 'freqCount': {
+                    const allText = lines.join(' ');
+                    setOutputText(freqCount(allText));
+                    showToast('✅ 词频统计完成', 1000);
+                    break;
+                }
+                case 'sentenceCount': {
+                    const total = lines.reduce((sum, l) => sum + (sentenceCount(l) || (l.trim() ? 1 : 0)), 0);
+                    setOutputText(`总句子数: ${total}\n每行句子数:\n` + lines.map((l, i) => `第${i+1}行: ${sentenceCount(l) || (l.trim() ? 1 : 0)}`).join(
+                        '\n'));
+                    showToast('✅ 句子统计完成', 1000);
+                    break;
+                }
+                default:
+                    showToast('未知操作', 1000);
+            }
+        }
+
+        // ---- 替换 ----
+        function applyReplace() {
+            const text = getInputText();
+            if (!text) { showToast('输入内容为空', 1200); return; }
+            const find = findText.value;
+            if (!find) { showToast('请输入要查找的文本', 1200); return; }
+            const replace = replaceText.value;
+            const lines = getLines(text);
+            try {
+                const regex = new RegExp(find, 'g');
+                const result = lines.map(line => line.replace(regex, replace));
+                setOutputText(joinLines(result));
+                showToast(`✅ 替换完成`, 1500);
+            } catch (e) {
+                // 如果不是有效正则，当作普通字符串
+                const result = lines.map(line => line.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                replace));
+                setOutputText(joinLines(result));
+                showToast(`✅ 替换完成 (普通文本)`, 1500);
+            }
+        }
+
+        function applyDelete() {
+            const text = getInputText();
+            if (!text) { showToast('输入内容为空', 1200); return; }
+            const find = findText.value;
+            if (!find) { showToast('请输入要删除的文本', 1200); return; }
+            const lines = getLines(text);
+            try {
+                const regex = new RegExp(find, 'g');
+                const result = lines.map(line => line.replace(regex, ''));
+                setOutputText(joinLines(result));
+                showToast(`✅ 删除完成`, 1500);
+            } catch (e) {
+                const result = lines.map(line => line.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                ''));
+                setOutputText(joinLines(result));
+                showToast(`✅ 删除完成 (普通文本)`, 1500);
+            }
+        }
+
+        // ---- 前后缀 ----
+        function applyPrefixSuffix(type) {
+            const text = getInputText();
+            if (!text) { showToast('输入内容为空', 1200); return; }
+            const val = type === 'prefix' ? prefixText.value : suffixText.value;
+            if (!val) { showToast(`请输入${type === 'prefix' ? '前缀' : '后缀'}内容`, 1200); return; }
+            const lines = getLines(text);
+            const result = lines.map(line => type === 'prefix' ? val + line : line + val);
+            setOutputText(joinLines(result));
+            showToast(`✅ 已添加${type === 'prefix' ? '前缀' : '后缀'}`, 1000);
+        }
+
+        // ---- 插入 ----
+        function applyInsertAt() {
+            const text = getInputText();
+            if (!text) { showToast('输入内容为空', 1200); return; }
+            const pos = parseInt(insertPos.value) || 1;
+            const content = insertText.value;
+            if (!content) { showToast('请输入要添加的内容', 1200); return; }
+            const lines = getLines(text);
+            const result = lines.map(line => {
+                if (line.length === 0) return content;
+                const idx = Math.min(pos - 1, line.length);
+                return line.slice(0, idx) + content + line.slice(idx);
+            });
+            setOutputText(joinLines(result));
+            showToast(`✅ 在第 ${pos} 字后添加内容`, 1000);
+        }
+
+        // ---- 删除 ----
+        function applyDeleteAt() {
+            const text = getInputText();
+            if (!text) { showToast('输入内容为空', 1200); return; }
+            const pos = parseInt(delPos.value) || 1;
+            const len = parseInt(delLen.value) || 1;
+            if (len <= 0) { showToast('删除长度必须大于 0', 1200); return; }
+            const lines = getLines(text);
+            const result = lines.map(line => {
+                if (line.length === 0) return line;
+                const start = Math.min(pos - 1, line.length);
+                const end = Math.min(start + len, line.length);
+                return line.slice(0, start) + line.slice(end);
+            });
+            setOutputText(joinLines(result));
+            showToast(`✅ 从第 ${pos} 字删除 ${len} 个字符`, 1000);
+        }
+
+        // ============================================================
+        //  辅助功能
+        // ============================================================
+        function clearInput() { inputArea.value = '';
+            updateStats();
+            showToast('已清空输入', 800); }
+
+        function clearOutput() { outputArea.value = '';
+            updateStats();
+            showToast('已清空输出', 800); }
+
+        function clearAll() { inputArea.value = '';
+            outputArea.value = '';
+            updateStats();
+            showToast('已全部清空', 800); }
+
+        function swapPanels() {
+            const tmp = inputArea.value;
+            inputArea.value = outputArea.value;
+            outputArea.value = tmp;
+            updateStats();
+            flashPanel('inputPanel');
+            flashPanel('outputPanel');
+            showToast('🔄 已交换', 800);
+        }
+
+        function copyResult() {
+            const text = outputArea.value;
+            if (!text) { showToast('没有内容可复制', 1200); return; }
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 已复制到剪贴板', 1200);
+            }).catch(() => {
+                outputArea.select();
+                document.execCommand('copy');
+                showToast('✅ 已复制到剪贴板', 1200);
+            });
+        }
+
+        function pasteFromClipboard() {
+            navigator.clipboard.readText().then(text => {
+                if (text) { inputArea.value = text;
+                    updateStats();
+                    showToast('✅ 已粘贴', 1000); }
+            }).catch(() => {
+                showToast('无法读取剪贴板，请手动粘贴 (Ctrl+V)', 1500);
+            });
+        }
+
+        // ---- 快捷键 ----
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') { e.preventDefault();
+                applyReplace(); }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault();
+                copyResult(); }
+        });
+
+        // ---- 初始化 ----
+        updateStats();
+        setTimeout(() => {
+            if (!outputArea.value) {
+                outputArea.value = inputArea.value;
+                updateStats();
+            }
+        }, 100);
+
+        outputArea.addEventListener('dblclick', copyResult);
+
+        console.log('📝 文本处理工具箱增强版已加载 (50+ 功能)');
+        console.log('💡 快捷键: Ctrl+Enter 执行替换, Ctrl+Shift+C 复制结果');
+        console.log('💡 点击分类标题可展开/收起功能组');
+    </script>
+
+</body>
+</html>

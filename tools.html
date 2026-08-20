@@ -240,6 +240,26 @@
             border-color: #fbbf24;
         }
 
+        /* 卡片6 特殊颜色 - 文本处理（新增） */
+        .card-text .icon-wrapper {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            box-shadow: 0 12px 24px -8px rgba(6, 182, 212, 0.30);
+        }
+
+        .card-text .badge {
+            background: #ecfeff;
+            border-color: #a5f3fc;
+            color: #155e75;
+        }
+
+        .card-text .enter-hint {
+            color: #06b6d4;
+        }
+
+        .card-text:hover {
+            border-color: #67e8f9;
+        }
+
         /* 响应式 */
         @media (max-width: 900px) {
             .card-grid {
@@ -392,6 +412,28 @@
                     <span class="badge"><i>📝</i> TXT 驱动</span>
                     <span class="badge"><i>🔄</i> 批量移动</span>
                     <span class="badge"><i>💾</i> 自动备份</span>
+                </div>
+
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- 工具6：文本处理工具箱（新增） -->
+            <a href="tools/text_processor.html" class="nav-card card-text" target="_blank" title="50+ 种文本转换功能">
+                <div class="icon-wrapper">📝</div>
+                <h2 class="card-title">
+                    文本处理工具箱
+                    <span class="arrow-hint">→</span>
+                </h2>
+                <p class="card-desc">
+                    50+ 种文本转换功能：大小写、命名风格、行操作、清理、编码、加密、统计等。
+                </p>
+
+                <div class="badge-group">
+                    <span class="badge"><i>📄</i> .txt</span>
+                    <span class="badge"><i>🔤</i> 大小写</span>
+                    <span class="badge"><i>🔄</i> 替换</span>
+                    <span class="badge"><i>🔐</i> 编码</span>
+                    <span class="badge"><i>📊</i> 统计</span>
                 </div>
 
                 <div class="enter-hint">点击进入 →</div>

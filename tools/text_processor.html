@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>文本处理工具箱 · 增强版</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本处理工具箱 · 70+ 功能增强版</title>
     <style>
         /* ---------- 全局重置 & 基础 ---------- */
         * {
@@ -21,7 +22,7 @@
             align-items: flex-start;
         }
         .app {
-            max-width: 1500px;
+            max-width: 1550px;
             width: 100%;
             background: #ffffff;
             border-radius: 24px;
@@ -93,13 +94,13 @@
         .toolbar {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             background: #f7faff;
             border-radius: 16px;
-            padding: 12px 16px;
+            padding: 10px 14px;
             margin-bottom: 18px;
             border: 1px solid #e6edf6;
-            max-height: 420px;
+            max-height: 460px;
             overflow-y: auto;
         }
         .toolbar::-webkit-scrollbar {
@@ -112,7 +113,7 @@
 
         .tool-category {
             border-bottom: 1px solid #eef2f7;
-            padding: 4px 0;
+            padding: 3px 0;
         }
         .tool-category:last-child {
             border-bottom: none;
@@ -122,7 +123,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 8px;
+            padding: 5px 8px;
             cursor: pointer;
             border-radius: 8px;
             transition: 0.2s;
@@ -157,7 +158,7 @@
             display: none;
             flex-wrap: wrap;
             align-items: center;
-            gap: 6px 10px;
+            gap: 5px 10px;
             padding: 6px 8px 10px 32px;
         }
         .category-body.open {
@@ -167,7 +168,7 @@
         .category-body .btn {
             background: #ffffff;
             border: 1px solid #d0dbe8;
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 30px;
             font-size: 12px;
             font-weight: 500;
@@ -179,7 +180,7 @@
             align-items: center;
             gap: 4px;
             line-height: 26px;
-            height: 34px;
+            height: 32px;
         }
         .category-body .btn:hover {
             background: #eaf0fa;
@@ -209,14 +210,14 @@
         .category-body input[type="search"] {
             border: 1px solid #d0dbe8;
             border-radius: 30px;
-            padding: 0 12px;
-            height: 34px;
+            padding: 0 10px;
+            height: 32px;
             font-size: 12px;
             background: #fff;
             outline: none;
             transition: 0.2s;
-            min-width: 60px;
-            max-width: 130px;
+            min-width: 50px;
+            max-width: 120px;
             color: #1a2639;
         }
         .category-body input:focus {
@@ -400,14 +401,14 @@
             .category-body .btn {
                 font-size: 11px;
                 padding: 3px 10px;
-                height: 30px;
+                height: 28px;
             }
             .category-body input {
-                height: 30px;
+                height: 28px;
                 font-size: 11px;
-                min-width: 50px;
-                max-width: 90px;
-                padding: 0 8px;
+                min-width: 40px;
+                max-width: 80px;
+                padding: 0 6px;
             }
             .panel textarea {
                 font-size: 13px;
@@ -437,6 +438,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="app" id="app">
@@ -444,7 +446,7 @@
         <div class="header">
             <div class="header-left">
                 <span class="icon">📝</span>
-                <h1>文本处理工具箱 <span class="sub">· 50+ 种功能</span></h1>
+                <h1>文本处理工具箱 <span class="sub">· 70+ 种功能</span></h1>
             </div>
             <div class="header-actions">
                 <button onclick="swapPanels()">🔄 交换</button>
@@ -496,21 +498,21 @@
                     <button class="btn" onclick="applyTransform('mergeLines')">合并为一行</button>
                     <span class="sep">|</span>
                     <span class="inline-label">行前加</span>
-                    <input type="text" id="prefixText" placeholder="前缀" value="" style="max-width:90px;" />
+                    <input type="text" id="prefixText" placeholder="前缀" value="" style="max-width:80px;" />
                     <button class="btn" onclick="applyPrefixSuffix('prefix')">执行</button>
                     <span class="sep">|</span>
                     <span class="inline-label">行后加</span>
-                    <input type="text" id="suffixText" placeholder="后缀" value="" style="max-width:90px;" />
+                    <input type="text" id="suffixText" placeholder="后缀" value="" style="max-width:80px;" />
                     <button class="btn" onclick="applyPrefixSuffix('suffix')">执行</button>
                     <span class="sep">|</span>
                     <span class="inline-label">第N字添加</span>
-                    <input type="number" id="insertPos" placeholder="位置" value="1" min="1" style="max-width:60px;" />
-                    <input type="text" id="insertText" placeholder="内容" value="" style="max-width:80px;" />
+                    <input type="number" id="insertPos" placeholder="位置" value="1" min="1" style="max-width:55px;" />
+                    <input type="text" id="insertText" placeholder="内容" value="" style="max-width:70px;" />
                     <button class="btn" onclick="applyInsertAt()">执行</button>
                     <span class="sep">|</span>
                     <span class="inline-label">第N字删除</span>
-                    <input type="number" id="delPos" placeholder="位置" value="1" min="1" style="max-width:60px;" />
-                    <input type="number" id="delLen" placeholder="长度" value="1" min="1" style="max-width:60px;" />
+                    <input type="number" id="delPos" placeholder="位置" value="1" min="1" style="max-width:55px;" />
+                    <input type="number" id="delLen" placeholder="长度" value="1" min="1" style="max-width:55px;" />
                     <button class="btn" onclick="applyDeleteAt()">执行</button>
                 </div>
             </div>
@@ -545,9 +547,9 @@
                 </div>
                 <div class="category-body">
                     <span class="inline-label">查找</span>
-                    <input type="text" id="findText" placeholder="文本或正则" value="" style="max-width:120px;" />
+                    <input type="text" id="findText" placeholder="文本或正则" value="" style="max-width:110px;" />
                     <span class="inline-label">→ 替换为</span>
-                    <input type="text" id="replaceText" placeholder="替换内容" value="" style="max-width:100px;" />
+                    <input type="text" id="replaceText" placeholder="替换内容" value="" style="max-width:90px;" />
                     <button class="btn primary-btn" onclick="applyReplace()">替换</button>
                     <button class="btn danger-btn" onclick="applyDelete()">删除</button>
                     <span class="sep">|</span>
@@ -623,6 +625,70 @@
                 </div>
             </div>
 
+            <!-- ===== 🆕 分类9: 格式化与美化 (JSON/SQL/XML/CSV) ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">💎 格式化与美化</span>
+                    <span class="cat-badge">10 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn primary-btn" onclick="applyTransform('jsonBeautify')">JSON 美化</button>
+                    <button class="btn" onclick="applyTransform('jsonCompact')">JSON 压缩</button>
+                    <button class="btn" onclick="applyTransform('jsonEscape')">JSON 转义</button>
+                    <button class="btn" onclick="applyTransform('jsonUnescape')">JSON 反转义</button>
+                    <button class="btn" onclick="applyTransform('jsonToCsv')">JSON → CSV</button>
+                    <button class="btn" onclick="applyTransform('csvToJson')">CSV → JSON</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('sqlBeautify')">SQL 美化</button>
+                    <button class="btn" onclick="applyTransform('sqlCompact')">SQL 压缩</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('xmlBeautify')">XML 美化</button>
+                    <button class="btn" onclick="applyTransform('xmlCompact')">XML 压缩</button>
+                </div>
+            </div>
+
+            <!-- ===== 🆕 分类10: 列表与对齐 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">🔄 列表与对齐</span>
+                    <span class="cat-badge">8 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('csvToList')">CSV → 行</button>
+                    <button class="btn" onclick="applyTransform('listToCsv')">行 → CSV</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('alignLeft')">左对齐</button>
+                    <button class="btn" onclick="applyTransform('alignRight')">右对齐</button>
+                    <button class="btn" onclick="applyTransform('alignCenter')">居中对齐</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('escapeSpecial')">转义特殊字符</button>
+                    <button class="btn" onclick="applyTransform('unescapeSpecial')">反转义特殊字符</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('removeDuplicateChars')">删除重复字符</button>
+                </div>
+            </div>
+
+            <!-- ===== 🆕 分类11: 哈希与时间 ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">🔢 哈希与时间</span>
+                    <span class="cat-badge">6 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn" onclick="applyTransform('hashSha256')">SHA-256</button>
+                    <button class="btn" onclick="applyTransform('hashSha1')">SHA-1</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('timestampToDate')">时间戳 → 日期</button>
+                    <button class="btn" onclick="applyTransform('dateToTimestamp')">日期 → 时间戳</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('hexToText')">十六进制 → 文本</button>
+                    <button class="btn" onclick="applyTransform('textToHex')">文本 → 十六进制</button>
+                </div>
+            </div>
+
         </div>
 
         <!-- 面板 -->
@@ -635,11 +701,7 @@
                         <button onclick="pasteFromClipboard()">📥 粘贴</button>
                     </div>
                 </div>
-                <textarea id="inputArea" placeholder="在此输入或粘贴文本…&#10;每行作为一个条目处理。">hello world
-JavaScript is awesome
-文本处理工具箱
-支持多行文本
-</textarea>
+                <textarea id="inputArea" placeholder="在此输入或粘贴文本…&#10;支持 JSON / SQL / XML / CSV 等格式">{"name":"工具","version":"1.0","features":["转换","美化","统计"]}</textarea>
                 <div class="panel-footer">
                     <div class="stats">
                         <span>行数: <span class="num" id="inputLineCount">0</span></span>
@@ -757,7 +819,7 @@ JavaScript is awesome
         }
 
         // ============================================================
-        //  核心功能实现
+        //  核心功能实现 (已有 50+ 保留，新增 20+)
         // ============================================================
 
         // ---- 大小写与命名 ----
@@ -793,9 +855,7 @@ JavaScript is awesome
 
         function toSnake(line) { return line.replace(/[\s\-]+/g, '_').toLowerCase(); }
 
-        function toConstant(line) {
-            return line.replace(/[\s\-]+/g, '_').toUpperCase();
-        }
+        function toConstant(line) { return line.replace(/[\s\-]+/g, '_').toUpperCase(); }
 
         function toKebab(line) { return line.replace(/[\s_]+/g, '-').toLowerCase(); }
 
@@ -804,10 +864,7 @@ JavaScript is awesome
 
         function reverseLines(line, idx, lines) { return lines[lines.length - 1 - idx]; }
 
-        function shuffleLines(line, idx, lines) {
-            // 在 transformLines 中特殊处理
-            return line;
-        }
+        function shuffleLines(line, idx, lines) { return line; }
 
         function sortAlpha(lines) { return lines.sort((a, b) => a.localeCompare(b)); }
 
@@ -881,85 +938,21 @@ JavaScript is awesome
 
         // ---- 加密 ----
         function morseEncode(line) {
-            const morse = {
-                'a': '.-',
-                'b': '-...',
-                'c': '-.-.',
-                'd': '-..',
-                'e': '.',
-                'f': '..-.',
-                'g': '--.',
-                'h': '....',
-                'i': '..',
-                'j': '.---',
-                'k': '-.-',
-                'l': '.-..',
-                'm': '--',
-                'n': '-.',
-                'o': '---',
-                'p': '.--.',
-                'q': '--.-',
-                'r': '.-.',
-                's': '...',
-                't': '-',
-                'u': '..-',
-                'v': '...-',
-                'w': '.--',
-                'x': '-..-',
-                'y': '-.--',
-                'z': '--..',
-                '0': '-----',
-                '1': '.----',
-                '2': '..---',
-                '3': '...--',
-                '4': '....-',
-                '5': '.....',
-                '6': '-....',
-                '7': '--...',
-                '8': '---..',
-                '9': '----.'
+            const morse = { 'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.', 'f': '..-.', 'g': '--.', 'h': '....',
+                'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..', 'm': '--', 'n': '-.', 'o': '---', 'p': '.--.',
+                'q': '--.-', 'r': '.-.', 's': '...', 't': '-', 'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
+                'y': '-.--', 'z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+                '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.'
             };
             return line.toLowerCase().split('').map(c => morse[c] || c).join(' ');
         }
 
         function morseDecode(line) {
-            const morse = {
-                '.-': 'a',
-                '-...': 'b',
-                '-.-.': 'c',
-                '-..': 'd',
-                '.': 'e',
-                '..-.': 'f',
-                '--.': 'g',
-                '....': 'h',
-                '..': 'i',
-                '.---': 'j',
-                '-.-': 'k',
-                '.-..': 'l',
-                '--': 'm',
-                '-.': 'n',
-                '---': 'o',
-                '.--.': 'p',
-                '--.-': 'q',
-                '.-.': 'r',
-                '...': 's',
-                '-': 't',
-                '..-': 'u',
-                '...-': 'v',
-                '.--': 'w',
-                '-..-': 'x',
-                '-.--': 'y',
-                '--..': 'z',
-                '-----': '0',
-                '.----': '1',
-                '..---': '2',
-                '...--': '3',
-                '....-': '4',
-                '.....': '5',
-                '-....': '6',
-                '--...': '7',
-                '---..': '8',
-                '----.': '9'
+            const morse = { '.-': 'a', '-...': 'b', '-.-.': 'c', '-..': 'd', '.': 'e', '..-.': 'f', '--.': 'g', '....': 'h',
+                '..': 'i', '.---': 'j', '-.-': 'k', '.-..': 'l', '--': 'm', '-.': 'n', '---': 'o', '.--.': 'p',
+                '--.-': 'q', '.-.': 'r', '...': 's', '-': 't', '..-': 'u', '...-': 'v', '.--': 'w', '-..-': 'x',
+                '-.--': 'y', '--..': 'z', '-----': '0', '.----': '1', '..---': '2', '...--': '3', '....-': '4',
+                '.....': '5', '-....': '6', '--...': '7', '---..': '8', '----.': '9'
             };
             return line.split(' ').map(c => morse[c] || c).join('');
         }
@@ -981,8 +974,8 @@ JavaScript is awesome
                 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'ut', 'aliquip', 'ex',
                 'ea', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'dolor', 'in', 'reprehenderit', 'in', 'voluptate',
                 'velit', 'esse', 'cillum', 'dolore', 'eu', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint', 'occaecat',
-                'cupidatat', 'non', 'proident', 'sunt', 'in', 'culpa', 'qui', 'officia', 'deserunt', 'mollit', 'anim', 'id',
-                'est', 'laborum'
+                'cupidatat', 'non', 'proident', 'sunt', 'in', 'culpa', 'qui', 'officia', 'deserunt', 'mollit', 'anim',
+                'id', 'est', 'laborum'
             ];
             let result = [];
             for (let i = 0; i < 50; i++) {
@@ -1002,8 +995,8 @@ JavaScript is awesome
 
         function reverseText(line) { return line.split('').reverse().join(''); }
 
-        // ---- 简繁转换（简化版） ----
-        const s2tMap = { '简': '簡', '体': '體', '中': '中', '文': '文', '转': '轉', '换': '換' };
+        // ---- 简繁 ----
+        const s2tMap = { '简': '簡', '体': '體', '中': '中', '文': '文', '转': '轉', '换': '換', '繁': '繁', '体': '體' };
 
         function s2t(line) {
             return line.split('').map(c => s2tMap[c] || c).join('');
@@ -1035,244 +1028,457 @@ JavaScript is awesome
         }
 
         // ============================================================
-        //  统一分发
+        //  🆕 高级格式化与转换 (JSON / SQL / XML / CSV / 对齐 / 哈希)
         // ============================================================
-        function applyTransform(type) {
+
+        // ---- JSON 工具 ----
+        function jsonBeautify(line) {
+            try { return JSON.stringify(JSON.parse(line), null, 2); } catch (e) { return '❌ 无效 JSON: ' + e.message; }
+        }
+
+        function jsonCompact(line) {
+            try { return JSON.stringify(JSON.parse(line)); } catch (e) { return '❌ 无效 JSON: ' + e.message; }
+        }
+
+        function jsonEscape(line) {
+            try { return JSON.stringify(line); } catch (e) { return '❌ 转义失败: ' + e.message; }
+        }
+
+        function jsonUnescape(line) {
+            try { return JSON.parse(line); } catch (e) { return '❌ 反转义失败: ' + e.message; }
+        }
+
+        function jsonToCsv(line) {
+            try {
+                const data = JSON.parse(line);
+                if (!Array.isArray(data) || data.length === 0) return '❌ 需要非空 JSON 数组';
+                const headers = Object.keys(data[0]);
+                let csv = headers.join(',') + '\n';
+                data.forEach(row => {
+                    csv += headers.map(h => {
+                        const val = row[h];
+                        if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+                            return '"' + val.replace(/"/g, '""') + '"';
+                        }
+                        return val ?? '';
+                    }).join(',') + '\n';
+                });
+                return csv;
+            } catch (e) { return '❌ 转换失败: ' + e.message; }
+        }
+
+        function csvToJson(line) {
+            try {
+                const rows = line.split('\n').filter(r => r.trim());
+                if (rows.length < 2) return '❌ 至少需要标题行和一行数据';
+                const headers = rows[0].split(',').map(h => h.trim());
+                const result = [];
+                for (let i = 1; i < rows.length; i++) {
+                    const values = rows[i].split(',').map(v => v.trim());
+                    const obj = {};
+                    headers.forEach((h, idx) => { obj[h] = values[idx] || ''; });
+                    result.push(obj);
+                }
+                return JSON.stringify(result, null, 2);
+            } catch (e) { return '❌ 转换失败: ' + e.message; }
+        }
+
+        // ---- SQL 工具 ----
+        function sqlBeautify(sql) {
+            return sql.replace(/select/gi, 'SELECT\n  ')
+                .replace(/from/gi, '\nFROM')
+                .replace(/where/gi, '\nWHERE')
+                .replace(/order by/gi, '\nORDER BY')
+                .replace(/group by/gi, '\nGROUP BY')
+                .replace(/left join/gi, '\nLEFT JOIN')
+                .replace(/right join/gi, '\nRIGHT JOIN')
+                .replace(/inner join/gi, '\nINNER JOIN')
+                .replace(/join/gi, '\nJOIN')
+                .replace(/and /gi, '  AND ')
+                .replace(/or /gi, '  OR ');
+        }
+
+        function sqlCompact(sql) {
+            return sql.replace(/\s+/g, ' ').trim();
+        }
+
+        // ---- XML 工具 ----
+        function xmlBeautify(xml) {
+            let formatted = '';
+            let indent = 0;
+            const lines = xml.replace(/>\s*</g, '>\n<').split('\n');
+            lines.forEach(line => {
+                if (line.match(/^<\/\w/)) indent--;
+                formatted += '  '.repeat(Math.max(0, indent)) + line + '\n';
+                if (line.match(/^<\w[^>]*[^/]>$/)) indent++;
+            });
+            return formatted.trim();
+        }
+
+        function xmlCompact(xml) {
+            return xml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+        }
+
+        // ---- 列表与对齐 ----
+        function csvToList(line) {
+            return line.split(',').map(s => s.trim()).join('\n');
+        }
+
+        function listToCsv(line) {
+            return getLines(line).map(s => s.trim()).join(', ');
+        }
+
+        function alignLeft(line) {
+            const lines = getLines(line);
+            const maxLen = Math.max(...lines.map(l => l.length));
+            return lines.map(l => l.padEnd(maxLen, ' ')).join('\n');
+        }
+
+        function alignRight(line) {
+            const lines = getLines(line);
+            const maxLen = Math.max(...lines.map(l => l.length));
+            return lines.map(l => l.padStart(maxLen, ' ')).join('\n');
+        }
+
+        function alignCenter(line) {
+            const lines = getLines(line);
+            const maxLen = Math.max(...lines.map(l => l.length));
+            return lines.map(l => {
+                const pad = maxLen - l.length;
+                const left = Math.floor(pad / 2);
+                return ' '.repeat(left) + l + ' '.repeat(pad - left);
+            }).join('\n');
+        }
+
+        function escapeSpecial(line) {
+            return line.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/\r/g, '\\r').replace(/"/g,
+                '\\"');
+        }
+
+        function unescapeSpecial(line) {
+            return line.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r').replace(/\\"/g, '"').replace(
+                /\\\\/g, '\\');
+        }
+
+        function removeDuplicateChars(line) {
+            return line.split('').filter((c, i, arr) => arr.indexOf(c) === i).join('');
+        }
+
+        // ---- 哈希与时间 ----
+        async function hashSha256(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function hashSha1(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function timestampToDate(line) {
+            const ts = parseInt(line.trim());
+            if (isNaN(ts)) return '❌ 无效时间戳';
+            const date = new Date(ts * 1000);
+            return date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+        }
+
+        function dateToTimestamp(line) {
+            const date = new Date(line.trim());
+            if (isNaN(date.getTime())) return '❌ 无效日期格式';
+            return Math.floor(date.getTime() / 1000);
+        }
+
+        function hexToText(line) {
+            try {
+                const hex = line.replace(/\s+/g, '');
+                const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                return new TextDecoder().decode(bytes);
+            } catch (e) { return '❌ 无效十六进制: ' + e.message; }
+        }
+
+        function textToHex(line) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(line);
+            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+        }
+
+        // ============================================================
+        //  统一分发 (增强版)
+        // ============================================================
+        async function applyTransform(type) {
             const text = getInputText();
             if (!text && text !== '') { showToast('输入内容为空', 1200); return; }
 
             const lines = getLines(text);
 
-            switch (type) {
-                case 'uppercase':
-                    transformLines(toUpper);
-                    break;
-                case 'lowercase':
-                    transformLines(toLower);
-                    break;
-                case 'capitalize':
-                    transformLines(toCapitalize);
-                    break;
-                case 'sentence':
-                    transformLines(toSentence);
-                    break;
-                case 'toggle':
-                    transformLines(toToggle);
-                    break;
-                case 'camel':
-                    transformLines(toCamel);
-                    break;
-                case 'pascal':
-                    transformLines(toPascal);
-                    break;
-                case 'snake':
-                    transformLines(toSnake);
-                    break;
-                case 'constant':
-                    transformLines(toConstant);
-                    break;
-                case 'kebab':
-                    transformLines(toKebab);
-                    break;
-                case 'addNumber':
-                    transformLines(addNumber);
-                    break;
-                case 'reverseLines': {
-                    const result = lines.reverse();
-                    setOutputText(joinLines(result));
-                    showToast('✅ 行已反转', 1000);
-                    break;
-                }
-                case 'shuffleLines': {
-                    const shuffled = [...lines];
-                    for (let i = shuffled.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            // 同步操作
+            const syncOperations = () => {
+                switch (type) {
+                    case 'uppercase':
+                        transformLines(toUpper); break;
+                    case 'lowercase':
+                        transformLines(toLower); break;
+                    case 'capitalize':
+                        transformLines(toCapitalize); break;
+                    case 'sentence':
+                        transformLines(toSentence); break;
+                    case 'toggle':
+                        transformLines(toToggle); break;
+                    case 'camel':
+                        transformLines(toCamel); break;
+                    case 'pascal':
+                        transformLines(toPascal); break;
+                    case 'snake':
+                        transformLines(toSnake); break;
+                    case 'constant':
+                        transformLines(toConstant); break;
+                    case 'kebab':
+                        transformLines(toKebab); break;
+                    case 'addNumber':
+                        transformLines(addNumber); break;
+                    case 'reverseLines': {
+                        const result = lines.reverse();
+                        setOutputText(joinLines(result));
+                        showToast('✅ 行已反转', 1000);
+                        break;
                     }
-                    setOutputText(joinLines(shuffled));
-                    showToast('✅ 行已打乱', 1000);
-                    break;
+                    case 'shuffleLines': {
+                        const shuffled = [...lines];
+                        for (let i = shuffled.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                        }
+                        setOutputText(joinLines(shuffled));
+                        showToast('✅ 行已打乱', 1000);
+                        break;
+                    }
+                    case 'sortAlpha': {
+                        const sorted = sortAlpha(lines);
+                        setOutputText(joinLines(sorted));
+                        showToast('✅ 已按字母排序 A→Z', 1000);
+                        break;
+                    }
+                    case 'sortAlphaDesc': {
+                        const sorted = sortAlphaDesc(lines);
+                        setOutputText(joinLines(sorted));
+                        showToast('✅ 已按字母排序 Z→A', 1000);
+                        break;
+                    }
+                    case 'sortLength': {
+                        const sorted = sortLength(lines);
+                        setOutputText(joinLines(sorted));
+                        showToast('✅ 已按长度升序', 1000);
+                        break;
+                    }
+                    case 'sortLengthDesc': {
+                        const sorted = sortLengthDesc(lines);
+                        setOutputText(joinLines(sorted));
+                        showToast('✅ 已按长度降序', 1000);
+                        break;
+                    }
+                    case 'mergeLines': {
+                        const merged = mergeLines(lines);
+                        setOutputText(joinLines(merged));
+                        showToast('✅ 已合并为一行', 1000);
+                        break;
+                    }
+                    case 'trimLines':
+                        transformLines(trimLines); break;
+                    case 'removeEmpty': {
+                        const result = lines.filter(line => line.trim().length > 0);
+                        setOutputText(joinLines(result));
+                        showToast('✅ 已删除空行', 1000);
+                        break;
+                    }
+                    case 'dedupe': {
+                        const unique = [];
+                        const seen = new Set();
+                        lines.forEach(line => {
+                            if (!seen.has(line)) { seen.add(line);
+                                unique.push(line); }
+                        });
+                        setOutputText(joinLines(unique));
+                        showToast('✅ 已删除重复行', 1000);
+                        break;
+                    }
+                    case 'collapseSpaces':
+                        transformLines(collapseSpaces); break;
+                    case 'removeAllSpaces':
+                        transformLines(removeAllSpaces); break;
+                    case 'removeLineBreaks': {
+                        setOutputText(lines.join(' '));
+                        showToast('✅ 已删除换行符', 1000);
+                        break;
+                    }
+                    case 'stripHtml':
+                        transformLines(stripHtml); break;
+                    case 'stripSpecial':
+                        transformLines(stripSpecial); break;
+                    case 'stripNumbers':
+                        transformLines(stripNumbers); break;
+                    case 'stripLetters':
+                        transformLines(stripLetters); break;
+                    case 'extractEmails': {
+                        const all = lines.map(extractEmails).filter(s => s);
+                        setOutputText(all.join('\n'));
+                        showToast('✅ 已提取邮箱', 1000);
+                        break;
+                    }
+                    case 'extractUrls': {
+                        const all = lines.map(extractUrls).filter(s => s);
+                        setOutputText(all.join('\n'));
+                        showToast('✅ 已提取网址', 1000);
+                        break;
+                    }
+                    case 'extractNumbers': {
+                        const all = lines.map(extractNumbers).filter(s => s);
+                        setOutputText(all.join('\n'));
+                        showToast('✅ 已提取数字', 1000);
+                        break;
+                    }
+                    case 'base64Encode':
+                        transformLines(base64Encode); break;
+                    case 'base64Decode':
+                        transformLines(base64Decode); break;
+                    case 'urlEncode':
+                        transformLines(urlEncode); break;
+                    case 'urlDecode':
+                        transformLines(urlDecode); break;
+                    case 'htmlEscape':
+                        transformLines(htmlEscape); break;
+                    case 'htmlUnescape':
+                        transformLines(htmlUnescape); break;
+                    case 'unicodeEncode':
+                        transformLines(unicodeEncode); break;
+                    case 'unicodeDecode':
+                        transformLines(unicodeDecode); break;
+                    case 'morseEncode':
+                        transformLines(morseEncode); break;
+                    case 'morseDecode':
+                        transformLines(morseDecode); break;
+                    case 'caesarEncode':
+                        transformLines(line => caesarEncode(line, 3)); break;
+                    case 'caesarDecode':
+                        transformLines(line => caesarDecode(line, 3)); break;
+                    case 'loremIpsum': {
+                        setOutputText(loremIpsum());
+                        showToast('✅ 已生成 Lorem Ipsum', 1000);
+                        break;
+                    }
+                    case 'slugify':
+                        transformLines(slugify); break;
+                    case 'reverseText':
+                        transformLines(reverseText); break;
+                    case 's2t':
+                        transformLines(s2t); break;
+                    case 't2s':
+                        transformLines(t2s); break;
+                    case 'wordCount': {
+                        const total = lines.reduce((sum, l) => sum + wordCount(l), 0);
+                        setOutputText(`总字数: ${total}\n每行字数:\n` + lines.map((l, i) => `第${i+1}行: ${wordCount(l)}`)
+                            .join('\n'));
+                        showToast('✅ 字数统计完成', 1000);
+                        break;
+                    }
+                    case 'charCount': {
+                        const total = lines.reduce((sum, l) => sum + l.length, 0);
+                        setOutputText(`总字符数: ${total}\n每行字符数:\n` + lines.map((l, i) => `第${i+1}行: ${l.length}`).join(
+                            '\n'));
+                        showToast('✅ 字符统计完成', 1000);
+                        break;
+                    }
+                    case 'paraCount': {
+                        const paras = text.split(/\n\s*\n/).filter(p => p.trim());
+                        setOutputText(`段落数: ${paras.length}\n\n` + paras.map((p, i) => `段落 ${i+1}:\n${p}`).join(
+                        '\n\n'));
+                        showToast('✅ 段落统计完成', 1000);
+                        break;
+                    }
+                    case 'freqCount': {
+                        const allText = lines.join(' ');
+                        setOutputText(freqCount(allText));
+                        showToast('✅ 词频统计完成', 1000);
+                        break;
+                    }
+                    case 'sentenceCount': {
+                        const total = lines.reduce((sum, l) => sum + (sentenceCount(l) || (l.trim() ? 1 : 0)), 0);
+                        setOutputText(`总句子数: ${total}\n每行句子数:\n` + lines.map((l, i) => `第${i+1}行: ${sentenceCount(l) || (l.trim() ? 1 : 0)}`)
+                            .join('\n'));
+                        showToast('✅ 句子统计完成', 1000);
+                        break;
+                    }
+                        // ===== 🆕 新增功能 =====
+                    case 'jsonBeautify':
+                        transformLines(jsonBeautify); break;
+                    case 'jsonCompact':
+                        transformLines(jsonCompact); break;
+                    case 'jsonEscape':
+                        transformLines(jsonEscape); break;
+                    case 'jsonUnescape':
+                        transformLines(jsonUnescape); break;
+                    case 'jsonToCsv':
+                        transformLines(jsonToCsv); break;
+                    case 'csvToJson':
+                        transformLines(csvToJson); break;
+                    case 'sqlBeautify':
+                        transformLines(sqlBeautify); break;
+                    case 'sqlCompact':
+                        transformLines(sqlCompact); break;
+                    case 'xmlBeautify':
+                        transformLines(xmlBeautify); break;
+                    case 'xmlCompact':
+                        transformLines(xmlCompact); break;
+                    case 'csvToList':
+                        transformLines(csvToList); break;
+                    case 'listToCsv':
+                        transformLines(listToCsv); break;
+                    case 'alignLeft':
+                        transformLines(alignLeft); break;
+                    case 'alignRight':
+                        transformLines(alignRight); break;
+                    case 'alignCenter':
+                        transformLines(alignCenter); break;
+                    case 'escapeSpecial':
+                        transformLines(escapeSpecial); break;
+                    case 'unescapeSpecial':
+                        transformLines(unescapeSpecial); break;
+                    case 'removeDuplicateChars':
+                        transformLines(removeDuplicateChars); break;
+                    case 'timestampToDate':
+                        transformLines(timestampToDate); break;
+                    case 'dateToTimestamp':
+                        transformLines(dateToTimestamp); break;
+                    case 'hexToText':
+                        transformLines(hexToText); break;
+                    case 'textToHex':
+                        transformLines(textToHex); break;
+                    default:
+                        showToast('未知操作', 1000);
                 }
-                case 'sortAlpha': {
-                    const sorted = sortAlpha(lines);
-                    setOutputText(joinLines(sorted));
-                    showToast('✅ 已按字母排序 A→Z', 1000);
-                    break;
+            };
+
+            // 异步哈希操作
+            if (type === 'hashSha256' || type === 'hashSha1') {
+                try {
+                    let hash;
+                    if (type === 'hashSha256') hash = await hashSha256(text);
+                    else hash = await hashSha1(text);
+                    setOutputText(hash);
+                    showToast('✅ 哈希生成完成', 1000);
+                } catch (e) {
+                    setOutputText('❌ 哈希失败: ' + e.message);
+                    showToast('❌ 哈希失败', 1500);
                 }
-                case 'sortAlphaDesc': {
-                    const sorted = sortAlphaDesc(lines);
-                    setOutputText(joinLines(sorted));
-                    showToast('✅ 已按字母排序 Z→A', 1000);
-                    break;
-                }
-                case 'sortLength': {
-                    const sorted = sortLength(lines);
-                    setOutputText(joinLines(sorted));
-                    showToast('✅ 已按长度升序', 1000);
-                    break;
-                }
-                case 'sortLengthDesc': {
-                    const sorted = sortLengthDesc(lines);
-                    setOutputText(joinLines(sorted));
-                    showToast('✅ 已按长度降序', 1000);
-                    break;
-                }
-                case 'mergeLines': {
-                    const merged = mergeLines(lines);
-                    setOutputText(joinLines(merged));
-                    showToast('✅ 已合并为一行', 1000);
-                    break;
-                }
-                case 'trimLines':
-                    transformLines(trimLines);
-                    break;
-                case 'removeEmpty': {
-                    const result = lines.filter(line => line.trim().length > 0);
-                    setOutputText(joinLines(result));
-                    showToast('✅ 已删除空行', 1000);
-                    break;
-                }
-                case 'dedupe': {
-                    const unique = [];
-                    const seen = new Set();
-                    lines.forEach(line => {
-                        if (!seen.has(line)) { seen.add(line);
-                            unique.push(line); }
-                    });
-                    setOutputText(joinLines(unique));
-                    showToast('✅ 已删除重复行', 1000);
-                    break;
-                }
-                case 'collapseSpaces':
-                    transformLines(collapseSpaces);
-                    break;
-                case 'removeAllSpaces':
-                    transformLines(removeAllSpaces);
-                    break;
-                case 'removeLineBreaks': {
-                    setOutputText(lines.join(' '));
-                    showToast('✅ 已删除换行符', 1000);
-                    break;
-                }
-                case 'stripHtml':
-                    transformLines(stripHtml);
-                    break;
-                case 'stripSpecial':
-                    transformLines(stripSpecial);
-                    break;
-                case 'stripNumbers':
-                    transformLines(stripNumbers);
-                    break;
-                case 'stripLetters':
-                    transformLines(stripLetters);
-                    break;
-                case 'extractEmails': {
-                    const all = lines.map(extractEmails).filter(s => s);
-                    setOutputText(all.join('\n'));
-                    showToast('✅ 已提取邮箱', 1000);
-                    break;
-                }
-                case 'extractUrls': {
-                    const all = lines.map(extractUrls).filter(s => s);
-                    setOutputText(all.join('\n'));
-                    showToast('✅ 已提取网址', 1000);
-                    break;
-                }
-                case 'extractNumbers': {
-                    const all = lines.map(extractNumbers).filter(s => s);
-                    setOutputText(all.join('\n'));
-                    showToast('✅ 已提取数字', 1000);
-                    break;
-                }
-                case 'base64Encode':
-                    transformLines(base64Encode);
-                    break;
-                case 'base64Decode':
-                    transformLines(base64Decode);
-                    break;
-                case 'urlEncode':
-                    transformLines(urlEncode);
-                    break;
-                case 'urlDecode':
-                    transformLines(urlDecode);
-                    break;
-                case 'htmlEscape':
-                    transformLines(htmlEscape);
-                    break;
-                case 'htmlUnescape':
-                    transformLines(htmlUnescape);
-                    break;
-                case 'unicodeEncode':
-                    transformLines(unicodeEncode);
-                    break;
-                case 'unicodeDecode':
-                    transformLines(unicodeDecode);
-                    break;
-                case 'morseEncode':
-                    transformLines(morseEncode);
-                    break;
-                case 'morseDecode':
-                    transformLines(morseDecode);
-                    break;
-                case 'caesarEncode':
-                    transformLines(line => caesarEncode(line, 3));
-                    break;
-                case 'caesarDecode':
-                    transformLines(line => caesarDecode(line, 3));
-                    break;
-                case 'loremIpsum': {
-                    setOutputText(loremIpsum());
-                    showToast('✅ 已生成 Lorem Ipsum', 1000);
-                    break;
-                }
-                case 'slugify':
-                    transformLines(slugify);
-                    break;
-                case 'reverseText':
-                    transformLines(reverseText);
-                    break;
-                case 's2t':
-                    transformLines(s2t);
-                    break;
-                case 't2s':
-                    transformLines(t2s);
-                    break;
-                case 'wordCount': {
-                    const total = lines.reduce((sum, l) => sum + wordCount(l), 0);
-                    setOutputText(`总字数: ${total}\n每行字数:\n` + lines.map((l, i) => `第${i+1}行: ${wordCount(l)}`).join(
-                    '\n'));
-                    showToast('✅ 字数统计完成', 1000);
-                    break;
-                }
-                case 'charCount': {
-                    const total = lines.reduce((sum, l) => sum + l.length, 0);
-                    setOutputText(`总字符数: ${total}\n每行字符数:\n` + lines.map((l, i) => `第${i+1}行: ${l.length}`).join(
-                    '\n'));
-                    showToast('✅ 字符统计完成', 1000);
-                    break;
-                }
-                case 'paraCount': {
-                    const paras = text.split(/\n\s*\n/).filter(p => p.trim());
-                    setOutputText(`段落数: ${paras.length}\n\n` + paras.map((p, i) => `段落 ${i+1}:\n${p}`).join('\n\n'));
-                    showToast('✅ 段落统计完成', 1000);
-                    break;
-                }
-                case 'freqCount': {
-                    const allText = lines.join(' ');
-                    setOutputText(freqCount(allText));
-                    showToast('✅ 词频统计完成', 1000);
-                    break;
-                }
-                case 'sentenceCount': {
-                    const total = lines.reduce((sum, l) => sum + (sentenceCount(l) || (l.trim() ? 1 : 0)), 0);
-                    setOutputText(`总句子数: ${total}\n每行句子数:\n` + lines.map((l, i) => `第${i+1}行: ${sentenceCount(l) || (l.trim() ? 1 : 0)}`).join(
-                        '\n'));
-                    showToast('✅ 句子统计完成', 1000);
-                    break;
-                }
-                default:
-                    showToast('未知操作', 1000);
+                return;
             }
+
+            syncOperations();
         }
 
         // ---- 替换 ----
@@ -1289,9 +1495,8 @@ JavaScript is awesome
                 setOutputText(joinLines(result));
                 showToast(`✅ 替换完成`, 1500);
             } catch (e) {
-                // 如果不是有效正则，当作普通字符串
                 const result = lines.map(line => line.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-                replace));
+                    replace));
                 setOutputText(joinLines(result));
                 showToast(`✅ 替换完成 (普通文本)`, 1500);
             }
@@ -1310,7 +1515,7 @@ JavaScript is awesome
                 showToast(`✅ 删除完成`, 1500);
             } catch (e) {
                 const result = lines.map(line => line.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-                ''));
+                    ''));
                 setOutputText(joinLines(result));
                 showToast(`✅ 删除完成 (普通文本)`, 1500);
             }
@@ -1430,10 +1635,11 @@ JavaScript is awesome
 
         outputArea.addEventListener('dblclick', copyResult);
 
-        console.log('📝 文本处理工具箱增强版已加载 (50+ 功能)');
+        console.log('📝 文本处理工具箱 · 70+ 功能增强版已加载');
         console.log('💡 快捷键: Ctrl+Enter 执行替换, Ctrl+Shift+C 复制结果');
         console.log('💡 点击分类标题可展开/收起功能组');
     </script>
 
 </body>
+
 </html>

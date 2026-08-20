@@ -23,7 +23,7 @@
         }
 
         .page-container {
-            max-width: 960px;
+            max-width: 1020px;
             width: 100%;
         }
 
@@ -220,8 +220,28 @@
             border-color: #fda4af;
         }
 
+        /* 卡片5 特殊颜色 - 文件夹结构化 */
+        .card-folder .icon-wrapper {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            box-shadow: 0 12px 24px -8px rgba(217, 119, 6, 0.30);
+        }
+
+        .card-folder .badge {
+            background: #fffbeb;
+            border-color: #fcd34d;
+            color: #92400e;
+        }
+
+        .card-folder .enter-hint {
+            color: #d97706;
+        }
+
+        .card-folder:hover {
+            border-color: #fbbf24;
+        }
+
         /* 响应式 */
-        @media (max-width: 860px) {
+        @media (max-width: 900px) {
             .card-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 20px;
@@ -283,7 +303,7 @@
                     <span class="arrow-hint">→</span>
                 </h2>
                 <p class="card-desc">
-                    合并多个 Excel 或 CSV 文件，自动添加“来源文件名”列。
+                    合并多个 Excel 或 CSV 文件，自动添加"来源文件名"列。
                 </p>
 
                 <div class="badge-group">
@@ -351,6 +371,27 @@
                     <span class="badge"><i>📊</i> .xlsx</span>
                     <span class="badge"><i>🖼️</i> 图片嵌入</span>
                     <span class="badge"><i>📌</i> 锚定单元格</span>
+                </div>
+
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- 工具5：文件夹结构化工具 -->
+            <a href="tools/folder_organizer.html" class="nav-card card-folder" target="_blank" title="通过 TXT 路径列表批量整理文件夹结构">
+                <div class="icon-wrapper">📁</div>
+                <h2 class="card-title">
+                    文件夹结构化
+                    <span class="arrow-hint">→</span>
+                </h2>
+                <p class="card-desc">
+                    导出路径列表 TXT，编辑后上传执行迁移，未列条目自动备份。
+                </p>
+
+                <div class="badge-group">
+                    <span class="badge"><i>📁</i> FS-Access</span>
+                    <span class="badge"><i>📝</i> TXT 驱动</span>
+                    <span class="badge"><i>🔄</i> 批量移动</span>
+                    <span class="badge"><i>💾</i> 自动备份</span>
                 </div>
 
                 <div class="enter-hint">点击进入 →</div>

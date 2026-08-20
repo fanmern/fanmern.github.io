@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文件夹结构化工具 · 路径列表版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f6f9fc;
+            color: #1e293b;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            max-width: 1100px;
+            width: 100%;
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.10);
+            padding: 36px 40px 44px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        h1 small {
+            font-size: 16px;
+            font-weight: 400;
+            color: #64748b;
+        }
+        .sub {
+            color: #475569;
+            font-size: 15px;
+            margin-bottom: 28px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 16px;
+            background: #f8fafc;
+            border-radius: 0 12px 12px 0;
+            line-height: 1.6;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            margin: 20px 0 24px;
+            align-items: center;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #eef2f6;
+            color: #1e293b;
+            user-select: none;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+        .btn-primary {
+            background: #1e293b;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #0f172a;
+        }
+        .btn-success {
+            background: #0b8a4c;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #0a6f3f;
+        }
+        .btn-danger {
+            background: #b91c1c;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #991b1b;
+        }
+        .btn-warning {
+            background: #d97706;
+            color: #fff;
+        }
+        .btn-warning:hover {
+            background: #b45309;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #cbd5e1;
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status-bar {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 14px 22px;
+            font-size: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 18px;
+            margin: 16px 0 20px;
+            min-height: 56px;
+            border: 1px solid #e2e8f0;
+        }
+        .status-bar .label {
+            color: #475569;
+            font-weight: 500;
+        }
+        .status-bar .value {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .status-bar .badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .progress-wrap {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            margin: 10px 0 4px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-wrap.active {
+            display: block;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            border-radius: 6px;
+            transition: width 0.25s ease;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin: 14px 0 10px;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 12px 16px;
+            border: 1px solid #eef2f6;
+        }
+        .stat-card .num {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+        .stat-card .desc {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .log-area {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            max-height: 280px;
+            overflow-y: auto;
+            margin: 18px 0 6px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .log-area .log-ok {
+            color: #4ade80;
+        }
+        .log-area .log-err {
+            color: #f87171;
+        }
+        .log-area .log-info {
+            color: #60a5fa;
+        }
+        .log-area .log-warn {
+            color: #fbbf24;
+        }
+        .log-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .log-area::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 6px;
+        }
+        .log-area::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 6px;
+        }
+        .file-input-hidden {
+            display: none;
+        }
+        .text-muted {
+            color: #64748b;
+            font-size: 13px;
+        }
+        .divider {
+            border: none;
+            border-top: 1.5px solid #eef2f6;
+            margin: 20px 0 16px;
+        }
+        .txt-preview {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            max-height: 250px;
+            overflow: auto;
+            white-space: pre;
+            margin-top: 10px;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .format-hint {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #475569;
+            margin-top: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+        .format-hint code {
+            background: #e2e8f0;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        @media (max-width:700px) {
+            .app-container {
+                padding: 20px 16px;
+            }
+            h1 {
+                font-size: 22px;
+                flex-wrap: wrap;
+            }
+            .toolbar {
+                gap: 8px;
+            }
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>📂 文件夹结构化工具 <small>路径列表 · TXT 驱动</small></h1>
+        <div class="sub">
+            ⚡ 选择文件夹 → 导出路径列表 TXT → 编辑路径（修改目标路径）→ 上传执行迁移 &amp; 未列条目移至「待处理文件」
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-primary" id="btnSelectFolder">📁 选择文件夹</button>
+            <button class="btn btn-success" id="btnExportTxt" disabled>⬇ 导出 TXT</button>
+            <button class="btn btn-warning" id="btnUploadTxt" disabled>⬆ 上传 TXT</button>
+            <button class="btn btn-danger" id="btnExecute" disabled>🚀 执行迁移</button>
+            <button class="btn btn-outline" id="btnClearLog">🧹 清空日志</button>
+            <span class="text-muted" style="margin-left:auto;" id="folderNameDisplay">未选择</span>
+        </div>
+
+        <div class="status-bar">
+            <span class="label">📌 状态：</span>
+            <span class="value" id="statusText">等待选择文件夹</span>
+            <span class="badge" id="statusBadge">就绪</span>
+            <span style="margin-left:auto;font-size:13px;color:#64748b;" id="entryCountDisplay">条目：0</span>
+        </div>
+        <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="num" id="statFiles">0</div><div class="desc">📄 文件</div></div>
+            <div class="stat-card"><div class="num" id="statFolders">0</div><div class="desc">📁 文件夹</div></div>
+            <div class="stat-card"><div class="num" id="statTotal">0</div><div class="desc">📦 总条目</div></div>
+            <div class="stat-card"><div class="num" id="statMoved">0</div><div class="desc">🔄 已移动</div></div>
+        </div>
+
+        <hr class="divider" />
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:600;font-size:15px;">📋 操作日志</span>
+            <span class="text-muted" id="logCount">0 条</span>
+        </div>
+        <div class="log-area" id="logArea"></div>
+
+        <!-- TXT 预览 -->
+        <div id="txtPreviewArea" style="display:none; margin-top:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-weight:600;font-size:14px;">📄 内容预览</span>
+                <span class="text-muted" id="txtLineCount">0 行</span>
+            </div>
+            <div class="txt-preview" id="txtPreview"></div>
+            <div class="format-hint">
+                💡 每行一个完整路径。修改路径即表示移动到新位置，删除某行则该条目将被移至「待处理文件」备份。
+            </div>
+        </div>
+
+        <input type="file" class="file-input-hidden" id="fileInput" accept=".txt" />
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- DOM ----------
+            const $ = id => document.getElementById(id);
+            const btnSelect = $('btnSelectFolder');
+            const btnExport = $('btnExportTxt');
+            const btnUpload = $('btnUploadTxt');
+            const btnExecute = $('btnExecute');
+            const btnClearLog = $('btnClearLog');
+            const fileInput = $('fileInput');
+            const statusText = $('statusText');
+            const statusBadge = $('statusBadge');
+            const folderNameDisplay = $('folderNameDisplay');
+            const entryCountDisplay = $('entryCountDisplay');
+            const progressWrap = $('progressWrap');
+            const progressBar = $('progressBar');
+            const statFiles = $('statFiles');
+            const statFolders = $('statFolders');
+            const statTotal = $('statTotal');
+            const statMoved = $('statMoved');
+            const logArea = $('logArea');
+            const logCount = $('logCount');
+            const txtPreview = $('txtPreview');
+            const txtPreviewArea = $('txtPreviewArea');
+            const txtLineCount = $('txtLineCount');
+
+            let rootHandle = null,
+                rootName = '',
+                scanResult = null,
+                uploadedPaths = null,
+                movePlan = null;
+            let isExecuting = false,
+                logCounter = 0;
+            const BACKUP_DIR = '待处理文件';
+
+            // ---------- 辅助 ----------
+            function setStatus(text, badge = '就绪', color = '') {
+                statusText.textContent = text;
+                statusBadge.textContent = badge;
+                statusBadge.style.background = color || '#dbeafe';
+            }
+
+            function updateStats() {
+                if (!scanResult) {
+                    ['statFiles', 'statFolders', 'statTotal'].forEach(id => $(id).textContent = '0');
+                    entryCountDisplay.textContent = '条目：0';
+                    return;
+                }
+                statFiles.textContent = scanResult.fileCount;
+                statFolders.textContent = scanResult.folderCount;
+                statTotal.textContent = scanResult.total;
+                entryCountDisplay.textContent = `条目：${scanResult.total}`;
+            }
+
+            function setProgress(pct, show = true) {
+                progressWrap.classList.toggle('active', show);
+                progressBar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+            }
+
+            function logMessage(msg, type = 'info') {
+                const cls = { ok: 'log-ok', err: 'log-err', info: 'log-info', warn: 'log-warn' } [type] || 'log-info';
+                const time = new Date().toLocaleTimeString();
+                const line = document.createElement('div');
+                line.className = cls;
+                line.textContent = `[${time}] ${msg}`;
+                logArea.appendChild(line);
+                logArea.scrollTop = logArea.scrollHeight;
+                logCounter++;
+                logCount.textContent = logCounter + ' 条';
+            }
+
+            function clearLog() { logArea.innerHTML = '';
+                logCounter = 0;
+                logCount.textContent = '0 条'; }
+
+            function normalizePath(p) {
+                if (!p) return '/';
+                let s = p.replace(/\\/g, '/').trim();
+                if (!s.startsWith('/')) s = '/' + s;
+                s = s.replace(/\/+/g, '/');
+                return s === '' ? '/' : s;
+            }
+
+            function dirname(p) {
+                if (!p || p === '/') return '/';
+                const parts = p.split('/').filter(Boolean);
+                if (parts.length <= 1) return '/';
+                parts.pop();
+                return '/' + parts.join('/');
+            }
+
+            function basename(p) {
+                if (!p || p === '/') return '';
+                const parts = p.split('/').filter(Boolean);
+                return parts[parts.length - 1] || '';
+            }
+
+            // ---------- 扫描 ----------
+            async function scanDirectory(handle, relPath = '/') {
+                const entries = [];
+                let files = 0,
+                    folders = 0;
+                try {
+                    for await (const entry of handle.values()) {
+                        if (entry.name === BACKUP_DIR) continue;
+                        const path = relPath === '/' ? '/' + entry.name : relPath + '/' + entry.name;
+                        const isDir = entry.kind === 'directory';
+                        const item = { name: entry.name, path: normalizePath(path), isDir, handle: entry, children: [] };
+                        if (isDir) {
+                            folders++;
+                            const sub = await scanDirectory(entry, path);
+                            item.children = sub.entries;
+                            files += sub.files;
+                            folders += sub.folders;
+                        } else {
+                            files++;
+                        }
+                        entries.push(item);
+                    }
+                } catch (e) { logMessage(`扫描出错: ${e.message}`, 'warn'); }
+                entries.sort((a, b) => {
+                    if (a.isDir && !b.isDir) return -1;
+                    if (!a.isDir && b.isDir) return 1;
+                    return a.name.localeCompare(b.name);
+                });
+                return { entries, files, folders };
+            }
+
+            // 扁平化
+            function flattenTree(tree, parentPath = '/', depth = 0) {
+                const result = [];
+                let fileCount = 0,
+                    folderCount = 0;
+
+                function walk(node, path, d) {
+                    const isDir = node.isDir;
+                    const item = {
+                        name: node.name,
+                        path: path,
+                        isDir,
+                        handle: node.handle,
+                        depth: d,
+                        children: node.children || []
+                    };
+                    result.push(item);
+
+                    if (isDir && node.children && node.children.length > 0) {
+                        for (const child of node.children) {
+                            const childPath = path === '/' ? '/' + child.name : path + '/' + child.name;
+                            walk(child, childPath, d + 1);
+                        }
+                    }
+                }
+
+                for (const node of tree) {
+                    const path = parentPath === '/' ? '/' + node.name : parentPath + '/' + node.name;
+                    walk(node, path, depth);
+                }
+
+                for (const item of result) {
+                    if (item.isDir) folderCount++;
+                    else fileCount++;
+                }
+                return { flatList: result, fileCount, folderCount, total: result.length };
+            }
+
+            // ---------- 导出 TXT（纯路径列表） ----------
+            function generateTxt(flatList) {
+                const lines = [];
+                // 注释头
+                lines.push('# 完整路径列表 - 每行一个路径');
+                lines.push('# 修改路径即表示移动到新位置，删除行则备份到「待处理文件」');
+                lines.push('# 注意：路径以 / 开头，表示相对于根目录');
+                lines.push('');
+
+                for (const item of flatList) {
+                    lines.push(item.path);
+                }
+
+                return lines.join('\n');
+            }
+
+            // ---------- 解析 TXT（纯路径列表） ----------
+            function parseTxt(content) {
+                const lines = content.split('\n');
+                const paths = [];
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    // 跳过空行和注释行
+                    if (!trimmed || trimmed.startsWith('#')) continue;
+                    // 跳过看起来像注释的
+                    if (trimmed.startsWith('//') || trimmed.startsWith(';')) continue;
+
+                    // 规范化路径
+                    const path = normalizePath(trimmed);
+                    if (path && path !== '/') {
+                        paths.push(path);
+                    }
+                }
+
+                return paths;
+            }
+
+            // ---------- 构建执行计划 ----------
+            function buildMovePlan(uploadedPaths, flatList) {
+                const origMap = new Map();
+                for (const item of flatList) {
+                    origMap.set(item.path, item);
+                }
+
+                const uploadedSet = new Set(uploadedPaths);
+                const plan = [];
+
+                // 处理上传的路径
+                for (const targetPath of uploadedPaths) {
+                    // 查找原始路径：上传的路径可能被修改过，需要匹配原始路径
+                    // 策略：用目标路径在扫描结果中查找，如果找不到则尝试用名称匹配
+                    // 更稳健：直接用路径匹配，因为用户可能只修改了部分路径
+                    // 但为了准确，我们建立原始路径到目标路径的映射
+                    // 这里我们按行匹配，每行对应一个条目
+                    // 由于用户可能增删行，我们采用：遍历所有原始条目，检查是否在上传列表中
+                    // 但更好的方式：保持顺序匹配
+                    // 这里我们采用：将上传的路径作为目标路径，与原始路径做对应
+                    // 最简单的方式：用户修改路径后，我们通过路径匹配来判断移动
+                }
+
+                // 更稳健的方式：遍历原始条目，查找其路径是否在上传列表中
+                // 如果路径变了，则通过名称和父路径匹配
+                // 这里采用：用户通常不会改变名称，只改变父路径
+                // 所以用名称 + 父路径匹配
+
+                // 建立名称到原始条目的映射（可能有重名，需要结合父路径）
+                const nameMap = new Map();
+                for (const item of flatList) {
+                    const name = item.name;
+                    if (!nameMap.has(name)) {
+                        nameMap.set(name, []);
+                    }
+                    nameMap.get(name).push(item);
+                }
+
+                // 对于每个上传的路径，尝试匹配
+                const usedItems = new Set();
+                const unmatchedTargets = [];
+
+                for (const targetPath of uploadedPaths) {
+                    const targetName = basename(targetPath);
+                    const targetDir = dirname(targetPath);
+
+                    // 尝试在扫描结果中查找
+                    const candidates = nameMap.get(targetName) || [];
+                    let matched = null;
+
+                    // 优先匹配路径完全相同的
+                    for (const item of candidates) {
+                        if (item.path === targetPath) {
+                            matched = item;
+                            break;
+                        }
+                    }
+
+                    // 如果没有完全匹配，尝试匹配名称相同且不在已使用列表中的
+                    if (!matched) {
+                        for (const item of candidates) {
+                            if (!usedItems.has(item.path)) {
+                                matched = item;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (matched) {
+                        usedItems.add(matched.path);
+                        const origPath = matched.path;
+                        if (origPath === targetPath) {
+                            plan.push({ type: 'noop', orig: origPath, target: targetPath, item: matched, msg: '无变化' });
+                        } else {
+                            plan.push({ type: 'move', orig: origPath, target: targetPath, item: matched, msg: '移动' });
+                        }
+                    } else {
+                        // 尝试用路径直接匹配
+                        const directMatch = origMap.get(targetPath);
+                        if (directMatch && !usedItems.has(targetPath)) {
+                            usedItems.add(targetPath);
+                            plan.push({ type: 'noop', orig: targetPath, target: targetPath, item: directMatch,
+                            msg: '无变化' });
+                        } else {
+                            unmatchedTargets.push(targetPath);
+                        }
+                    }
+                }
+
+                // 记录未匹配的目标路径
+                for (const target of unmatchedTargets) {
+                    plan.push({ type: 'error', orig: target, target: target, msg: '未匹配到原始条目', item: null });
+                }
+
+                // 找出未在上传列表中出现的原始条目（需要备份）
+                const backupItems = [];
+                for (const item of flatList) {
+                    if (item.path === '/') continue;
+                    if (!usedItems.has(item.path)) {
+                        backupItems.push(item);
+                    }
+                }
+
+                return { plan, backupItems };
+            }
+
+            // ---------- 执行迁移 ----------
+            async function executeMigration(plan, backupItems, rootHandle) {
+                const results = { moved: 0, skipped: 0, errors: [], backups: 0, backupErrors: [] };
+
+                let backupHandle = null;
+                if (backupItems.length > 0) {
+                    try {
+                        backupHandle = await rootHandle.getDirectoryHandle(BACKUP_DIR, { create: true });
+                        logMessage(`📁 已创建/获取「${BACKUP_DIR}」备份目录`, 'ok');
+                    } catch (e) {
+                        logMessage(`⚠️ 创建「${BACKUP_DIR}」失败: ${e.message}`, 'err');
+                    }
+                }
+
+                async function ensureDirectoryPath(baseHandle, path) {
+                    if (!path || path === '/') return baseHandle;
+                    const parts = path.split('/').filter(Boolean);
+                    let current = baseHandle;
+                    for (const part of parts) {
+                        try {
+                            current = await current.getDirectoryHandle(part, { create: true });
+                        } catch (e) {
+                            current = await current.getDirectoryHandle(part);
+                        }
+                    }
+                    return current;
+                }
+
+                async function moveItem(item, targetPath, rootHandle) {
+                    try {
+                        const targetDir = dirname(targetPath);
+                        const targetName = basename(targetPath);
+                        if (!targetName) throw new Error('目标路径无效');
+                        const srcHandle = item.handle;
+                        if (!srcHandle) throw new Error('源句柄不存在');
+
+                        let targetDirHandle;
+                        if (targetDir === '/' || targetDir === '') {
+                            targetDirHandle = rootHandle;
+                        } else {
+                            targetDirHandle = await ensureDirectoryPath(rootHandle, targetDir);
+                        }
+
+                        let targetExists = false;
+                        try {
+                            await targetDirHandle.getFileHandle(targetName);
+                            targetExists = true;
+                        } catch (e) {
+                            try {
+                                await targetDirHandle.getDirectoryHandle(targetName);
+                                targetExists = true;
+                            } catch (e2) {}
+                        }
+
+                        if (targetExists) {
+                            try {
+                                const targetFile = await targetDirHandle.getFileHandle(targetName);
+                                await targetFile.remove();
+                                logMessage(`🗑️ 已删除已存在的目标文件: ${targetPath}`, 'warn');
+                            } catch (e) {
+                                try {
+                                    await targetDirHandle.getDirectoryHandle(targetName);
+                                    throw new Error(`目标文件夹已存在: ${targetPath}`);
+                                } catch (e2) {
+                                    throw new Error(`目标已存在且无法处理: ${targetPath}`);
+                                }
+                            }
+                        }
+
+                        if (item.isDir) {
+                            await srcHandle.move(targetDirHandle, targetName);
+                            logMessage(`📁 移动文件夹: ${item.path} → ${targetPath}`, 'ok');
+                        } else {
+                            await srcHandle.move(targetDirHandle, targetName);
+                            logMessage(`📄 移动文件: ${item.path} → ${targetPath}`, 'ok');
+                        }
+                        results.moved++;
+                        return true;
+                    } catch (e) {
+                        logMessage(`❌ 移动失败 ${item.path} → ${targetPath}: ${e.message}`, 'err');
+                        results.errors.push({ orig: item.path, target: targetPath, error: e.message });
+                        return false;
+                    }
+                }
+
+                setProgress(0, true);
+                const totalMoves = plan.filter(p => p.type === 'move').length;
+                let done = 0;
+                for (const entry of plan) {
+                    if (entry.type === 'move') {
+                        const success = await moveItem(entry.item, entry.target, rootHandle);
+                        if (!success) results.skipped++;
+                        done++;
+                        setProgress(totalMoves > 0 ? (done / totalMoves) * 100 : 100);
+                    } else if (entry.type === 'error') {
+                        results.errors.push({ orig: entry.orig, target: entry.target, error: entry.msg });
+                    }
+                }
+
+                if (backupItems.length > 0 && backupHandle) {
+                    setProgress(0, true);
+                    const totalBackup = backupItems.length;
+                    let backupDone = 0;
+                    for (const item of backupItems) {
+                        try {
+                            const srcHandle = item.handle;
+                            if (!srcHandle) throw new Error('源句柄不存在');
+                            const relPath = item.path.startsWith('/') ? item.path.slice(1) : item.path;
+                            const backupTargetPath = '/' + BACKUP_DIR + '/' + relPath;
+                            const targetDir = dirname(backupTargetPath);
+                            const targetName = basename(backupTargetPath);
+                            if (!targetName) throw new Error('备份目标名称无效');
+
+                            let backupDirHandle;
+                            if (targetDir === '/' + BACKUP_DIR || targetDir === '') {
+                                backupDirHandle = backupHandle;
+                            } else {
+                                const relParts = targetDir.replace('/' + BACKUP_DIR, '').split('/').filter(Boolean);
+                                let current = backupHandle;
+                                for (const part of relParts) {
+                                    current = await current.getDirectoryHandle(part, { create: true });
+                                }
+                                backupDirHandle = current;
+                            }
+
+                            let exists = false;
+                            try {
+                                await backupDirHandle.getFileHandle(targetName);
+                                exists = true;
+                            } catch (e) {
+                                try {
+                                    await backupDirHandle.getDirectoryHandle(targetName);
+                                    exists = true;
+                                } catch (e2) {}
+                            }
+                            if (exists) {
+                                try {
+                                    const f = await backupDirHandle.getFileHandle(targetName);
+                                    await f.remove();
+                                } catch (e) {
+                                    await backupDirHandle.getDirectoryHandle(targetName);
+                                    throw new Error(`备份目标已存在且为目录: ${backupTargetPath}`);
+                                }
+                            }
+
+                            await srcHandle.move(backupDirHandle, targetName);
+                            logMessage(`💾 备份: ${item.path} → ${backupTargetPath}`, 'ok');
+                            results.backups++;
+                        } catch (e) {
+                            logMessage(`❌ 备份失败 ${item.path}: ${e.message}`, 'err');
+                            results.backupErrors.push({ orig: item.path, error: e.message });
+                        }
+                        backupDone++;
+                        setProgress(totalBackup > 0 ? (backupDone / totalBackup) * 100 : 100);
+                    }
+                } else if (backupItems.length > 0 && !backupHandle) {
+                    logMessage(`⚠️ 无法备份：「${BACKUP_DIR}」目录创建失败`, 'err');
+                }
+                setProgress(0, false);
+                return results;
+            }
+
+            // ---------- UI 事件 ----------
+            btnSelect.addEventListener('click', async () => {
+                try {
+                    if (!window.showDirectoryPicker) {
+                        logMessage('❌ 浏览器不支持 File System Access API', 'err');
+                        setStatus('浏览器不支持', '错误', '#fca5a5');
+                        return;
+                    }
+                    const handle = await window.showDirectoryPicker();
+                    rootHandle = handle;
+                    rootName = handle.name;
+                    folderNameDisplay.textContent = `📁 ${rootName}`;
+                    setStatus('正在扫描...', '扫描中', '#fde68a');
+                    logMessage(`📂 已选择: ${rootName}`, 'info');
+
+                    const scanStart = Date.now();
+                    const result = await scanDirectory(handle);
+                    const flat = flattenTree(result.entries);
+                    scanResult = {
+                        tree: result.entries,
+                        flatList: flat.flatList,
+                        fileCount: flat.fileCount,
+                        folderCount: flat.folderCount,
+                        total: flat.total,
+                        rootHandle: handle,
+                        rootName: rootName
+                    };
+                    updateStats();
+                    const elapsed = ((Date.now() - scanStart) / 1000).toFixed(1);
+                    logMessage(`✅ 扫描完成：${flat.total} 条目 (${flat.fileCount} 文件, ${flat.folderCount} 文件夹) 耗时 ${elapsed}s`,
+                        'ok');
+                    setStatus(`就绪 · ${rootName} (${flat.total} 条目)`, '已扫描', '#bbf7d0');
+
+                    btnExport.disabled = false;
+                    btnUpload.disabled = false;
+                    btnExecute.disabled = true;
+                    statMoved.textContent = '0';
+                    uploadedPaths = null;
+                    movePlan = null;
+                    txtPreviewArea.style.display = 'none';
+                } catch (e) {
+                    if (e.name === 'AbortError' || e.message?.includes('abort')) {
+                        logMessage('⏹️ 用户取消', 'warn');
+                        return;
+                    }
+                    logMessage(`❌ 选择失败: ${e.message}`, 'err');
+                    setStatus('选择失败', '错误', '#fca5a5');
+                }
+            });
+
+            btnExport.addEventListener('click', () => {
+                if (!scanResult) {
+                    logMessage('⚠️ 请先选择文件夹', 'warn');
+                    return;
+                }
+                try {
+                    const content = generateTxt(scanResult.flatList);
+                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download =
+                        `路径列表_${scanResult.rootName}_${new Date().toISOString().slice(0,10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    // 显示预览
+                    txtPreview.textContent = content;
+                    txtPreviewArea.style.display = 'block';
+                    txtLineCount.textContent = content.split('\n').length + ' 行';
+
+                    logMessage(`⬇️ TXT 已导出 (${scanResult.flatList.length} 个路径)`, 'ok');
+                    setStatus('TXT 已导出，请编辑后上传', '已导出', '#bfdbfe');
+                    btnExecute.disabled = true;
+                } catch (e) {
+                    logMessage(`❌ 导出失败: ${e.message}`, 'err');
+                    setStatus('导出失败', '错误', '#fca5a5');
+                }
+            });
+
+            btnUpload.addEventListener('click', () => {
+                if (!scanResult) { logMessage('⚠️ 请先选择文件夹', 'warn'); return; }
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    setStatus('解析 TXT...', '解析中', '#fde68a');
+                    const content = await file.text();
+                    const paths = parseTxt(content);
+                    if (paths.length === 0) {
+                        logMessage('⚠️ TXT 无有效路径', 'warn');
+                        return;
+                    }
+
+                    uploadedPaths = paths;
+                    logMessage(`⬆️ 已上传 ${file.name}，解析 ${paths.length} 个路径`, 'ok');
+                    setStatus(`已解析 ${paths.length} 个路径，请执行迁移`, '已上传', '#bfdbfe');
+
+                    const plan = buildMovePlan(paths, scanResult.flatList);
+                    movePlan = plan;
+                    const moveCount = plan.plan.filter(p => p.type === 'move').length;
+                    const backupCount = plan.backupItems.length;
+                    const errorCount = plan.plan.filter(p => p.type === 'error').length;
+                    logMessage(`📋 计划：${moveCount} 个移动，${backupCount} 个备份，${plan.plan.filter(p=>p.type==='noop').length} 个无变化`,
+                        'info');
+                    if (errorCount > 0) {
+                        logMessage(`⚠️ 有 ${errorCount} 条未匹配的路径`, 'warn');
+                        for (const p of plan.plan) {
+                            if (p.type === 'error') {
+                                logMessage(`  未匹配: ${p.orig}`, 'warn');
+                            }
+                        }
+                    }
+                    btnExecute.disabled = false;
+
+                    // 显示TXT预览
+                    txtPreview.textContent = content;
+                    txtPreviewArea.style.display = 'block';
+                    txtLineCount.textContent = content.split('\n').length + ' 行';
+                } catch (err) {
+                    logMessage(`❌ 解析失败: ${err.message}`, 'err');
+                    setStatus('解析失败', '错误', '#fca5a5');
+                }
+                fileInput.value = '';
+            });
+
+            btnExecute.addEventListener('click', async () => {
+                if (isExecuting) return;
+                if (!scanResult || !movePlan) {
+                    logMessage('⚠️ 请先上传并解析 TXT', 'warn');
+                    return;
+                }
+                if (!rootHandle) {
+                    logMessage('⚠️ 根目录句柄丢失，重新选择', 'err');
+                    return;
+                }
+
+                const plan = movePlan;
+                const moveCount = plan.plan.filter(p => p.type === 'move').length;
+                const backupCount = plan.backupItems.length;
+                const errorCount = plan.plan.filter(p => p.type === 'error').length;
+                if (moveCount === 0 && backupCount === 0 && errorCount === 0) {
+                    logMessage('📭 无操作', 'info');
+                    return;
+                }
+                let msg = `执行 ${moveCount} 个移动，${backupCount} 个备份`;
+                if (errorCount > 0) msg += `，${errorCount} 个错误(跳过)`;
+                if (!confirm(`${msg}？`)) {
+                    logMessage('⏹️ 取消执行', 'warn');
+                    return;
+                }
+
+                isExecuting = true;
+                btnExecute.disabled = true;
+                btnSelect.disabled = true;
+                btnExport.disabled = true;
+                btnUpload.disabled = true;
+                setStatus('执行中...', '进行中', '#fde68a');
+
+                try {
+                    const results = await executeMigration(plan.plan, plan.backupItems, rootHandle);
+                    statMoved.textContent = results.moved;
+                    logMessage(`✅ 完成：移动 ${results.moved}，备份 ${results.backups}，错误 ${results.errors.length}`, 'ok');
+                    if (results.errors.length) logMessage(`⚠️ ${results.errors.length} 个移动错误`, 'warn');
+                    if (results.backupErrors.length) logMessage(`⚠️ ${results.backupErrors.length} 个备份错误`, 'warn');
+                    setStatus(`完成 · 移动 ${results.moved} 备份 ${results.backups}`, '完成', '#bbf7d0');
+
+                    // 重新扫描
+                    logMessage('🔄 重新扫描...', 'info');
+                    const newResult = await scanDirectory(rootHandle);
+                    const flat = flattenTree(newResult.entries);
+                    scanResult = {
+                        tree: newResult.entries,
+                        flatList: flat.flatList,
+                        fileCount: flat.fileCount,
+                        folderCount: flat.folderCount,
+                        total: flat.total,
+                        rootHandle: rootHandle,
+                        rootName: rootName
+                    };
+                    updateStats();
+                    logMessage(`🔄 扫描完成：${flat.total} 条目`, 'ok');
+                } catch (e) {
+                    logMessage(`❌ 执行错误: ${e.message}`, 'err');
+                    setStatus('执行出错', '错误', '#fca5a5');
+                } finally {
+                    isExecuting = false;
+                    btnExecute.disabled = true;
+                    btnSelect.disabled = false;
+                    btnExport.disabled = false;
+                    btnUpload.disabled = false;
+                    movePlan = null;
+                    uploadedPaths = null;
+                }
+            });
+
+            btnClearLog.addEventListener('click', clearLog);
+
+            // 初始化
+            clearLog();
+            setStatus('等待选择文件夹', '就绪', '#dbeafe');
+            updateStats();
+            logMessage('🚀 工具已加载，点击「选择文件夹」开始', 'info');
+            logMessage(`💡 未列条目自动移至「${BACKUP_DIR}」目录`, 'info');
+            logMessage('📝 TXT 格式：每行一个完整路径，修改路径即移动到新位置', 'info');
+        })();
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文本处理工具箱 · 70+ 功能增强版</title>
+    <title>文本处理工具箱 · 精简增强版</title>
     <style>
         /* ---------- 全局重置 & 基础 ---------- */
         * {
@@ -446,7 +446,7 @@
         <div class="header">
             <div class="header-left">
                 <span class="icon">📝</span>
-                <h1>文本处理工具箱 <span class="sub">· 70+ 种功能</span></h1>
+                <h1>文本处理工具箱 <span class="sub">· 精简增强版</span></h1>
             </div>
             <div class="header-actions">
                 <button onclick="swapPanels()">🔄 交换</button>
@@ -559,12 +559,12 @@
                 </div>
             </div>
 
-            <!-- ===== 分类5: 编码与转换 ===== -->
+            <!-- ===== 分类5: 编码与转换 (含简繁互转) ===== -->
             <div class="tool-category">
                 <div class="category-header" onclick="toggleCategory(this)">
                     <span class="arrow">▶</span>
                     <span class="cat-label">🔐 编码与转换</span>
-                    <span class="cat-badge">8 种</span>
+                    <span class="cat-badge">10 种</span>
                 </div>
                 <div class="category-body">
                     <button class="btn" onclick="applyTransform('base64Encode')">Base64 编码</button>
@@ -575,41 +575,34 @@
                     <button class="btn" onclick="applyTransform('htmlUnescape')">HTML 反转义</button>
                     <button class="btn" onclick="applyTransform('unicodeEncode')">→ Unicode</button>
                     <button class="btn" onclick="applyTransform('unicodeDecode')">Unicode →</button>
-                </div>
-            </div>
-
-            <!-- ===== 分类6: 加密与解密 ===== -->
-            <div class="tool-category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <span class="arrow">▶</span>
-                    <span class="cat-label">🔒 加密与解密</span>
-                    <span class="cat-badge">4 种</span>
-                </div>
-                <div class="category-body">
-                    <button class="btn" onclick="applyTransform('morseEncode')">→ 摩斯电码</button>
-                    <button class="btn" onclick="applyTransform('morseDecode')">摩斯电码 →</button>
-                    <button class="btn" onclick="applyTransform('caesarEncode')">凯撒加密</button>
-                    <button class="btn" onclick="applyTransform('caesarDecode')">凯撒解密</button>
-                </div>
-            </div>
-
-            <!-- ===== 分类7: 生成工具 ===== -->
-            <div class="tool-category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <span class="arrow">▶</span>
-                    <span class="cat-label">✨ 生成工具</span>
-                    <span class="cat-badge">4 种</span>
-                </div>
-                <div class="category-body">
-                    <button class="btn" onclick="applyTransform('loremIpsum')">Lorem Ipsum</button>
-                    <button class="btn" onclick="applyTransform('slugify')">生成 Slug</button>
-                    <button class="btn" onclick="applyTransform('reverseText')">文本反转</button>
+                    <span class="sep">|</span>
                     <button class="btn" onclick="applyTransform('s2t')">简体 → 繁体</button>
                     <button class="btn" onclick="applyTransform('t2s')">繁体 → 简体</button>
                 </div>
             </div>
 
-            <!-- ===== 分类8: 统计与分析 ===== -->
+            <!-- ===== 分类6: 格式化与美化 (移除JSON/CSV互转) ===== -->
+            <div class="tool-category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <span class="arrow">▶</span>
+                    <span class="cat-label">💎 格式化与美化</span>
+                    <span class="cat-badge">6 种</span>
+                </div>
+                <div class="category-body">
+                    <button class="btn primary-btn" onclick="applyTransform('jsonBeautify')">JSON 美化</button>
+                    <button class="btn" onclick="applyTransform('jsonCompact')">JSON 压缩</button>
+                    <button class="btn" onclick="applyTransform('jsonEscape')">JSON 转义</button>
+                    <button class="btn" onclick="applyTransform('jsonUnescape')">JSON 反转义</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('sqlBeautify')">SQL 美化</button>
+                    <button class="btn" onclick="applyTransform('sqlCompact')">SQL 压缩</button>
+                    <span class="sep">|</span>
+                    <button class="btn" onclick="applyTransform('xmlBeautify')">XML 美化</button>
+                    <button class="btn" onclick="applyTransform('xmlCompact')">XML 压缩</button>
+                </div>
+            </div>
+
+            <!-- ===== 分类7: 统计与分析 ===== -->
             <div class="tool-category">
                 <div class="category-header" onclick="toggleCategory(this)">
                     <span class="arrow">▶</span>
@@ -625,70 +618,6 @@
                 </div>
             </div>
 
-            <!-- ===== 🆕 分类9: 格式化与美化 (JSON/SQL/XML/CSV) ===== -->
-            <div class="tool-category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <span class="arrow">▶</span>
-                    <span class="cat-label">💎 格式化与美化</span>
-                    <span class="cat-badge">10 种</span>
-                </div>
-                <div class="category-body">
-                    <button class="btn primary-btn" onclick="applyTransform('jsonBeautify')">JSON 美化</button>
-                    <button class="btn" onclick="applyTransform('jsonCompact')">JSON 压缩</button>
-                    <button class="btn" onclick="applyTransform('jsonEscape')">JSON 转义</button>
-                    <button class="btn" onclick="applyTransform('jsonUnescape')">JSON 反转义</button>
-                    <button class="btn" onclick="applyTransform('jsonToCsv')">JSON → CSV</button>
-                    <button class="btn" onclick="applyTransform('csvToJson')">CSV → JSON</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('sqlBeautify')">SQL 美化</button>
-                    <button class="btn" onclick="applyTransform('sqlCompact')">SQL 压缩</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('xmlBeautify')">XML 美化</button>
-                    <button class="btn" onclick="applyTransform('xmlCompact')">XML 压缩</button>
-                </div>
-            </div>
-
-            <!-- ===== 🆕 分类10: 列表与对齐 ===== -->
-            <div class="tool-category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <span class="arrow">▶</span>
-                    <span class="cat-label">🔄 列表与对齐</span>
-                    <span class="cat-badge">8 种</span>
-                </div>
-                <div class="category-body">
-                    <button class="btn" onclick="applyTransform('csvToList')">CSV → 行</button>
-                    <button class="btn" onclick="applyTransform('listToCsv')">行 → CSV</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('alignLeft')">左对齐</button>
-                    <button class="btn" onclick="applyTransform('alignRight')">右对齐</button>
-                    <button class="btn" onclick="applyTransform('alignCenter')">居中对齐</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('escapeSpecial')">转义特殊字符</button>
-                    <button class="btn" onclick="applyTransform('unescapeSpecial')">反转义特殊字符</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('removeDuplicateChars')">删除重复字符</button>
-                </div>
-            </div>
-
-            <!-- ===== 🆕 分类11: 哈希与时间 ===== -->
-            <div class="tool-category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <span class="arrow">▶</span>
-                    <span class="cat-label">🔢 哈希与时间</span>
-                    <span class="cat-badge">6 种</span>
-                </div>
-                <div class="category-body">
-                    <button class="btn" onclick="applyTransform('hashSha256')">SHA-256</button>
-                    <button class="btn" onclick="applyTransform('hashSha1')">SHA-1</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('timestampToDate')">时间戳 → 日期</button>
-                    <button class="btn" onclick="applyTransform('dateToTimestamp')">日期 → 时间戳</button>
-                    <span class="sep">|</span>
-                    <button class="btn" onclick="applyTransform('hexToText')">十六进制 → 文本</button>
-                    <button class="btn" onclick="applyTransform('textToHex')">文本 → 十六进制</button>
-                </div>
-            </div>
-
         </div>
 
         <!-- 面板 -->
@@ -701,7 +630,7 @@
                         <button onclick="pasteFromClipboard()">📥 粘贴</button>
                     </div>
                 </div>
-                <textarea id="inputArea" placeholder="在此输入或粘贴文本…&#10;支持 JSON / SQL / XML / CSV 等格式">{"name":"工具","version":"1.0","features":["转换","美化","统计"]}</textarea>
+                <textarea id="inputArea" placeholder="在此输入或粘贴文本…&#10;支持 JSON / SQL / XML 等格式">{"name":"工具","version":"1.0","features":["转换","美化","统计"]}</textarea>
                 <div class="panel-footer">
                     <div class="stats">
                         <span>行数: <span class="num" id="inputLineCount">0</span></span>
@@ -819,7 +748,7 @@
         }
 
         // ============================================================
-        //  核心功能实现 (已有 50+ 保留，新增 20+)
+        //  核心功能实现
         // ============================================================
 
         // ---- 大小写与命名 ----
@@ -936,65 +865,6 @@
             return line.replace(/\\u([0-9a-fA-F]{4})/g, (m, hex) => String.fromCharCode(parseInt(hex, 16)));
         }
 
-        // ---- 加密 ----
-        function morseEncode(line) {
-            const morse = { 'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.', 'f': '..-.', 'g': '--.', 'h': '....',
-                'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..', 'm': '--', 'n': '-.', 'o': '---', 'p': '.--.',
-                'q': '--.-', 'r': '.-.', 's': '...', 't': '-', 'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
-                'y': '-.--', 'z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
-                '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.'
-            };
-            return line.toLowerCase().split('').map(c => morse[c] || c).join(' ');
-        }
-
-        function morseDecode(line) {
-            const morse = { '.-': 'a', '-...': 'b', '-.-.': 'c', '-..': 'd', '.': 'e', '..-.': 'f', '--.': 'g', '....': 'h',
-                '..': 'i', '.---': 'j', '-.-': 'k', '.-..': 'l', '--': 'm', '-.': 'n', '---': 'o', '.--.': 'p',
-                '--.-': 'q', '.-.': 'r', '...': 's', '-': 't', '..-': 'u', '...-': 'v', '.--': 'w', '-..-': 'x',
-                '-.--': 'y', '--..': 'z', '-----': '0', '.----': '1', '..---': '2', '...--': '3', '....-': '4',
-                '.....': '5', '-....': '6', '--...': '7', '---..': '8', '----.': '9'
-            };
-            return line.split(' ').map(c => morse[c] || c).join('');
-        }
-
-        function caesarEncode(line, shift = 3) {
-            return line.split('').map(c => {
-                if (c >= 'a' && c <= 'z') return String.fromCharCode((c.charCodeAt(0) - 97 + shift) % 26 + 97);
-                if (c >= 'A' && c <= 'Z') return String.fromCharCode((c.charCodeAt(0) - 65 + shift) % 26 + 65);
-                return c;
-            }).join('');
-        }
-
-        function caesarDecode(line, shift = 3) { return caesarEncode(line, 26 - shift); }
-
-        // ---- 生成 ----
-        function loremIpsum() {
-            const words = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do',
-                'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'ut', 'enim', 'ad',
-                'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'ut', 'aliquip', 'ex',
-                'ea', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'dolor', 'in', 'reprehenderit', 'in', 'voluptate',
-                'velit', 'esse', 'cillum', 'dolore', 'eu', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint', 'occaecat',
-                'cupidatat', 'non', 'proident', 'sunt', 'in', 'culpa', 'qui', 'officia', 'deserunt', 'mollit', 'anim',
-                'id', 'est', 'laborum'
-            ];
-            let result = [];
-            for (let i = 0; i < 50; i++) {
-                let sentence = [];
-                let len = 3 + Math.floor(Math.random() * 8);
-                for (let j = 0; j < len; j++) {
-                    sentence.push(words[Math.floor(Math.random() * words.length)]);
-                }
-                result.push(sentence.join(' ') + '.');
-            }
-            return result.join(' ');
-        }
-
-        function slugify(line) {
-            return line.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        }
-
-        function reverseText(line) { return line.split('').reverse().join(''); }
-
         // ---- 简繁 ----
         const s2tMap = { '简': '簡', '体': '體', '中': '中', '文': '文', '转': '轉', '换': '換', '繁': '繁', '体': '體' };
 
@@ -1028,7 +898,7 @@
         }
 
         // ============================================================
-        //  🆕 高级格式化与转换 (JSON / SQL / XML / CSV / 对齐 / 哈希)
+        //  格式化与美化 (移除了JSON/CSV互转)
         // ============================================================
 
         // ---- JSON 工具 ----
@@ -1046,41 +916,6 @@
 
         function jsonUnescape(line) {
             try { return JSON.parse(line); } catch (e) { return '❌ 反转义失败: ' + e.message; }
-        }
-
-        function jsonToCsv(line) {
-            try {
-                const data = JSON.parse(line);
-                if (!Array.isArray(data) || data.length === 0) return '❌ 需要非空 JSON 数组';
-                const headers = Object.keys(data[0]);
-                let csv = headers.join(',') + '\n';
-                data.forEach(row => {
-                    csv += headers.map(h => {
-                        const val = row[h];
-                        if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
-                            return '"' + val.replace(/"/g, '""') + '"';
-                        }
-                        return val ?? '';
-                    }).join(',') + '\n';
-                });
-                return csv;
-            } catch (e) { return '❌ 转换失败: ' + e.message; }
-        }
-
-        function csvToJson(line) {
-            try {
-                const rows = line.split('\n').filter(r => r.trim());
-                if (rows.length < 2) return '❌ 至少需要标题行和一行数据';
-                const headers = rows[0].split(',').map(h => h.trim());
-                const result = [];
-                for (let i = 1; i < rows.length; i++) {
-                    const values = rows[i].split(',').map(v => v.trim());
-                    const obj = {};
-                    headers.forEach((h, idx) => { obj[h] = values[idx] || ''; });
-                    result.push(obj);
-                }
-                return JSON.stringify(result, null, 2);
-            } catch (e) { return '❌ 转换失败: ' + e.message; }
         }
 
         // ---- SQL 工具 ----
@@ -1119,97 +954,8 @@
             return xml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
         }
 
-        // ---- 列表与对齐 ----
-        function csvToList(line) {
-            return line.split(',').map(s => s.trim()).join('\n');
-        }
-
-        function listToCsv(line) {
-            return getLines(line).map(s => s.trim()).join(', ');
-        }
-
-        function alignLeft(line) {
-            const lines = getLines(line);
-            const maxLen = Math.max(...lines.map(l => l.length));
-            return lines.map(l => l.padEnd(maxLen, ' ')).join('\n');
-        }
-
-        function alignRight(line) {
-            const lines = getLines(line);
-            const maxLen = Math.max(...lines.map(l => l.length));
-            return lines.map(l => l.padStart(maxLen, ' ')).join('\n');
-        }
-
-        function alignCenter(line) {
-            const lines = getLines(line);
-            const maxLen = Math.max(...lines.map(l => l.length));
-            return lines.map(l => {
-                const pad = maxLen - l.length;
-                const left = Math.floor(pad / 2);
-                return ' '.repeat(left) + l + ' '.repeat(pad - left);
-            }).join('\n');
-        }
-
-        function escapeSpecial(line) {
-            return line.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/\r/g, '\\r').replace(/"/g,
-                '\\"');
-        }
-
-        function unescapeSpecial(line) {
-            return line.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r').replace(/\\"/g, '"').replace(
-                /\\\\/g, '\\');
-        }
-
-        function removeDuplicateChars(line) {
-            return line.split('').filter((c, i, arr) => arr.indexOf(c) === i).join('');
-        }
-
-        // ---- 哈希与时间 ----
-        async function hashSha256(text) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function hashSha1(text) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        function timestampToDate(line) {
-            const ts = parseInt(line.trim());
-            if (isNaN(ts)) return '❌ 无效时间戳';
-            const date = new Date(ts * 1000);
-            return date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
-        }
-
-        function dateToTimestamp(line) {
-            const date = new Date(line.trim());
-            if (isNaN(date.getTime())) return '❌ 无效日期格式';
-            return Math.floor(date.getTime() / 1000);
-        }
-
-        function hexToText(line) {
-            try {
-                const hex = line.replace(/\s+/g, '');
-                const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-                return new TextDecoder().decode(bytes);
-            } catch (e) { return '❌ 无效十六进制: ' + e.message; }
-        }
-
-        function textToHex(line) {
-            const encoder = new TextEncoder();
-            const bytes = encoder.encode(line);
-            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
-        }
-
         // ============================================================
-        //  统一分发 (增强版)
+        //  统一分发 (精简版)
         // ============================================================
         async function applyTransform(type) {
             const text = getInputText();
@@ -1358,23 +1104,6 @@
                         transformLines(unicodeEncode); break;
                     case 'unicodeDecode':
                         transformLines(unicodeDecode); break;
-                    case 'morseEncode':
-                        transformLines(morseEncode); break;
-                    case 'morseDecode':
-                        transformLines(morseDecode); break;
-                    case 'caesarEncode':
-                        transformLines(line => caesarEncode(line, 3)); break;
-                    case 'caesarDecode':
-                        transformLines(line => caesarDecode(line, 3)); break;
-                    case 'loremIpsum': {
-                        setOutputText(loremIpsum());
-                        showToast('✅ 已生成 Lorem Ipsum', 1000);
-                        break;
-                    }
-                    case 'slugify':
-                        transformLines(slugify); break;
-                    case 'reverseText':
-                        transformLines(reverseText); break;
                     case 's2t':
                         transformLines(s2t); break;
                     case 't2s':
@@ -1413,7 +1142,7 @@
                         showToast('✅ 句子统计完成', 1000);
                         break;
                     }
-                        // ===== 🆕 新增功能 =====
+                        // ===== 格式化 =====
                     case 'jsonBeautify':
                         transformLines(jsonBeautify); break;
                     case 'jsonCompact':
@@ -1422,10 +1151,6 @@
                         transformLines(jsonEscape); break;
                     case 'jsonUnescape':
                         transformLines(jsonUnescape); break;
-                    case 'jsonToCsv':
-                        transformLines(jsonToCsv); break;
-                    case 'csvToJson':
-                        transformLines(csvToJson); break;
                     case 'sqlBeautify':
                         transformLines(sqlBeautify); break;
                     case 'sqlCompact':
@@ -1434,49 +1159,10 @@
                         transformLines(xmlBeautify); break;
                     case 'xmlCompact':
                         transformLines(xmlCompact); break;
-                    case 'csvToList':
-                        transformLines(csvToList); break;
-                    case 'listToCsv':
-                        transformLines(listToCsv); break;
-                    case 'alignLeft':
-                        transformLines(alignLeft); break;
-                    case 'alignRight':
-                        transformLines(alignRight); break;
-                    case 'alignCenter':
-                        transformLines(alignCenter); break;
-                    case 'escapeSpecial':
-                        transformLines(escapeSpecial); break;
-                    case 'unescapeSpecial':
-                        transformLines(unescapeSpecial); break;
-                    case 'removeDuplicateChars':
-                        transformLines(removeDuplicateChars); break;
-                    case 'timestampToDate':
-                        transformLines(timestampToDate); break;
-                    case 'dateToTimestamp':
-                        transformLines(dateToTimestamp); break;
-                    case 'hexToText':
-                        transformLines(hexToText); break;
-                    case 'textToHex':
-                        transformLines(textToHex); break;
                     default:
                         showToast('未知操作', 1000);
                 }
             };
-
-            // 异步哈希操作
-            if (type === 'hashSha256' || type === 'hashSha1') {
-                try {
-                    let hash;
-                    if (type === 'hashSha256') hash = await hashSha256(text);
-                    else hash = await hashSha1(text);
-                    setOutputText(hash);
-                    showToast('✅ 哈希生成完成', 1000);
-                } catch (e) {
-                    setOutputText('❌ 哈希失败: ' + e.message);
-                    showToast('❌ 哈希失败', 1500);
-                }
-                return;
-            }
 
             syncOperations();
         }
@@ -1635,7 +1321,7 @@
 
         outputArea.addEventListener('dblclick', copyResult);
 
-        console.log('📝 文本处理工具箱 · 70+ 功能增强版已加载');
+        console.log('📝 文本处理工具箱 · 精简增强版已加载');
         console.log('💡 快捷键: Ctrl+Enter 执行替换, Ctrl+Shift+C 复制结果');
         console.log('💡 点击分类标题可展开/收起功能组');
     </script>

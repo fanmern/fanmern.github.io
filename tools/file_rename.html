@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File System Access API 批量原地重命名</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, sans-serif;
+        }
+        body {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+            background-color: #f5f7fa;
+        }
+        .wrap {
+            background: #fff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 16px;
+            font-size:22px;
+        }
+        .alert {
+            background:#e1f5fe;
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:16px;
+            font-size:14px;
+            color:#0277bd;
+        }
+        .danger-tip {
+            background:#ffebee;
+            color:#c62828;
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:20px;
+        }
+        .form-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:14px;
+            margin-bottom:18px;
+        }
+        .form-item {
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+        }
+        label {
+            font-size:14px;
+            font-weight:500;
+        }
+        input, select {
+            padding:9px 12px;
+            border:1px solid #ccc;
+            border-radius:6px;
+            font-size:14px;
+        }
+        .btn-group {
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            margin:20px 0;
+        }
+        button {
+            padding:10px 18px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+        }
+        .btn-blue { background:#409eff; color:#fff; }
+        .btn-green { background:#67c23a; color:#fff; }
+        .btn-orange { background:#e6a23c; color:#fff; }
+        .btn-red { background:#f56c6c; color:#fff; }
+
+        /* 模式切换按钮组 */
+        .mode-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 14px;
+        }
+        .mode-btn {
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            background: #f1f3f5;
+            color: #333;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover {
+            background: #e2e8f0;
+        }
+        .mode-btn.active {
+            border-color: #409eff;
+            background: #e1f5fe;
+            color: #0277bd;
+        }
+
+        /* 参数行 */
+        .params-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            align-items: flex-end;
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+        }
+        .param-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+            flex: 1 0 auto;
+        }
+        .param-item label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+        }
+        .param-item input {
+            padding: 7px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .param-item input:focus {
+            outline: 2px solid #409eff;
+            border-color: transparent;
+        }
+        .mode-hint {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        table {
+            width:100%;
+            border-collapse: collapse;
+            margin-top:10px;
+        }
+        th,td {
+            border:1px solid #e2e8f0;
+            padding:9px;
+            font-size:13px;
+        }
+        th { background:#f7f8fa; }
+        .old { color:#666; }
+        .new { color:#007bff; font-weight:500; }
+        #status { margin:12px 0; font-size:14px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>FS Access API 文件夹原地批量重命名</h1>
+    <div class="alert">
+        ⚠️仅 Chrome / Edge 支持；必须部署 http/https 服务，file://双击打开不工作！
+        选择文件夹后，可<strong>直接修改磁盘真实文件名称</strong>
+    </div>
+    <div class="danger-tip">
+        ⚠️风险提醒：重命名不可逆！建议先备份文件，再执行真实重命名！
+    </div>
+
+    <button class="btn-blue" id="selectFolderBtn">📂选择本地文件夹</button>
+    <div id="status">未选择文件夹</div>
+
+    <!-- 模式选择按钮组 -->
+    <div class="mode-selector" id="modeSelector">
+        <button class="mode-btn active" data-mode="replace">🔁 替换</button>
+        <button class="mode-btn" data-mode="prefix">➕ 前缀</button>
+        <button class="mode-btn" data-mode="suffix">➖ 后缀</button>
+        <button class="mode-btn" data-mode="delete">✂️ 删除</button>
+        <button class="mode-btn" data-mode="serial">🔢 序号</button>
+        <button class="mode-btn" data-mode="upper">🔠 大写</button>
+        <button class="mode-btn" data-mode="lower">🔡 小写</button>
+    </div>
+
+    <!-- 动态参数区域 -->
+    <div class="params-row" id="paramsRow">
+        <!-- 由 JS 动态渲染 -->
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-orange" id="previewBtn">🔍预览重命名结果</button>
+        <button class="btn-green" id="runRenameBtn">✅执行原地重命名（真实修改磁盘）</button>
+        <button class="btn-red" id="clearBtn">清空列表</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>原始文件名</th>
+            <th>重命名后文件名</th>
+        </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    (function() {
+        // DOM 引用
+        const selectFolderBtn = document.getElementById('selectFolderBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const runRenameBtn = document.getElementById('runRenameBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const tableBody = document.getElementById('tableBody');
+        const statusEl = document.getElementById('status');
+        const modeSelector = document.getElementById('modeSelector');
+        const paramsRow = document.getElementById('paramsRow');
+
+        // 状态
+        let dirHandle = null;
+        let fileItems = []; // { handle, originName, newName }
+
+        // 当前模式
+        let currentMode = 'replace';
+
+        // ---------- 工具函数 ----------
+        function splitNameExt(filename) {
+            const dot = filename.lastIndexOf('.');
+            if (dot <= 0) return { name: filename, ext: '' };
+            return { name: filename.slice(0, dot), ext: filename.slice(dot) };
+        }
+
+        // 计算新文件名（参数从当前输入框获取）
+        function calcNewName(originName, idx) {
+            const { name, ext } = splitNameExt(originName);
+            let base = name;
+            const mode = currentMode;
+            // 获取输入值
+            const findInput = document.getElementById('findInput');
+            const replaceInput = document.getElementById('replaceInput');
+            const startInput = document.getElementById('startInput');
+            const findText = findInput ? findInput.value : '';
+            const replaceText = replaceInput ? replaceInput.value : '';
+            const startNum = startInput ? Number(startInput.value) || 1 : 1;
+
+            switch (mode) {
+                case 'replace':
+                    base = base.split(findText).join(replaceText);
+                    break;
+                case 'prefix':
+                    base = findText + base;
+                    break;
+                case 'suffix':
+                    base = base + findText;
+                    break;
+                case 'delete':
+                    base = base.split(findText).join('');
+                    break;
+                case 'serial':
+                    const num = startNum + idx;
+                    base = (replaceText || 'file_') + num;
+                    break;
+                case 'upper':
+                    base = base.toUpperCase();
+                    break;
+                case 'lower':
+                    base = base.toLowerCase();
+                    break;
+                default:
+                    break;
+            }
+            return base + ext;
+        }
+
+        // ---------- 渲染参数区域 ----------
+        function renderParams() {
+            const mode = currentMode;
+            let html = '';
+            // 根据模式决定显示哪些参数
+            if (mode === 'replace') {
+                html = `
+                    <div class="param-item">
+                        <label for="findInput">查找文本</label>
+                        <input type="text" id="findInput" placeholder="例如：old" value="">
+                    </div>
+                    <div class="param-item">
+                        <label for="replaceInput">替换为</label>
+                        <input type="text" id="replaceInput" placeholder="例如：new" value="">
+                    </div>
+                    <div class="mode-hint">将文件名中的查找文本替换为新文本</div>
+                `;
+            } else if (mode === 'prefix') {
+                html = `
+                    <div class="param-item">
+                        <label for="findInput">前缀文本</label>
+                        <input type="text" id="findInput" placeholder="例如：pre_" value="">
+                    </div>
+                    <div class="mode-hint">在文件名开头添加前缀</div>
+                `;
+            } else if (mode === 'suffix') {
+                html = `
+                    <div class="param-item">
+                        <label for="findInput">后缀文本</label>
+                        <input type="text" id="findInput" placeholder="例如：_suffix" value="">
+                    </div>
+                    <div class="mode-hint">在文件名末尾（扩展名前）添加后缀</div>
+                `;
+            } else if (mode === 'delete') {
+                html = `
+                    <div class="param-item">
+                        <label for="findInput">要删除的文本</label>
+                        <input type="text" id="findInput" placeholder="例如：old" value="">
+                    </div>
+                    <div class="mode-hint">删除文件名中所有匹配的文本</div>
+                `;
+            } else if (mode === 'serial') {
+                html = `
+                    <div class="param-item">
+                        <label for="replaceInput">序号模板</label>
+                        <input type="text" id="replaceInput" placeholder="例如：photo_" value="file_">
+                    </div>
+                    <div class="param-item">
+                        <label for="startInput">起始序号</label>
+                        <input type="number" id="startInput" value="1" min="1">
+                    </div>
+                    <div class="mode-hint">按文件顺序重命名为“模板+序号”，保留扩展名</div>
+                `;
+            } else if (mode === 'upper' || mode === 'lower') {
+                const label = mode === 'upper' ? '大写' : '小写';
+                html = `
+                    <div class="mode-hint">将文件名（不含扩展名）全部转换为${label}</div>
+                `;
+            }
+            paramsRow.innerHTML = html;
+
+            // 绑定输入事件，自动预览（可选）
+            const inputs = paramsRow.querySelectorAll('input');
+            inputs.forEach(inp => {
+                inp.addEventListener('input', () => {
+                    // 如果有文件列表且预览需要更新，可以自动刷新，但为了性能，用户可手动预览
+                });
+            });
+        }
+
+        // ---------- 切换模式 ----------
+        function setMode(mode) {
+            currentMode = mode;
+            // 更新按钮高亮
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            renderParams();
+        }
+
+        // ---------- 绑定模式按钮 ----------
+        modeSelector.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mode-btn');
+            if (!btn) return;
+            const mode = btn.dataset.mode;
+            if (mode) {
+                setMode(mode);
+            }
+        });
+
+        // 初始化默认模式
+        setMode('replace');
+
+        // ---------- 文件夹选择 ----------
+        selectFolderBtn.addEventListener('click', async () => {
+            if (!window.showDirectoryPicker) {
+                alert('你的浏览器不支持 File System Access API，请使用 Chrome / Edge，并且不能用file://打开！');
+                return;
+            }
+            try {
+                dirHandle = await window.showDirectoryPicker();
+                statusEl.innerText = `已选中文件夹：${dirHandle.name}`;
+                fileItems = [];
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'file') {
+                        fileItems.push({
+                            handle: entry,
+                            originName: entry.name,
+                            newName: entry.name
+                        });
+                    }
+                }
+                statusEl.innerText += `，读取到文件：${fileItems.length} 个`;
+                renderTable();
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = '选择文件夹失败：' + err.message;
+            }
+        });
+
+        // ---------- 渲染表格 ----------
+        function renderTable() {
+            tableBody.innerHTML = '';
+            fileItems.forEach((item, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td class="old">${item.originName}</td>
+                    <td class="new">${item.newName}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // ---------- 预览 ----------
+        previewBtn.addEventListener('click', () => {
+            if (!dirHandle || fileItems.length === 0) {
+                alert('请先选择文件夹！');
+                return;
+            }
+            // 获取当前输入值
+            const findInput = document.getElementById('findInput');
+            const replaceInput = document.getElementById('replaceInput');
+            const startInput = document.getElementById('startInput');
+            // 保存当前值以便calc使用（calc内部通过id获取）
+            fileItems.forEach((item, idx) => {
+                item.newName = calcNewName(item.originName, idx);
+            });
+            renderTable();
+            statusEl.innerText = `预览完成，共 ${fileItems.length} 个文件`;
+        });
+
+        // ---------- 执行重命名 ----------
+        runRenameBtn.addEventListener('click', async () => {
+            if (!dirHandle || fileItems.length === 0) {
+                alert('请先选择文件夹并预览！');
+                return;
+            }
+            const confirmRes = confirm('⚠️确认要真实修改磁盘文件名？建议先备份！确定继续吗？');
+            if (!confirmRes) return;
+
+            let success = 0;
+            let fail = 0;
+            statusEl.innerText = '开始重命名...';
+
+            // 确保每个item的newName是最新的
+            fileItems.forEach((item, idx) => {
+                item.newName = calcNewName(item.originName, idx);
+            });
+
+            for (const item of fileItems) {
+                const oldName = item.originName;
+                const newName = item.newName;
+                if (oldName === newName) {
+                    success++;
+                    continue;
+                }
+                try {
+                    await item.handle.move(newName);
+                    item.originName = newName;
+                    item.newName = newName;
+                    success++;
+                } catch (e) {
+                    console.error('重命名失败', oldName, e);
+                    fail++;
+                }
+            }
+            statusEl.innerText = `完成！成功${success}个，失败${fail}个`;
+            renderTable();
+        });
+
+        // ---------- 清空 ----------
+        clearBtn.addEventListener('click', () => {
+            dirHandle = null;
+            fileItems = [];
+            statusEl.innerText = '未选择文件夹';
+            renderTable();
+        });
+
+        // 额外：当文件列表为空时自动清空表格
+    })();
+</script>
+</body>
+</html>

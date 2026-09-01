@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数据报表 · 分组合并与居中</title>
+    <!-- SheetJS CDN -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- 独立css文件 -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <!-- ========== HTML 结构（主界面） ========== -->
+    <div class="app-container" id="app">
+        <header class="app-header">
+            <div class="app-header-left">
+                <div class="logo">📊 <span>数据</span>展示</div>
+                <span class="badge">分组报表</span>
+            </div>
+            <div class="upload-area">
+                <div class="upload-btn-wrapper">
+                    <button class="upload-btn" id="uploadBtn">
+                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                        上传文件
+                    </button>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+                </div>
+                <span class="file-info" id="fileInfo">未选择文件</span>
+                <span class="row-count" id="rowCount"></span>
+            </div>
+        </header>
+        <div class="table-toolbar">
+            <div class="table-toolbar-left">
+                <span class="dot"></span>
+                <span id="dataStatus">请上传数据文件</span>
+            </div>
+            <div class="table-toolbar-right">
+                <button class="btn-setting" id="settingBtn">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+                    设置
+                    <span class="setting-count" id="settingCount">0</span>
+                </button>
+            </div>
+        </div>
+        <div class="table-wrapper" id="tableWrapper">
+            <div class="table-scroll" id="tableScroll">
+                <table id="dataTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            <div class="pagination-bar" id="paginationBar">
+                <div class="info">
+                    <span id="totalInfo">共 0 条</span>
+                    <span>每页</span>
+                    <select id="pageSizeSelect">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span>条</span>
+                </div>
+                <div class="controls">
+                    <button id="prevPage" disabled>上一页</button>
+                    <span>第</span>
+                    <input type="number" id="pageInput" class="page-input" value="1" min="1">
+                    <span class="total-pages">/ <span id="totalPages">1</span> 页</span>
+                    <button id="nextPage" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 设置面板 -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3>⚙️ 列显示设置 <span class="count-badge" id="settingsCountBadge">0 列</span></h3>
+            <button class="btn-close-settings" id="closeSettingsBtn">✕</button>
+        </div>
+        <div class="settings-body">
+            <div class="settings-column-left">
+                <div class="settings-column-title">📋 可选列</div>
+                <input class="search-box" id="searchCol" type="text" placeholder="搜索列名...">
+                <div class="col-list" id="colList"></div>
+            </div>
+            <div class="settings-column-right">
+                <div class="settings-column-title">📌 已选列（拖拽调整顺序）</div>
+                <ul id="selectedOrderList"><li class="empty-hint">暂无已选列</li></ul>
+            </div>
+        </div>
+        <div class="settings-footer">
+            <button class="btn-reset" id="resetSettingsBtn">恢复默认</button>
+            <button class="btn-close-panel" id="closePanelBtn">关闭</button>
+        </div>
+    </div>
+    <!-- 筛选浮层 -->
+    <div class="filter-popup" id="filterPopup">
+        <div class="filter-title" id="filterPopupTitle">筛选</div>
+        <div id="filterPopupBody"></div>
+        <div class="filter-actions">
+            <button class="clear-btn" id="filterClearBtn">清除</button>
+            <button class="apply-btn" id="filterApplyBtn">应用</button>
+        </div>
+    </div>
+
+    <!-- JS模块引入，顺序不能乱！ -->
+    <script src="./js/config.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/data.js"></script>
+    <script src="./js/render.js"></script>
+    <script src="./js/events.js"></script>
+    <script src="./js/ui.js"></script>
+</body>
+</html>

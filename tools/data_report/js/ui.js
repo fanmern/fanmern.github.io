@@ -2,29 +2,6 @@
 // 6. UI模块 (ui.js) - 设置面板、上传等
 // ================================================================
 
-// ---- 编码检测工具 ----
-const EncodingDetector = {
-    detectEncoding(buffer) {
-        try {
-            const decoder = new TextDecoder('utf-8', { fatal: true });
-            decoder.decode(buffer);
-            return 'utf-8';
-        } catch (_) {
-            try {
-                const decoder = new TextDecoder('gbk', { fatal: true });
-                decoder.decode(buffer);
-                return 'gbk';
-            } catch (_2) {
-                return 'gb2312';
-            }
-        }
-    },
-    decodeBuffer(buffer, encoding) {
-        const decoder = new TextDecoder(encoding);
-        return decoder.decode(buffer);
-    }
-};
-
 // ---- UI 管理器 ----
 const UIManager = {
     init() {
@@ -40,19 +17,50 @@ const UIManager = {
                 alert('文件为空或格式不正确');
                 return;
             }
+
+            // 检查是否有乱码（表头包含 � 或明显非中文）
+            const firstRow = rows[0] || [];
+            const hasGarbled = firstRow.some(cell => {
+                if (typeof cell !== 'string') return false;
+                return cell.includes('�') || /[^\x00-\x7F]/.test(cell) === false && cell.length > 0;
+            });
+
+            if (hasGarbled) {
+                alert('检测到乱码，请确保 CSV 文件使用 UTF-8 编码保存');
+                return;
+            }
+
             const headers = rows[0].map(h => String(h).trim());
-            DataStore.allColumns = headers;
+            const validHeaders = headers.filter(h => h !== '');
+            if (validHeaders.length === 0) {
+                alert('未检测到有效的表头');
+                return;
+            }
+
+            DataStore.allColumns = validHeaders;
             const data = [];
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
+                if (!row || row.length === 0) continue;
+                const hasData = row.some(cell => cell !== '' && cell !== undefined && cell !== null);
+                if (!hasData) continue;
+
                 const obj = {};
-                for (let j = 0; j < headers.length; j++) {
-                    let val = row[j] !== undefined ? row[j] : '';
+                for (let j = 0; j < validHeaders.length; j++) {
+                    const colName = validHeaders[j];
+                    const originalIndex = headers.indexOf(colName);
+                    let val = row[originalIndex] !== undefined ? row[originalIndex] : '';
                     if (typeof val === 'string') val = val.trim();
-                    obj[headers[j]] = val;
+                    obj[colName] = val;
                 }
                 data.push(obj);
             }
+
+            if (data.length === 0) {
+                alert('未解析到有效数据');
+                return;
+            }
+
             DataStore.allData = DataStore.preprocess(data);
             DataStore.loadPersisted();
             DataStore.applyFilters();
@@ -60,45 +68,84 @@ const UIManager = {
             EventManager.rebindTableEvents();
             UIManager.renderSettingsPanel();
             DataStore.saveRawData(data);
+
             const displayName = fileName || '数据';
             dataStatus.textContent = `✅ 共 ${data.length} 条数据 (${displayName})`;
             rowCount.textContent = `${data.length} 行`;
         };
 
-        // ---- 解析 CSV 内容（支持编码检测） ----
-        const parseCSVContent = (content, fileName, callback) => {
-            try {
-                // 先尝试 UTF-8
-                const workbook = XLSX.read(content, { type: 'string', raw: true });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-                callback(rows, fileName);
-            } catch (_) {
-                // 尝试检测编码后重新解析
+        // ---- 解析 CSV（先用 TextDecoder 解码，再交给 XLSX） ----
+        const parseCSVFromBuffer = (buffer, fileName, callback) => {
+            // 尝试不同编码
+            const encodings = ['gbk', 'gb2312', 'utf-8', 'big5', 'windows-1252'];
+            
+            for (const encoding of encodings) {
                 try {
-                    const encoder = new TextEncoder();
-                    const buffer = encoder.encode(content);
-                    const encoding = EncodingDetector.detectEncoding(buffer);
-                    const decoded = EncodingDetector.decodeBuffer(buffer, encoding);
-                    const workbook = XLSX.read(decoded, { type: 'string', raw: true });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-                    callback(rows, fileName);
-                } catch (err) {
-                    // 最后尝试 GBK 强制解码
-                    try {
-                        const encoder = new TextEncoder();
-                        const buffer = encoder.encode(content);
-                        const decoded = new TextDecoder('gbk').decode(buffer);
-                        const workbook = XLSX.read(decoded, { type: 'string', raw: true });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-                        callback(rows, fileName);
-                    } catch (err2) {
-                        alert(`解析 CSV 失败: ${fileName}\n${err2.message}`);
+                    const decoder = new TextDecoder(encoding);
+                    const text = decoder.decode(buffer);
+                    
+                    // 检查是否包含乱码（� 字符）
+                    if (text.includes('�')) {
+                        continue;
                     }
-                }
+                    
+                    // 检查是否能解析出有效表头
+                    const lines = text.split('\n').filter(line => line.trim() !== '');
+                    if (lines.length < 2) continue;
+                    
+                    // 检查表头是否包含中文（或有效字符）
+                    const firstLine = lines[0];
+                    const hasChinese = /[\u4e00-\u9fff]/.test(firstLine);
+                    const hasGarbled = /�/.test(firstLine);
+                    
+                    if (hasGarbled) continue;
+                    
+                    // 如果检测到中文，说明编码正确
+                    if (hasChinese || encoding === 'utf-8') {
+                        try {
+                            const workbook = XLSX.read(text, {
+                                type: 'string',
+                                raw: true
+                            });
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const rows = XLSX.utils.sheet_to_json(firstSheet, {
+                                header: 1,
+                                defval: '',
+                                raw: true
+                            });
+                            const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
+                            if (filteredRows.length > 0) {
+                                console.log(`✅ 使用编码: ${encoding}`);
+                                callback(filteredRows, fileName);
+                                return;
+                            }
+                        } catch (_) {}
+                    }
+                } catch (_) {}
             }
+            
+            // 最后尝试：使用 XLSX 直接解析（不经过 TextDecoder）
+            try {
+                const workbook = XLSX.read(buffer, {
+                    type: 'array',
+                    raw: true,
+                    cellDates: false
+                });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, {
+                    header: 1,
+                    defval: '',
+                    raw: true
+                });
+                const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
+                if (filteredRows.length > 0) {
+                    console.log('✅ 使用 XLSX 自动检测');
+                    callback(filteredRows, fileName);
+                    return;
+                }
+            } catch (_) {}
+
+            alert('解析 CSV 失败: 无法识别文件编码，请确保文件为 UTF-8 或 GBK 编码');
         };
 
         // ---- 处理 ZIP 文件 ----
@@ -109,7 +156,6 @@ const UIManager = {
                 let csvFile = null;
                 let csvFileName = '';
 
-                // 查找第一个 .csv 文件
                 for (const [name, zipEntry] of Object.entries(zip.files)) {
                     if (name.toLowerCase().endsWith('.csv') && !zipEntry.dir) {
                         csvFile = zipEntry;
@@ -123,9 +169,8 @@ const UIManager = {
                     return;
                 }
 
-                // 读取 CSV 内容
-                const content = await csvFile.async('string');
-                parseCSVContent(content, csvFileName, onParseData);
+                const buffer = await csvFile.async('arraybuffer');
+                parseCSVFromBuffer(buffer, csvFileName, onParseData);
                 fileInfo.textContent = `📦 ${file.name} → 📎 ${csvFileName}`;
 
             } catch (err) {
@@ -134,7 +179,7 @@ const UIManager = {
             }
         };
 
-        // ---- 处理普通 CSV/Excel 文件 ----
+        // ---- 处理普通文件 ----
         const processFile = (file) => {
             const ext = file.name.split('.').pop().toLowerCase();
 
@@ -147,25 +192,13 @@ const UIManager = {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
-                        const content = e.target.result;
-                        parseCSVContent(content, file.name, onParseData);
+                        const buffer = e.target.result;
+                        parseCSVFromBuffer(buffer, file.name, onParseData);
                     } catch (err) {
-                        // 尝试以 ArrayBuffer 方式读取
-                        const reader2 = new FileReader();
-                        reader2.onload = function(e2) {
-                            try {
-                                const buffer = e2.target.result;
-                                const encoding = EncodingDetector.detectEncoding(buffer);
-                                const text = EncodingDetector.decodeBuffer(buffer, encoding);
-                                parseCSVContent(text, file.name, onParseData);
-                            } catch (err2) {
-                                alert('解析 CSV 失败: ' + err2.message);
-                            }
-                        };
-                        reader2.readAsArrayBuffer(file);
+                        alert('解析 CSV 失败: ' + err.message);
                     }
                 };
-                reader.readAsText(file, 'UTF-8');
+                reader.readAsArrayBuffer(file);
                 return;
             }
 
@@ -242,6 +275,7 @@ const UIManager = {
 
         searchCol.addEventListener('input', UIManager.renderSettingsPanel);
 
+        // ---- 全局 Esc 关闭 ----
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (panel.classList.contains('open')) closeSettings();
@@ -441,5 +475,5 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('pageSizeSelect').value = DataStore.pageSize;
     }
 
-    console.log('📊 分组报表已启动 (支持 ZIP 压缩包 + 多编码)');
+    console.log('📊 分组报表已启动 (支持 ZIP + 多编码)');
 });

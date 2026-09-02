@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>淘宝天猫活动日历 · 焕新</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f2f4f9;
+      color: #0b1a33;
+      line-height: 1.5;
+    }
+
+    /* ----- 柔光容器 ----- */
+    .app {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 32px 40px;
+    }
+
+    /* ===== 顶部导航 · 全新玻璃质感 ===== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      padding: 18px 32px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 28px;
+      box-shadow: 0 8px 32px rgba(0, 20, 40, 0.08), 0 2px 8px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-left .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(145deg, #ff6b35, #ff3b1f);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 6px 16px rgba(255, 59, 31, 0.25);
+    }
+
+    .header-left h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #0b1a33 0%, #2a3f66 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-left h1 span {
+      font-weight: 400;
+      font-size: 16px;
+      background: none;
+      -webkit-text-fill-color: #64748b;
+      margin-left: 6px;
+      letter-spacing: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .header-right .data-badge {
+      background: rgba(15, 23, 42, 0.06);
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-right .data-badge i {
+      font-style: normal;
+      font-size: 16px;
+    }
+
+    /* ===== 筛选栏 · 干净圆润 ===== */
+    .filter-bar {
+      background: #ffffff;
+      padding: 14px 24px;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px 20px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 4px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(203, 213, 225, 0.4);
+      margin-bottom: 28px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      padding: 2px 12px 2px 16px;
+      border-radius: 40px;
+      border: 1px solid #e9edf2;
+      transition: 0.2s;
+    }
+    .filter-group:focus-within {
+      border-color: #ff6b35;
+      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12);
+      background: #ffffff;
+    }
+
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      border: none;
+      background: transparent;
+      padding: 8px 4px 8px 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #0b1a33;
+      outline: none;
+      min-width: 70px;
+      cursor: pointer;
+    }
+    .filter-group input {
+      min-width: 100px;
+    }
+    .filter-group select option {
+      background: #fff;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+      background: #f1f4f9;
+      padding: 4px;
+      border-radius: 40px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .view-btn {
+      padding: 6px 18px;
+      border: none;
+      background: transparent;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 0.2px;
+    }
+
+    .view-btn.active {
+      background: #ffffff;
+      color: #0b1a33;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .view-btn:hover:not(.active) {
+      color: #0b1a33;
+    }
+
+    /* ===== 统计卡片 · 精致微光 ===== */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 16px 20px 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(203, 213, 225, 0.3);
+      transition: 0.2s;
+      text-align: center;
+      backdrop-filter: blur(4px);
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: #cbd5e1;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .stat-card .num {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .stat-card .lbl {
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      margin-top: 4px;
+      letter-spacing: 0.2px;
+    }
+
+    .stat-card.s-level .num {
+      color: #e11d48;
+    }
+    .stat-card.a-level .num {
+      color: #f97316;
+    }
+    .stat-card.b-level .num {
+      color: #2563eb;
+    }
+    .stat-card.c-level .num {
+      color: #16a34a;
+    }
+    .stat-card.ongoing-card .num {
+      color: #0d9488;
+    }
+
+    /* ===== 卡片视图 ===== */
+    .calendar-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+    .month-card {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.02);
+      border: 1px solid #eef2f6;
+      overflow: hidden;
+      transition: 0.2s;
+    }
+    .month-card:hover {
+      border-color: #dce2ec;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.04);
+    }
+    .month-header {
+      padding: 16px 22px;
+      font-size: 17px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      color: #0b1a33;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #eef2f6;
+    }
+    .month-header .count {
+      font-size: 12px;
+      font-weight: 500;
+      background: rgba(0, 0, 0, 0.04);
+      padding: 2px 14px;
+      border-radius: 30px;
+      color: #475569;
+    }
+    .month-body {
+      padding: 12px 16px 16px;
+    }
+
+    /* ===== 活动条目 ===== */
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 6px;
+      transition: 0.15s;
+      border: 1px solid transparent;
+      cursor: pointer;
+      position: relative;
+    }
+    .event-item:last-child {
+      margin-bottom: 0;
+    }
+    .event-item:hover {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+
+    .event-badge {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+    }
+    .event-badge.S {
+      background: linear-gradient(145deg, #e11d48, #be123c);
+    }
+    .event-badge.A {
+      background: linear-gradient(145deg, #f97316, #ea580c);
+    }
+    .event-badge.B {
+      background: linear-gradient(145deg, #2563eb, #1d4ed8);
+    }
+    .event-badge.C {
+      background: linear-gradient(145deg, #16a34a, #15803d);
+    }
+
+    .event-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .event-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0b1a33;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .event-date {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .event-discount {
+      font-size: 11px;
+      font-weight: 600;
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 1px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 3px;
+    }
+
+    .event-status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 30px;
+      background: #f1f5f9;
+      color: #475569;
+      white-space: nowrap;
+    }
+    .event-status.ongoing {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .event-status.upcoming {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .event-status.ended {
+      background: #f1f5f9;
+      color: #94a3b8;
+    }
+
+    /* ===== 列表 & 时间轴 (保持原有干净感) ===== */
+    .list-view.show {
+      display: block;
+    }
+    .list-view {
+      display: none;
+    }
+    .calendar-wrapper.hide {
+      display: none;
+    }
+    .timeline-view {
+      display: none;
+    }
+    .timeline-view.show {
+      display: block;
+    }
+
+    .list-table {
+      width: 100%;
+      background: #fff;
+      border-radius: 28px;
+      border: 1px solid #eef2f6;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
+    }
+    .list-table thead th {
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      background: #f8fafc;
+      border-bottom: 1px solid #eef2f6;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .list-table tbody td {
+      padding: 12px 18px;
+      font-size: 13px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .list-table tbody tr {
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .list-table tbody tr:hover {
+      background: #f8fafc;
+    }
+    .level-tag {
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 40px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+    .level-tag.S {
+      background: #e11d48;
+    }
+    .level-tag.A {
+      background: #f97316;
+    }
+    .level-tag.B {
+      background: #2563eb;
+    }
+    .level-tag.C {
+      background: #16a34a;
+    }
+
+    /* 时间轴 */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, #e11d48, #f97316, #2563eb, #16a34a);
+      border-radius: 8px;
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 16px 22px;
+      border: 1px solid #eef2f6;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .timeline-item:hover {
+      transform: translateX(6px);
+      border-color: #cbd5e1;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -30px;
+      top: 22px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #94a3b8;
+    }
+    .timeline-item.S::before {
+      box-shadow: 0 0 0 2px #e11d48;
+      background: #e11d48;
+    }
+    .timeline-item.A::before {
+      box-shadow: 0 0 0 2px #f97316;
+      background: #f97316;
+    }
+    .timeline-item.B::before {
+      box-shadow: 0 0 0 2px #2563eb;
+      background: #2563eb;
+    }
+    .timeline-item.C::before {
+      box-shadow: 0 0 0 2px #16a34a;
+      background: #16a34a;
+    }
+    .tl-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .tl-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0b1a33;
+    }
+    .tl-date {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .tl-phases {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .tl-phase {
+      font-size: 11px;
+      padding: 3px 14px;
+      border-radius: 40px;
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    /* ===== 弹窗 ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal {
+      background: #ffffff;
+      border-radius: 36px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2);
+      animation: modalIn 0.25s ease;
+      padding: 8px 0 0;
+    }
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    .modal-head {
+      padding: 24px 28px 8px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .modal-head h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0b1a33;
+    }
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 40px;
+      border: none;
+      background: #f1f5f9;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      color: #334155;
+    }
+    .modal-close:hover {
+      background: #e2e8f0;
+    }
+    .modal-body {
+      padding: 8px 28px 28px;
+    }
+    .modal-row {
+      display: flex;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+    .modal-row:last-child {
+      border-bottom: none;
+    }
+    .modal-row .label {
+      width: 80px;
+      flex-shrink: 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+    .modal-row .value {
+      flex: 1;
+      font-weight: 500;
+    }
+    .modal-phases {
+      margin-top: 16px;
+    }
+    .modal-phases h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 10px;
+    }
+    .phase-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      background: #f8fafc;
+      border-radius: 16px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .phase-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 10px;
+      background: #2563eb;
+      flex-shrink: 0;
+    }
+    .phase-name {
+      font-weight: 600;
+      min-width: 60px;
+      color: #0b1a33;
+    }
+    .phase-time {
+      color: #64748b;
+    }
+
+    /* 加载 & 空状态 */
+    .loading,
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #64748b;
+    }
+    .loading .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #f97316;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    /* 回到顶部 */
+    .back-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      border-radius: 60px;
+      background: #ffffff;
+      color: #0b1a33;
+      border: 1px solid #e2e8f0;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      z-index: 50;
+    }
+    .back-top.show {
+      display: flex;
+    }
+    .back-top:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      border-color: #cbd5e1;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .app {
+        padding: 16px 16px 32px;
+      }
+      .header {
+        padding: 14px 20px;
+        border-radius: 24px;
+      }
+      .filter-bar {
+        border-radius: 32px;
+        padding: 12px 18px;
+        gap: 10px;
+      }
+      .filter-group {
+        padding: 2px 10px 2px 14px;
+      }
+      .filter-group input {
+        min-width: 70px;
+      }
+      .view-toggle {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+      }
+      .stats-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .calendar-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 480px) {
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .stat-card {
+        padding: 12px 12px 10px;
+      }
+      .stat-card .num {
+        font-size: 22px;
+      }
+      .header-left h1 {
+        font-size: 20px;
+      }
+      .header-left h1 span {
+        font-size: 13px;
+      }
+      .header-left .brand-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- 顶部导航 全新 -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand-icon">📅</div>
+      <h1>活动日历 <span>· 淘宝天猫</span></h1>
+    </div>
+    <div class="header-right">
+      <div class="data-badge">
+        <i>📋</i> <span id="dataInfo">共 0 个活动</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>年份</label>
+      <select id="filterYear"><option value="all">全部</option></select>
+    </div>
+    <div class="filter-group">
+      <label>级别</label>
+      <select id="filterLevel">
+        <option value="all">全部</option>
+        <option value="S">S级</option>
+        <option value="A">A级</option>
+        <option value="B">B级</option>
+        <option value="C">C级</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>品类</label>
+      <select id="filterCategory"><option value="all">全部</option></select>
+    </div>
+    <div class="filter-group">
+      <label>搜索</label>
+      <input type="text" id="filterSearch" placeholder="活动名称..." style="min-width:100px;">
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="calendar">📋 卡片</button>
+      <button class="view-btn" data-view="list">📊 列表</button>
+      <button class="view-btn" data-view="timeline">🕐 时间轴</button>
+    </div>
+  </div>
+
+  <!-- 统计 -->
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- 主内容 -->
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div>正在加载活动数据...</div>
+  </div>
+  <div id="calendarView" class="calendar-wrapper hide"></div>
+  <div id="listView" class="list-view"></div>
+  <div id="timelineView" class="timeline-view"></div>
+  <div id="emptyState" class="empty-state" style="display:none">
+    <div class="icon">🔍</div>
+    <div>没有找到匹配的活动</div>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle"></h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- 回到顶部 -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // ----- 数据 & 逻辑 (保持不变, 仅优化样式) -----
+  let allEvents = [];
+  let filteredEvents = [];
+  let currentView = 'calendar';
+
+  async function loadData() {
+    try {
+      const resp = await fetch('event_calendar_data.json');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      allEvents = data;
+      initFilters();
+      applyFilters();
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('dataInfo').textContent = `共 ${data.length} 个活动`;
+    } catch (e) {
+      document.getElementById('loading').innerHTML =
+        '<div style="font-size:48px;margin-bottom:16px">⚠️</div>' +
+        '<div style="font-size:16px;color:#e11d48;font-weight:600">数据加载失败</div>' +
+        '<div style="margin-top:8px;color:#475569">请确认 event_calendar_data.json 存在且格式正确</div>' +
+        '<div style="margin-top:4px;font-size:12px;color:#94a3b8">' + e.message + '</div>';
+    }
+  }
+
+  function initFilters() {
+    const years = [...new Set(allEvents.map(e => e.year))].sort();
+    const yearSel = document.getElementById('filterYear');
+    years.forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y + '年';
+      yearSel.appendChild(opt);
+    });
+    const cats = new Set();
+    allEvents.forEach(e => {
+      if (e.category) e.category.split('/').forEach(c => cats.add(c.trim()));
+    });
+    const catSel = document.getElementById('filterCategory');
+    [...cats].sort().forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      catSel.appendChild(opt);
+    });
+    ['filterYear', 'filterLevel', 'filterCategory'].forEach(id => {
+      document.getElementById(id).addEventListener('change', applyFilters);
+    });
+    document.getElementById('filterSearch').addEventListener('input', debounce(applyFilters, 300));
+  }
+
+  function applyFilters() {
+    const year = document.getElementById('filterYear').value;
+    const level = document.getElementById('filterLevel').value;
+    const category = document.getElementById('filterCategory').value;
+    const search = document.getElementById('filterSearch').value.trim().toLowerCase();
+    filteredEvents = allEvents.filter(e => {
+      if (year !== 'all' && e.year !== +year) return false;
+      if (level !== 'all' && e.level !== level) return false;
+      if (category !== 'all' && (!e.category || !e.category.includes(category))) return false;
+      if (search && !e.name.toLowerCase().includes(search)) return false;
+      return true;
+    });
+    renderStats();
+    renderCurrentView();
+  }
+
+  function renderStats() {
+    const counts = { S: 0, A: 0, B: 0, C: 0 };
+    filteredEvents.forEach(e => { if (counts[e.level] !== undefined) counts[e.level]++; });
+    const now = new Date();
+    const ongoing = filteredEvents.filter(e => isEventOngoing(e, now)).length;
+    document.getElementById('statsRow').innerHTML = `
+      <div class="stat-card"><div class="num">${filteredEvents.length}</div><div class="lbl">活动总数</div></div>
+      <div class="stat-card s-level"><div class="num">${counts.S}</div><div class="lbl">S级 · 顶级</div></div>
+      <div class="stat-card a-level"><div class="num">${counts.A}</div><div class="lbl">A级 · 重要</div></div>
+      <div class="stat-card b-level"><div class="num">${counts.B}</div><div class="lbl">B级 · 常规</div></div>
+      <div class="stat-card c-level"><div class="num">${counts.C}</div><div class="lbl">C级 · 品类</div></div>
+      <div class="stat-card ongoing-card"><div class="num">${ongoing}</div><div class="lbl">进行中</div></div>
+    `;
+  }
+
+  function renderCurrentView() {
+    if (filteredEvents.length === 0) {
+      document.getElementById('calendarView').classList.add('hide');
+      document.getElementById('listView').classList.remove('show');
+      document.getElementById('timelineView').classList.remove('show');
+      document.getElementById('emptyState').style.display = 'block';
+      return;
+    }
+    document.getElementById('emptyState').style.display = 'none';
+    if (currentView === 'calendar') renderCalendar();
+    else if (currentView === 'list') renderList();
+    else if (currentView === 'timeline') renderTimeline();
+  }
+
+  function renderCalendar() {
+    const container = document.getElementById('calendarView');
+    container.classList.remove('hide');
+    document.getElementById('listView').classList.remove('show');
+    document.getElementById('timelineView').classList.remove('show');
+    const groups = {};
+    filteredEvents.forEach(e => {
+      const key = e.year + '-' + String(getMainMonth(e)).padStart(2, '0');
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(e);
+    });
+    const monthNames = ['', '1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    const sortedKeys = Object.keys(groups).sort();
+    container.innerHTML = sortedKeys.map(key => {
+      const [y, m] = key.split('-');
+      const events = groups[key].sort((a, b) => {
+        const order = { S: 0, A: 1, B: 2, C: 3 };
+        return (order[a.level] || 9) - (order[b.level] || 9);
+      });
+      return `
+        <div class="month-card">
+          <div class="month-header">
+            <span>${y}年${monthNames[+m]}</span>
+            <span class="count">${events.length} 个活动</span>
+          </div>
+          <div class="month-body">${events.map(e => renderEventItem(e)).join('')}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderEventItem(e) {
+    const now = new Date();
+    const status = getEventStatus(e, now);
+    const dateStr = formatDateRange(e);
+    const statusHtml = status === 'ongoing' ? '<span class="event-status ongoing">进行中</span>' :
+      status === 'upcoming' ? '<span class="event-status upcoming">即将开始</span>' :
+      '<span class="event-status ended">已结束</span>';
+    return `
+      <div class="event-item" onclick="showDetail('${e.id}')">
+        <div class="event-badge ${e.level}">${e.level}</div>
+        <div class="event-info">
+          <div class="event-name">${e.name}</div>
+          <div class="event-date">${dateStr}</div>
+          ${e.discount ? `<span class="event-discount">${e.discount}</span>` : ''}
+        </div>
+        ${statusHtml}
+      </div>`;
+  }
+
+  function renderList() {
+    const container = document.getElementById('listView');
+    container.classList.add('show');
+    document.getElementById('calendarView').classList.add('hide');
+    document.getElementById('timelineView').classList.remove('show');
+    const sorted = [...filteredEvents].sort((a, b) => getFirstDate(a) - getFirstDate(b));
+    container.innerHTML = `
+      <table class="list-table">
+        <thead><tr>
+          <th>级别</th><th>活动名称</th><th>时间</th><th>品类</th><th>优惠</th><th>状态</th>
+        </tr></thead>
+        <tbody>${sorted.map(e => {
+          const status = getEventStatus(e, new Date());
+          const statusText = status === 'ongoing' ? '<span style="color:#0d9488;font-weight:600">进行中</span>' :
+            status === 'upcoming' ? '<span style="color:#d97706">即将开始</span>' :
+            '<span style="color:#94a3b8">已结束</span>';
+          return `
+            <tr onclick="showDetail('${e.id}')">
+              <td><span class="level-tag ${e.level}">${e.level}</span></td>
+              <td style="font-weight:600">${e.name}</td>
+              <td style="white-space:nowrap;font-size:12px;color:#475569">${formatDateRange(e)}</td>
+              <td style="font-size:12px;color:#64748b;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.category || ''}">${e.category || '-'}</td>
+              <td style="font-size:12px;color:#b91c1c">${e.discount || '-'}</td>
+              <td>${statusText}</td>
+            </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+  }
+
+  function renderTimeline() {
+    const container = document.getElementById('timelineView');
+    container.classList.add('show');
+    document.getElementById('calendarView').classList.add('hide');
+    document.getElementById('listView').classList.remove('show');
+    const sorted = [...filteredEvents].sort((a, b) => getFirstDate(a) - getFirstDate(b));
+    container.innerHTML = `
+      <div class="timeline">${sorted.map(e => {
+        const phasesHtml = (e.phases || []).map(p =>
+          `<span class="tl-phase">${p.name}: ${p.start} ~ ${p.end}</span>`
+        ).join('');
+        return `
+          <div class="timeline-item ${e.level}" onclick="showDetail('${e.id}')">
+            <div class="tl-header">
+              <span class="level-tag ${e.level}">${e.level}</span>
+              <span class="tl-name">${e.name}</span>
+            </div>
+            <div class="tl-date">${formatDateRange(e)}</div>
+            ${e.discount ? `<span class="event-discount" style="margin-top:6px">${e.discount}</span>` : ''}
+            <div class="tl-phases">${phasesHtml}</div>
+          </div>`;
+      }).join('')}</div>`;
+  }
+
+  function showDetail(id) {
+    const e = allEvents.find(ev => ev.id === id);
+    if (!e) return;
+    document.getElementById('modalTitle').textContent = e.name;
+    const status = getEventStatus(e, new Date());
+    const statusLabel = status === 'ongoing' ? '🟢 进行中' :
+      status === 'upcoming' ? '🟡 即将开始' : '⚪ 已结束';
+    let html = `
+      <div class="modal-row"><span class="label">级别</span><span class="value"><span class="level-tag ${e.level}">${e.level}级</span></span></div>
+      <div class="modal-row"><span class="label">年份</span><span class="value">${e.year}年</span></div>
+      <div class="modal-row"><span class="label">状态</span><span class="value">${statusLabel}</span></div>
+      <div class="modal-row"><span class="label">品类</span><span class="value">${e.category || '-'}</span></div>
+      ${e.discount ? `<div class="modal-row"><span class="label">优惠</span><span class="value" style="color:#b91c1c;font-weight:700">${e.discount}</span></div>` : ''}
+      ${e.notes ? `<div class="modal-row"><span class="label">备注</span><span class="value">${e.notes}</span></div>` : ''}`;
+    if (e.phases && e.phases.length > 0) {
+      html += `<div class="modal-phases"><h3>活动阶段</h3>
+        ${e.phases.map(p => `
+          <div class="phase-item">
+            <span class="phase-dot"></span>
+            <span class="phase-name">${p.name}</span>
+            <span class="phase-time">${p.start} ~ ${p.end}</span>
+          </div>`).join('')}</div>`;
+    }
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+  }
+
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      renderCurrentView();
+    });
+  });
+
+  function getMainMonth(e) {
+    if (e.phases && e.phases.length > 0) return new Date(e.phases[0].start).getMonth() + 1;
+    return 1;
+  }
+
+  function getFirstDate(e) {
+    if (e.phases && e.phases.length > 0) return new Date(e.phases[0].start);
+    return new Date(e.year, 0, 1);
+  }
+
+  function getLastDate(e) {
+    if (e.phases && e.phases.length > 0) return new Date(e.phases[e.phases.length - 1].end);
+    return new Date(e.year, 11, 31);
+  }
+
+  function formatDateRange(e) {
+    if (!e.phases || e.phases.length === 0) return '';
+    if (e.phases.length === 1) return `${e.phases[0].start} ~ ${e.phases[0].end}`;
+    return `${e.phases[0].start} ~ ${e.phases[e.phases.length - 1].end}`;
+  }
+
+  function isEventOngoing(e, now) {
+    const start = getFirstDate(e);
+    const end = getLastDate(e);
+    end.setHours(23, 59, 59, 999);
+    return now >= start && now <= end;
+  }
+
+  function getEventStatus(e, now) {
+    const start = getFirstDate(e);
+    const end = getLastDate(e);
+    end.setHours(23, 59, 59, 999);
+    if (now >= start && now <= end) return 'ongoing';
+    if (now < start) return 'upcoming';
+    return 'ended';
+  }
+
+  function debounce(fn, ms) {
+    let t;
+    return function (...args) { clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, args), ms); };
+  }
+
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  window.addEventListener('scroll', () => {
+    document.getElementById('backTop').classList.toggle('show', window.scrollY > 400);
+  });
+
+  loadData();
+</script>
+</body>
+</html>

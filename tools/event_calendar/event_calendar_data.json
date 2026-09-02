@@ -1,0 +1,3349 @@
+[
+  {
+    "id": "2020_nhj",
+    "name": "天猫年货节",
+    "level": "S",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-01-13", "end": "2020-01-17" }],
+    "discount": "满200减15",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2020_jz_xn",
+    "name": "家装新年惠",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-01-01", "end": "2020-01-08" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2020_my_jk",
+    "name": "母婴进口大赏节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-01-11", "end": "2020-01-12" }],
+    "discount": "",
+    "category": "母婴",
+    "notes": ""
+  },
+  {
+    "id": "2020_gn_bdy",
+    "name": "天猫过年不打烊",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-01", "end": "2020-02-14" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "春节期间正常发货"
+  },
+  {
+    "id": "2020_qrj",
+    "name": "天猫情人节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-12", "end": "2020-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2020_nh_bdy",
+    "name": "年货不打烊",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-07", "end": "2020-02-14" }],
+    "discount": "",
+    "category": "食品/日用",
+    "notes": ""
+  },
+  {
+    "id": "2020_kn_zyd",
+    "name": "开年总动员",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-20", "end": "2020-02-26" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_yq_tz",
+    "name": "油漆涂装节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-22", "end": "2020-03-31" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2020_kxj_cf",
+    "name": "开学季",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-25", "end": "2020-03-02" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": ""
+  },
+  {
+    "id": "2020_mz_cg",
+    "name": "美妆春光节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-25", "end": "2020-03-02" }],
+    "discount": "",
+    "category": "美妆护肤",
+    "notes": ""
+  },
+  {
+    "id": "2020_jzj_cf",
+    "name": "家装节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-02-26", "end": "2020-03-27" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": ""
+  },
+  {
+    "id": "2020_38_jh",
+    "name": "聚划算38大促",
+    "level": "A",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-02", "end": "2020-03-08" }],
+    "discount": "满200减20",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_38_nwj",
+    "name": "三八女王节",
+    "level": "A",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-03", "end": "2020-03-08" }],
+    "discount": "满200减20",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": ""
+  },
+  {
+    "id": "2020_qc_qc",
+    "name": "春季汽车节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-03", "end": "2020-03-18" }],
+    "discount": "",
+    "category": "汽车用品",
+    "notes": ""
+  },
+  {
+    "id": "2020_hlw_jz",
+    "name": "互联网家装节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-04", "end": "2020-03-18" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2020_ccj",
+    "name": "春茶节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-10", "end": "2020-03-31" }],
+    "discount": "",
+    "category": "食品/茶叶",
+    "notes": ""
+  },
+  {
+    "id": "2020_chj",
+    "name": "317吃货节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-15", "end": "2020-03-19" }],
+    "discount": "",
+    "category": "食品零食",
+    "notes": ""
+  },
+  {
+    "id": "2020_cxxfs",
+    "name": "春夏新风尚",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-22", "end": "2020-03-28" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": "春装上新"
+  },
+  {
+    "id": "2020_3m_jkr",
+    "name": "3月健康日",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-03-28", "end": "2020-03-31" }],
+    "discount": "",
+    "category": "健康保健",
+    "notes": ""
+  },
+  {
+    "id": "2020_bbcxj",
+    "name": "宝宝出行节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-01", "end": "2020-04-30" }],
+    "discount": "",
+    "category": "母婴",
+    "notes": ""
+  },
+  {
+    "id": "2020_cyj_cf",
+    "name": "出游季",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-07", "end": "2020-04-12" }],
+    "discount": "",
+    "category": "户外/旅行箱/防晒",
+    "notes": ""
+  },
+  {
+    "id": "2020_mjj",
+    "name": "美甲节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-05", "end": "2020-04-08" }],
+    "discount": "",
+    "category": "美妆美甲",
+    "notes": ""
+  },
+  {
+    "id": "2020_jz_dj",
+    "name": "家装行业大促",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-08", "end": "2020-04-12" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2020_hbh",
+    "name": "天猫婚博会",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-09", "end": "2020-04-11" }],
+    "discount": "",
+    "category": "珠宝/婚庆",
+    "notes": ""
+  },
+  {
+    "id": "2020_mbfsj",
+    "name": "美白防晒节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-11", "end": "2020-04-16" }],
+    "discount": "",
+    "category": "美妆护肤",
+    "notes": ""
+  },
+  {
+    "id": "2020_ert_shj",
+    "name": "儿童生活节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-12", "end": "2020-04-15" }],
+    "discount": "",
+    "category": "母婴/玩具",
+    "notes": ""
+  },
+  {
+    "id": "2020_cjdpkh",
+    "name": "超级大牌狂欢",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-18", "end": "2020-04-20" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_423_ts",
+    "name": "423图书节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-21", "end": "2020-04-23" }],
+    "discount": "",
+    "category": "图书",
+    "notes": ""
+  },
+  {
+    "id": "2020_nanrj",
+    "name": "天猫男人节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-04-22", "end": "2020-04-27" }],
+    "discount": "",
+    "category": "男装/数码/运动",
+    "notes": ""
+  },
+  {
+    "id": "2020_mqj_cf",
+    "name": "天猫母亲节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-03", "end": "2020-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_5y_ccj",
+    "name": "5月春茶节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-05", "end": "2020-05-07" }],
+    "discount": "",
+    "category": "食品/茶叶",
+    "notes": ""
+  },
+  {
+    "id": "2020_jz_5y",
+    "name": "家装5月行业大促",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-09", "end": "2020-05-13" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2020_517_tx",
+    "name": "517通信狂欢节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-11", "end": "2020-05-17" }],
+    "discount": "",
+    "category": "数码/手机/通信",
+    "notes": ""
+  },
+  {
+    "id": "2020_520_cf",
+    "name": "520表白节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-13", "end": "2020-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2020_dzj",
+    "name": "天猫底妆节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-16", "end": "2020-05-19" }],
+    "discount": "",
+    "category": "美妆",
+    "notes": ""
+  },
+  {
+    "id": "2020_dlylxj",
+    "name": "大六一旅行季",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-16", "end": "2020-06-01" }],
+    "discount": "",
+    "category": "户外/旅行",
+    "notes": ""
+  },
+  {
+    "id": "2020_jk_kh",
+    "name": "进口狂欢周",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-19", "end": "2020-05-25" }],
+    "discount": "",
+    "category": "进口商品",
+    "notes": ""
+  },
+  {
+    "id": "2020_fqj",
+    "name": "天猫父亲节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-05-25", "end": "2020-06-30" }],
+    "discount": "",
+    "category": "男装/数码/运动",
+    "notes": ""
+  },
+  {
+    "id": "2020_618",
+    "name": "618年中大促",
+    "level": "S",
+    "year": 2020,
+    "phases": [
+      { "name": "预售期", "start": "2020-06-01", "end": "2020-06-03" },
+      { "name": "正式期", "start": "2020-06-04", "end": "2020-06-19" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_jh66",
+    "name": "聚划算66大聚惠",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-06-02", "end": "2020-06-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_dwj",
+    "name": "天猫端午节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-06-04", "end": "2020-06-09" }],
+    "discount": "",
+    "category": "食品/酒水",
+    "notes": ""
+  },
+  {
+    "id": "2020_zwj",
+    "name": "造物节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-07-08", "end": "2020-07-12" }],
+    "discount": "",
+    "category": "创意/潮玩/原创设计",
+    "notes": ""
+  },
+  {
+    "id": "2020_pjj",
+    "name": "天猫啤酒节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-07-01", "end": "2020-07-31" }],
+    "discount": "",
+    "category": "酒水饮料",
+    "notes": ""
+  },
+  {
+    "id": "2020_yyj",
+    "name": "天猫游泳节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-07-01", "end": "2020-07-31" }],
+    "discount": "",
+    "category": "运动户外",
+    "notes": ""
+  },
+  {
+    "id": "2020_722_xh",
+    "name": "722洗护节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-07-20", "end": "2020-07-24" }],
+    "discount": "",
+    "category": "洗护日化",
+    "notes": ""
+  },
+  {
+    "id": "2020_88hyj",
+    "name": "88会员节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-08-06", "end": "2020-08-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "88VIP专属"
+  },
+  {
+    "id": "2020_qq_sx",
+    "name": "秋冬上新",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-08-15", "end": "2020-08-25" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2020_qx_cf",
+    "name": "七夕情人节",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-08-20", "end": "2020-08-25" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2020_818_sc",
+    "name": "818暑促",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-08-15", "end": "2020-08-20" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_99",
+    "name": "99划算节",
+    "level": "S",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-09-07", "end": "2020-09-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_jhj",
+    "name": "结婚季",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-09-01", "end": "2020-09-10" }],
+    "discount": "",
+    "category": "珠宝/婚庆/家居",
+    "notes": ""
+  },
+  {
+    "id": "2020_jqcyj",
+    "name": "金秋出游季",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-09-20", "end": "2020-09-28" }],
+    "discount": "",
+    "category": "户外/旅行",
+    "notes": ""
+  },
+  {
+    "id": "2020_gq_dhz",
+    "name": "国庆大惠战",
+    "level": "B",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-10-01", "end": "2020-10-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_zqj",
+    "name": "淘宝中秋节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-10-01", "end": "2020-10-03" }],
+    "discount": "",
+    "category": "食品/酒水/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2020_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2020,
+    "phases": [
+      { "name": "预售期", "start": "2020-10-21", "end": "2020-10-31" },
+      { "name": "第一波", "start": "2020-11-01", "end": "2020-11-03" },
+      { "name": "狂欢日", "start": "2020-11-11", "end": "2020-11-11" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_s12",
+    "name": "双12活动",
+    "level": "A",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-12-10", "end": "2020-12-12" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2020_sdj",
+    "name": "梦幻圣诞节",
+    "level": "C",
+    "year": 2020,
+    "phases": [{ "name": "正式期", "start": "2020-12-20", "end": "2020-12-26" }],
+    "discount": "",
+    "category": "礼品/玩具/服饰",
+    "notes": ""
+  },
+  {
+    "id": "2021_nhj",
+    "name": "天猫年货节",
+    "level": "S",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-01-20", "end": "2021-01-25" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2021_my_jk",
+    "name": "母婴进口大赏节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-01-11", "end": "2021-01-12" }],
+    "discount": "",
+    "category": "母婴",
+    "notes": ""
+  },
+  {
+    "id": "2021_gn_bdy",
+    "name": "天猫过年不打烊",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-01", "end": "2021-02-14" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_qrj",
+    "name": "天猫情人节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-12", "end": "2021-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2021_nh_bdy",
+    "name": "年货不打烊",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-07", "end": "2021-02-14" }],
+    "discount": "",
+    "category": "食品/日用",
+    "notes": ""
+  },
+  {
+    "id": "2021_kn_zyd",
+    "name": "开年总动员",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-20", "end": "2021-02-26" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_yq_tz",
+    "name": "油漆涂装节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-22", "end": "2021-03-31" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2021_kxj",
+    "name": "开学季",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-25", "end": "2021-03-02" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": ""
+  },
+  {
+    "id": "2021_jzj",
+    "name": "家装节",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-02-26", "end": "2021-03-27" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": ""
+  },
+  {
+    "id": "2021_38_jh",
+    "name": "聚划算38大促",
+    "level": "A",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-02", "end": "2021-03-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_38_nwj",
+    "name": "三八女王节",
+    "level": "A",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-03", "end": "2021-03-08" }],
+    "discount": "",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": ""
+  },
+  {
+    "id": "2021_qc_qc",
+    "name": "春季汽车节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-03", "end": "2021-03-18" }],
+    "discount": "",
+    "category": "汽车用品",
+    "notes": ""
+  },
+  {
+    "id": "2021_hlw_jz",
+    "name": "互联网家装节",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-04", "end": "2021-03-18" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2021_ccj",
+    "name": "春茶节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-10", "end": "2021-03-31" }],
+    "discount": "",
+    "category": "食品/茶叶",
+    "notes": ""
+  },
+  {
+    "id": "2021_chj",
+    "name": "317吃货节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-15", "end": "2021-03-19" }],
+    "discount": "",
+    "category": "食品零食",
+    "notes": ""
+  },
+  {
+    "id": "2021_cxxfs",
+    "name": "春夏新风尚",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-03-22", "end": "2021-03-28" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2021_bbcxj",
+    "name": "宝宝出行节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-01", "end": "2021-04-30" }],
+    "discount": "",
+    "category": "母婴",
+    "notes": ""
+  },
+  {
+    "id": "2021_cyj",
+    "name": "出游季",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-07", "end": "2021-04-12" }],
+    "discount": "",
+    "category": "户外/旅行箱/防晒",
+    "notes": ""
+  },
+  {
+    "id": "2021_mjj",
+    "name": "美甲节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-05", "end": "2021-04-08" }],
+    "discount": "",
+    "category": "美妆美甲",
+    "notes": ""
+  },
+  {
+    "id": "2021_jz_dj",
+    "name": "家装行业大促",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-08", "end": "2021-04-12" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2021_hbh",
+    "name": "天猫婚博会",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-09", "end": "2021-04-11" }],
+    "discount": "",
+    "category": "珠宝/婚庆",
+    "notes": ""
+  },
+  {
+    "id": "2021_xyj",
+    "name": "天猫校园季",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-13", "end": "2021-04-22" }],
+    "discount": "",
+    "category": "数码/文具/生活",
+    "notes": ""
+  },
+  {
+    "id": "2021_cjdpkh",
+    "name": "超级大牌狂欢",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-18", "end": "2021-04-20" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_nanrj",
+    "name": "天猫男人节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-22", "end": "2021-04-27" }],
+    "discount": "",
+    "category": "男装/数码/运动",
+    "notes": ""
+  },
+  {
+    "id": "2021_mqj",
+    "name": "天猫母亲节",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-05-03", "end": "2021-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_jz_5y",
+    "name": "家装5月行业大促",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-05-09", "end": "2021-05-13" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2021_517_tx",
+    "name": "517通信狂欢节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-05-11", "end": "2021-05-17" }],
+    "discount": "",
+    "category": "数码/手机/通信",
+    "notes": ""
+  },
+  {
+    "id": "2021_520",
+    "name": "520表白节",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-05-13", "end": "2021-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2021_55",
+    "name": "55吾折天盛典",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-04-27", "end": "2021-05-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_618",
+    "name": "618年中大促",
+    "level": "S",
+    "year": 2021,
+    "phases": [
+      { "name": "预售期", "start": "2021-05-24", "end": "2021-05-31" },
+      { "name": "第一波", "start": "2021-06-01", "end": "2021-06-03" },
+      { "name": "品类日", "start": "2021-06-04", "end": "2021-06-15" },
+      { "name": "狂欢日", "start": "2021-06-16", "end": "2021-06-19" }
+    ],
+    "discount": "满200减30/满300减50",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_jh66",
+    "name": "聚划算66大聚惠",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-06-02", "end": "2021-06-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_dwj",
+    "name": "天猫端午节",
+    "level": "C",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-06-04", "end": "2021-06-09" }],
+    "discount": "",
+    "category": "食品/酒水",
+    "notes": ""
+  },
+  {
+    "id": "2021_zwj",
+    "name": "造物节",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-07-08", "end": "2021-07-12" }],
+    "discount": "",
+    "category": "创意/潮玩/原创设计",
+    "notes": ""
+  },
+  {
+    "id": "2021_88hyj",
+    "name": "88会员节",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-08-06", "end": "2021-08-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "88VIP专属"
+  },
+  {
+    "id": "2021_qq_xfs",
+    "name": "秋冬新风尚",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-08-15", "end": "2021-08-25" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2021_kxj_qj",
+    "name": "开学季",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-08-25", "end": "2021-09-01" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": ""
+  },
+  {
+    "id": "2021_99",
+    "name": "99划算节",
+    "level": "S",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-09-05", "end": "2021-09-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_gq_dhz",
+    "name": "国庆大惠战",
+    "level": "B",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-10-01", "end": "2021-10-31" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2021,
+    "phases": [
+      { "name": "预售期", "start": "2021-10-20", "end": "2021-10-31" },
+      { "name": "抢先购", "start": "2021-11-01", "end": "2021-11-03" },
+      { "name": "狂欢日", "start": "2021-11-11", "end": "2021-11-11" }
+    ],
+    "discount": "满200减25",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2021_s12",
+    "name": "双12活动",
+    "level": "A",
+    "year": 2021,
+    "phases": [{ "name": "正式期", "start": "2021-12-10", "end": "2021-12-12" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_nhj",
+    "name": "阿里年货节",
+    "level": "S",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-01-01", "end": "2022-01-08" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2022_my_jk",
+    "name": "母婴进口大赏节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-01-11", "end": "2022-01-12" }],
+    "discount": "",
+    "category": "母婴",
+    "notes": ""
+  },
+  {
+    "id": "2022_gn_bdy",
+    "name": "天猫过年不打烊",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-02-01", "end": "2022-02-14" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_qrj",
+    "name": "天猫情人节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-02-12", "end": "2022-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2022_nh_bdy",
+    "name": "年货不打烊",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-02-07", "end": "2022-02-14" }],
+    "discount": "",
+    "category": "食品/日用",
+    "notes": ""
+  },
+  {
+    "id": "2022_kn_zyd",
+    "name": "开年总动员",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-02-20", "end": "2022-02-26" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_jzj",
+    "name": "家装节",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-02-26", "end": "2022-03-27" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": ""
+  },
+  {
+    "id": "2022_smj",
+    "name": "天猫睡眠节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-02-26", "end": "2022-02-28" }],
+    "discount": "",
+    "category": "家居/床品",
+    "notes": ""
+  },
+  {
+    "id": "2022_38_jh",
+    "name": "聚划算38大促",
+    "level": "A",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-03-02", "end": "2022-03-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_38_nwj",
+    "name": "三八女王节",
+    "level": "A",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-03-03", "end": "2022-03-08" }],
+    "discount": "满200减20",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": ""
+  },
+  {
+    "id": "2022_hlw_jz",
+    "name": "互联网家装节",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-03-04", "end": "2022-03-18" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2022_ccj",
+    "name": "春茶节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-03-10", "end": "2022-03-31" }],
+    "discount": "",
+    "category": "食品/茶叶",
+    "notes": ""
+  },
+  {
+    "id": "2022_chj",
+    "name": "317吃货节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-03-15", "end": "2022-03-19" }],
+    "discount": "",
+    "category": "食品零食",
+    "notes": ""
+  },
+  {
+    "id": "2022_cxxfs",
+    "name": "春夏新风尚",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-03-22", "end": "2022-03-28" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2022_bbcxj",
+    "name": "宝宝出行节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-01", "end": "2022-04-30" }],
+    "discount": "",
+    "category": "母婴",
+    "notes": ""
+  },
+  {
+    "id": "2022_cyj",
+    "name": "出游季",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-07", "end": "2022-04-12" }],
+    "discount": "",
+    "category": "户外/旅行箱/防晒",
+    "notes": ""
+  },
+  {
+    "id": "2022_mjj",
+    "name": "美甲节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-05", "end": "2022-04-08" }],
+    "discount": "",
+    "category": "美妆美甲",
+    "notes": ""
+  },
+  {
+    "id": "2022_cwj",
+    "name": "天猫厨卫节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-08", "end": "2022-04-11" }],
+    "discount": "",
+    "category": "家电/厨卫",
+    "notes": ""
+  },
+  {
+    "id": "2022_jz_dj",
+    "name": "家装行业大促",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-08", "end": "2022-04-12" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2022_hbh",
+    "name": "天猫婚博会",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-09", "end": "2022-04-11" }],
+    "discount": "",
+    "category": "珠宝/婚庆",
+    "notes": ""
+  },
+  {
+    "id": "2022_mbfsj",
+    "name": "美白防晒节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-11", "end": "2022-04-16" }],
+    "discount": "",
+    "category": "美妆护肤",
+    "notes": ""
+  },
+  {
+    "id": "2022_ert_shj",
+    "name": "儿童生活节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-12", "end": "2022-04-15" }],
+    "discount": "",
+    "category": "母婴/玩具",
+    "notes": ""
+  },
+  {
+    "id": "2022_xyj",
+    "name": "天猫校园季",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-13", "end": "2022-04-22" }],
+    "discount": "",
+    "category": "数码/文具/生活",
+    "notes": ""
+  },
+  {
+    "id": "2022_cjdpkh",
+    "name": "超级大牌狂欢",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-18", "end": "2022-04-20" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_tsj",
+    "name": "图书节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-21", "end": "2022-04-23" }],
+    "discount": "",
+    "category": "图书",
+    "notes": ""
+  },
+  {
+    "id": "2022_nanrj",
+    "name": "天猫男人节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-04-22", "end": "2022-04-27" }],
+    "discount": "",
+    "category": "男装/数码/运动",
+    "notes": ""
+  },
+  {
+    "id": "2022_mqj",
+    "name": "天猫母亲节",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-03", "end": "2022-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_txj",
+    "name": "天猫T恤节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-08", "end": "2022-05-11" }],
+    "discount": "",
+    "category": "服饰",
+    "notes": ""
+  },
+  {
+    "id": "2022_jz_5y",
+    "name": "家装5月行业大促",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-09", "end": "2022-05-13" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2022_517_tx",
+    "name": "517通信狂欢节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-11", "end": "2022-05-17" }],
+    "discount": "",
+    "category": "数码/手机/通信",
+    "notes": ""
+  },
+  {
+    "id": "2022_520",
+    "name": "520表白节",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-13", "end": "2022-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2022_dzj",
+    "name": "天猫底妆节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-16", "end": "2022-05-19" }],
+    "discount": "",
+    "category": "美妆",
+    "notes": ""
+  },
+  {
+    "id": "2022_gmj",
+    "name": "天猫闺蜜节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-16", "end": "2022-05-25" }],
+    "discount": "",
+    "category": "美妆/服饰/零食",
+    "notes": ""
+  },
+  {
+    "id": "2022_jk_kh",
+    "name": "进口狂欢周",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-19", "end": "2022-05-25" }],
+    "discount": "",
+    "category": "进口商品",
+    "notes": ""
+  },
+  {
+    "id": "2022_fqj",
+    "name": "天猫父亲节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-05-25", "end": "2022-06-30" }],
+    "discount": "",
+    "category": "男装/数码/运动",
+    "notes": ""
+  },
+  {
+    "id": "2022_618",
+    "name": "618年中大促",
+    "level": "S",
+    "year": 2022,
+    "phases": [
+      { "name": "预售期", "start": "2022-05-26", "end": "2022-05-31" },
+      { "name": "第一波", "start": "2022-06-01", "end": "2022-06-03" },
+      { "name": "品类日", "start": "2022-06-04", "end": "2022-06-15" },
+      { "name": "狂欢日", "start": "2022-06-16", "end": "2022-06-19" }
+    ],
+    "discount": "满300减50/满200减30",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_jh66",
+    "name": "聚划算66大聚惠",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-06-02", "end": "2022-06-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_66_ayr",
+    "name": "66全国爱眼日",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-06-04", "end": "2022-06-08" }],
+    "discount": "",
+    "category": "眼镜/隐形/护眼",
+    "notes": ""
+  },
+  {
+    "id": "2022_zwj",
+    "name": "造物节",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-07-08", "end": "2022-07-12" }],
+    "discount": "",
+    "category": "创意/潮玩/原创设计",
+    "notes": ""
+  },
+  {
+    "id": "2022_88_qk",
+    "name": "88全球狂欢节",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-08-01", "end": "2022-08-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_99",
+    "name": "99大促",
+    "level": "S",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-09-07", "end": "2022-09-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_qjsj",
+    "name": "天猫全球酒水节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-09-09", "end": "2022-09-11" }],
+    "discount": "",
+    "category": "酒水饮料",
+    "notes": ""
+  },
+  {
+    "id": "2022_gq_dhz",
+    "name": "国庆大惠站",
+    "level": "B",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-10-01", "end": "2022-10-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_djd_gq",
+    "name": "大家电国庆7天乐",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-10-01", "end": "2022-10-07" }],
+    "discount": "",
+    "category": "家电",
+    "notes": ""
+  },
+  {
+    "id": "2022_zqj",
+    "name": "淘宝中秋节",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-10-03", "end": "2022-10-05" }],
+    "discount": "",
+    "category": "食品/酒水/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2022_gq_cg",
+    "name": "国庆疯狂购",
+    "level": "C",
+    "year": 2022,
+    "phases": [{ "name": "正式期", "start": "2022-10-05", "end": "2022-10-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2022,
+    "phases": [
+      { "name": "预售期", "start": "2022-10-24", "end": "2022-10-31" },
+      { "name": "第一波", "start": "2022-10-31", "end": "2022-11-03" },
+      { "name": "第二波", "start": "2022-11-10", "end": "2022-11-11" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2022_s12",
+    "name": "双12活动",
+    "level": "A",
+    "year": 2022,
+    "phases": [
+      { "name": "预热期", "start": "2022-12-05", "end": "2022-12-09" },
+      { "name": "正式期", "start": "2022-12-10", "end": "2022-12-12" }
+    ],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_nhj",
+    "name": "淘宝年货节",
+    "level": "S",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-01-09", "end": "2023-01-15" }],
+    "discount": "满200减15",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2023_cj_bdy",
+    "name": "春节不打烊",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-01-24", "end": "2023-02-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_qrj",
+    "name": "淘宝情人节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-02-09", "end": "2023-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2023_38_nwj",
+    "name": "38女王节",
+    "level": "A",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-03-04", "end": "2023-03-08" }],
+    "discount": "满200减20",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": ""
+  },
+  {
+    "id": "2023_xsl_z",
+    "name": "淘宝新势力周",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-03-21", "end": "2023-03-24" }],
+    "discount": "",
+    "category": "服饰",
+    "notes": "原创设计/潮牌"
+  },
+  {
+    "id": "2023_cz_jkr",
+    "name": "淘宝超值进口日",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-03-25", "end": "2023-03-26" }],
+    "discount": "",
+    "category": "进口商品",
+    "notes": ""
+  },
+  {
+    "id": "2023_jkj",
+    "name": "淘宝健康节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-04-11", "end": "2023-04-14" }],
+    "discount": "",
+    "category": "健康保健/医药",
+    "notes": ""
+  },
+  {
+    "id": "2023_ch_xs",
+    "name": "淘宝初夏上新",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-04-12", "end": "2023-04-15" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2023_cdl",
+    "name": "淘宝超来电",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-04-17", "end": "2023-04-20" }],
+    "discount": "",
+    "category": "数码家电",
+    "notes": ""
+  },
+  {
+    "id": "2023_cyj",
+    "name": "淘宝出游季",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-04-24", "end": "2023-04-27" }],
+    "discount": "",
+    "category": "户外/旅行",
+    "notes": ""
+  },
+  {
+    "id": "2023_mqj",
+    "name": "淘宝母亲节",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-05-03", "end": "2023-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_txj",
+    "name": "淘宝T恤节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-05-08", "end": "2023-05-11" }],
+    "discount": "",
+    "category": "服饰",
+    "notes": ""
+  },
+  {
+    "id": "2023_520",
+    "name": "520表白节",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-05-13", "end": "2023-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2023_cwj",
+    "name": "淘宝橱柜节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-05-13", "end": "2023-06-20" }],
+    "discount": "",
+    "category": "家装建材",
+    "notes": ""
+  },
+  {
+    "id": "2023_dzj",
+    "name": "淘宝底妆节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-05-16", "end": "2023-05-19" }],
+    "discount": "",
+    "category": "美妆",
+    "notes": ""
+  },
+  {
+    "id": "2023_fqj",
+    "name": "淘宝父亲节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-05-25", "end": "2023-06-30" }],
+    "discount": "",
+    "category": "男装/数码/运动",
+    "notes": ""
+  },
+  {
+    "id": "2023_618",
+    "name": "618年中大促",
+    "level": "S",
+    "year": 2023,
+    "phases": [
+      { "name": "预售期", "start": "2023-05-26", "end": "2023-05-31" },
+      { "name": "第一波", "start": "2023-05-31", "end": "2023-06-03" },
+      { "name": "品类日", "start": "2023-06-04", "end": "2023-06-15" },
+      { "name": "狂欢日", "start": "2023-06-16", "end": "2023-06-20" }
+    ],
+    "discount": "满300减50/满200减30",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_jh66",
+    "name": "聚划算66大聚惠",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-06-02", "end": "2023-06-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_ksj",
+    "name": "狂暑季",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-07-12", "end": "2023-07-15" }],
+    "discount": "",
+    "category": "家电/空调/冷饮",
+    "notes": ""
+  },
+  {
+    "id": "2023_sft_ys",
+    "name": "三伏天热养生",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-07-18", "end": "2023-07-20" }],
+    "discount": "",
+    "category": "健康保健/食品",
+    "notes": ""
+  },
+  {
+    "id": "2023_719_jsj",
+    "name": "719酒水节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-07-19", "end": "2023-07-21" }],
+    "discount": "",
+    "category": "酒水饮料",
+    "notes": ""
+  },
+  {
+    "id": "2023_cwj_7",
+    "name": "潮玩嘉年华",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-07-28", "end": "2023-07-30" }],
+    "discount": "",
+    "category": "潮玩/盲盒",
+    "notes": ""
+  },
+  {
+    "id": "2023_qjr",
+    "name": "家清日",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-01", "end": "2023-08-03" }],
+    "discount": "",
+    "category": "日化清洁",
+    "notes": ""
+  },
+  {
+    "id": "2023_88hyj",
+    "name": "88会员节",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-08", "end": "2023-08-11" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "88VIP专属"
+  },
+  {
+    "id": "2023_qxj",
+    "name": "淘宝七夕节",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-17", "end": "2023-08-22" }],
+    "discount": "满300减30",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2023_qxsl_z",
+    "name": "秋新势力周",
+    "level": "B",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-23", "end": "2023-08-26" }],
+    "discount": "",
+    "category": "服饰",
+    "notes": "秋装上新"
+  },
+  {
+    "id": "2023_818_cdl",
+    "name": "818超来电",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-16", "end": "2023-08-18" }],
+    "discount": "",
+    "category": "数码家电",
+    "notes": ""
+  },
+  {
+    "id": "2023_apr",
+    "name": "爱宠日",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-14", "end": "2023-08-15" }],
+    "discount": "",
+    "category": "宠物",
+    "notes": ""
+  },
+  {
+    "id": "2023_cj_gcj",
+    "name": "超级购车节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-08-19", "end": "2023-08-21" }],
+    "discount": "",
+    "category": "汽车用品",
+    "notes": ""
+  },
+  {
+    "id": "2023_jhj",
+    "name": "淘宝结婚季",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-09-01", "end": "2023-09-03" }],
+    "discount": "",
+    "category": "珠宝/婚庆/家居",
+    "notes": ""
+  },
+  {
+    "id": "2023_zqj",
+    "name": "淘宝中秋节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-09-11", "end": "2023-09-13" }],
+    "discount": "",
+    "category": "食品/酒水/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2023_99",
+    "name": "99划算节",
+    "level": "S",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-09-07", "end": "2023-09-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_djd_gq",
+    "name": "大家电国庆7天乐",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-10-01", "end": "2023-10-07" }],
+    "discount": "",
+    "category": "家电",
+    "notes": ""
+  },
+  {
+    "id": "2023_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2023,
+    "phases": [
+      { "name": "预售期", "start": "2023-10-24", "end": "2023-10-31" },
+      { "name": "抢先购", "start": "2023-10-31", "end": "2023-11-03" },
+      { "name": "好价节", "start": "2023-11-04", "end": "2023-11-08" },
+      { "name": "狂欢日", "start": "2023-11-10", "end": "2023-11-11" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": "强调全网最低价"
+  },
+  {
+    "id": "2023_s12",
+    "name": "双12活动",
+    "level": "A",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-12-01", "end": "2023-12-12" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2023_sdj",
+    "name": "梦幻圣诞节",
+    "level": "C",
+    "year": 2023,
+    "phases": [{ "name": "正式期", "start": "2023-12-21", "end": "2023-12-26" }],
+    "discount": "",
+    "category": "礼品/玩具/服饰",
+    "notes": ""
+  },
+  {
+    "id": "2024_nhj",
+    "name": "年货节",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-01-15", "end": "2024-01-31" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2024_cj_gwj",
+    "name": "春节购物季",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-01-25", "end": "2024-02-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_qrj",
+    "name": "情人节活动",
+    "level": "C",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-02-10", "end": "2024-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2024_kmh",
+    "name": "开门红",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-02-17", "end": "2024-02-24" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_38_hxj",
+    "name": "38焕新周",
+    "level": "A",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-03-04", "end": "2024-03-08" }],
+    "discount": "满300减50",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": ""
+  },
+  {
+    "id": "2024_cj_jzj",
+    "name": "春季家装节",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-03-15", "end": "2024-03-31" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": ""
+  },
+  {
+    "id": "2024_xs_j",
+    "name": "上新季",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-04-01", "end": "2024-04-15" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": "春装/夏装上新"
+  },
+  {
+    "id": "2024_cyj",
+    "name": "出游季",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-04-10", "end": "2024-04-18" }],
+    "discount": "",
+    "category": "户外/旅行/防晒",
+    "notes": ""
+  },
+  {
+    "id": "2024_wy",
+    "name": "五一活动",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-04-28", "end": "2024-05-04" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_520",
+    "name": "520礼遇季",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-05-13", "end": "2024-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2024_618",
+    "name": "618年中大促",
+    "level": "S",
+    "year": 2024,
+    "phases": [
+      { "name": "第一波现货", "start": "2024-05-20", "end": "2024-05-28" },
+      { "name": "第二波正式", "start": "2024-05-31", "end": "2024-06-20" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": "取消预售，直接现货开卖"
+  },
+  {
+    "id": "2024_sqjj",
+    "name": "暑期经济",
+    "level": "C",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-07-01", "end": "2024-07-31" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_88hyj",
+    "name": "88会员节",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-08-06", "end": "2024-08-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "88VIP专属"
+  },
+  {
+    "id": "2024_qx",
+    "name": "七夕活动",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-08-08", "end": "2024-08-12" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2024_fxj",
+    "name": "返校季",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-08-25", "end": "2024-08-31" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": ""
+  },
+  {
+    "id": "2024_99",
+    "name": "99划算节",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-09-06", "end": "2024-09-11" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_qj_jzj",
+    "name": "家装节",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-09-10", "end": "2024-09-20" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": ""
+  },
+  {
+    "id": "2024_zq_yr",
+    "name": "中秋预热",
+    "level": "C",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-09-20", "end": "2024-09-26" }],
+    "discount": "",
+    "category": "食品/酒水/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2024_gq_dc",
+    "name": "国庆大促",
+    "level": "B",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-10-01", "end": "2024-10-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2024,
+    "phases": [
+      { "name": "预售期", "start": "2024-10-14", "end": "2024-10-21" },
+      { "name": "第一波", "start": "2024-10-21", "end": "2024-10-24" },
+      { "name": "第二波", "start": "2024-10-31", "end": "2024-11-11" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": "开启时间史上最早"
+  },
+  {
+    "id": "2024_s12",
+    "name": "双12/年终好价节",
+    "level": "A",
+    "year": 2024,
+    "phases": [
+      { "name": "预热期", "start": "2024-12-05", "end": "2024-12-09" },
+      { "name": "正式期", "start": "2024-12-10", "end": "2024-12-12" }
+    ],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2024_sd_sd",
+    "name": "圣诞/双旦",
+    "level": "C",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-12-25", "end": "2025-01-05" }],
+    "discount": "",
+    "category": "礼品/玩具/服饰",
+    "notes": ""
+  },
+  {
+    "id": "2025_nhj_ys",
+    "name": "天猫年货节预售",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "定金期", "start": "2025-01-02", "end": "2025-01-06" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2025_nhj_xh",
+    "name": "天猫年货节现货",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-01-06", "end": "2025-01-20" }],
+    "discount": "满200减30",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2025_tb_nhj",
+    "name": "淘宝年货节",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-01-17", "end": "2025-01-31" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2025_cj_hd",
+    "name": "春节活动",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-01-22", "end": "2025-01-31" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "春节不打烊"
+  },
+  {
+    "id": "2025_qrj",
+    "name": "情人节活动",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-02-10", "end": "2025-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2025_kmh",
+    "name": "开门红",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-02-17", "end": "2025-02-24" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_38_nwj",
+    "name": "38女王节",
+    "level": "A",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-03-01", "end": "2025-03-08" }],
+    "discount": "满300减50",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": ""
+  },
+  {
+    "id": "2025_cj_jzj",
+    "name": "春季家装节",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-03-15", "end": "2025-03-31" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": ""
+  },
+  {
+    "id": "2025_kxj",
+    "name": "开学季",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-03-20", "end": "2025-03-24" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": ""
+  },
+  {
+    "id": "2025_xs_xlc",
+    "name": "上新季·秀场新潮流",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-04-23", "end": "2025-04-28" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2025_wy",
+    "name": "五一活动",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-04-28", "end": "2025-05-04" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_mqj",
+    "name": "母亲节",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-05-08", "end": "2025-05-11" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_520",
+    "name": "520礼遇季",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-05-15", "end": "2025-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2025_618",
+    "name": "618购物节",
+    "level": "S",
+    "year": 2025,
+    "phases": [
+      { "name": "第一波", "start": "2025-05-28", "end": "2025-06-03" },
+      { "name": "品类日", "start": "2025-06-04", "end": "2025-06-15" },
+      { "name": "狂欢日", "start": "2025-06-16", "end": "2025-06-20" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_mlzxr",
+    "name": "美力造新日",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-02", "end": "2025-07-05" }],
+    "discount": "",
+    "category": "美妆",
+    "notes": ""
+  },
+  {
+    "id": "2025_jh_rx",
+    "name": "聚划算日销托管",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-01", "end": "2025-07-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_sm_mdj",
+    "name": "数码免单节",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-08", "end": "2025-07-10" }],
+    "discount": "",
+    "category": "数码",
+    "notes": ""
+  },
+  {
+    "id": "2025_fs_qcj",
+    "name": "服饰清仓季",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-08", "end": "2025-07-11" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": ""
+  },
+  {
+    "id": "2025_ip_jnh",
+    "name": "IP嘉年华·中夏乐游节",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-10", "end": "2025-07-12" }],
+    "discount": "",
+    "category": "潮玩/IP联名",
+    "notes": ""
+  },
+  {
+    "id": "2025_coad_88",
+    "name": "冲奥热动季(含88会员节)",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-27", "end": "2025-08-05" }],
+    "discount": "",
+    "category": "运动/全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_qx",
+    "name": "七夕活动",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-08-10", "end": "2025-08-16" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": ""
+  },
+  {
+    "id": "2025_jd_gx",
+    "name": "家点灵感上新季",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-08-14", "end": "2025-08-18" }],
+    "discount": "",
+    "category": "家居",
+    "notes": ""
+  },
+  {
+    "id": "2025_fxj",
+    "name": "返校季",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-08-22", "end": "2025-08-31" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": ""
+  },
+  {
+    "id": "2025_qfxd",
+    "name": "秋风行动",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-09-15", "end": "2025-09-20" }],
+    "discount": "",
+    "category": "服饰/家居",
+    "notes": ""
+  },
+  {
+    "id": "2025_99",
+    "name": "99划算节",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-09-05", "end": "2025-09-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_gq_dc",
+    "name": "国庆大促",
+    "level": "B",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-10-01", "end": "2025-10-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2025,
+    "phases": [
+      { "name": "预售期", "start": "2025-10-14", "end": "2025-10-21" },
+      { "name": "第一波", "start": "2025-10-21", "end": "2025-10-28" },
+      { "name": "第二波", "start": "2025-10-31", "end": "2025-11-11" }
+    ],
+    "discount": "满300减50",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_hxj",
+    "name": "滑雪季",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-11-01", "end": "2025-11-07" }],
+    "discount": "",
+    "category": "运动户外",
+    "notes": ""
+  },
+  {
+    "id": "2025_s12",
+    "name": "双12/年终好价节",
+    "level": "A",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-12-01", "end": "2025-12-12" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": ""
+  },
+  {
+    "id": "2025_sdj",
+    "name": "圣诞季",
+    "level": "C",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-12-20", "end": "2025-12-26" }],
+    "discount": "",
+    "category": "礼品/玩具/服饰",
+    "notes": ""
+  },
+  {
+    "id": "2025_nhj_qd",
+    "name": "年货节启动",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-12-15", "end": "2025-12-21" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": ""
+  },
+  {
+    "id": "2026_nhj",
+    "name": "年货节",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-01-10", "end": "2026-01-25" }],
+    "discount": "",
+    "category": "食品/酒水/家居/礼盒",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_cj_bdy",
+    "name": "春节不打烊",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-01-26", "end": "2026-02-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_qrj",
+    "name": "情人节",
+    "level": "C",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-02-10", "end": "2026-02-14" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_kmh",
+    "name": "开门红",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-02-18", "end": "2026-02-25" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_38_hxj",
+    "name": "38焕新周/女王节",
+    "level": "A",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-03-02", "end": "2026-03-08" }],
+    "discount": "",
+    "category": "美妆/服饰/母婴/珠宝",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_cj_jzj",
+    "name": "春季家装节",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-03-15", "end": "2026-03-31" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_kxj_xsl",
+    "name": "开学季/新势力周",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-03-18", "end": "2026-03-25" }],
+    "discount": "",
+    "category": "数码/文具/服饰",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_cyj",
+    "name": "出游季",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-04-05", "end": "2026-04-12" }],
+    "discount": "",
+    "category": "户外/旅行/防晒",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_xs_j",
+    "name": "上新季",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-04-20", "end": "2026-04-28" }],
+    "discount": "",
+    "category": "服饰鞋包",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_wy",
+    "name": "五一活动",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-04-28", "end": "2026-05-05" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_mqj",
+    "name": "母亲节",
+    "level": "C",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-05-08", "end": "2026-05-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_520",
+    "name": "520礼遇季",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-05-15", "end": "2026-05-20" }],
+    "discount": "",
+    "category": "珠宝/香水/口红/礼品",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_618",
+    "name": "618年中大促",
+    "level": "S",
+    "year": 2026,
+    "phases": [
+      { "name": "第一波", "start": "2026-05-25", "end": "2026-06-03" },
+      { "name": "品类日", "start": "2026-06-04", "end": "2026-06-15" },
+      { "name": "狂欢日", "start": "2026-06-16", "end": "2026-06-20" }
+    ],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_sq_88",
+    "name": "暑期经济/88会员节",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-07-25", "end": "2026-08-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_qx",
+    "name": "七夕活动",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-08-12", "end": "2026-08-18" }],
+    "discount": "",
+    "category": "珠宝/美妆/礼品",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_fxj",
+    "name": "返校季/开学季",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-08-22", "end": "2026-09-01" }],
+    "discount": "",
+    "category": "数码/文具/宿舍用品",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_99",
+    "name": "99划算节",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-09-05", "end": "2026-09-10" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_qj_jzj",
+    "name": "秋季家装节",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-09-12", "end": "2026-09-22" }],
+    "discount": "",
+    "category": "家装建材/家具",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_gq_dc",
+    "name": "国庆大促",
+    "level": "B",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-10-01", "end": "2026-10-07" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_s11",
+    "name": "双11全球狂欢节",
+    "level": "S",
+    "year": 2026,
+    "phases": [
+      { "name": "预售期", "start": "2026-10-14", "end": "2026-10-21" },
+      { "name": "第一波", "start": "2026-10-21", "end": "2026-10-28" },
+      { "name": "第二波", "start": "2026-10-31", "end": "2026-11-11" }
+    ],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_s12",
+    "name": "双12/年终好价节",
+    "level": "A",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-12-05", "end": "2026-12-12" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "预估日期"
+  },
+  {
+    "id": "2026_sd_sd",
+    "name": "圣诞/双旦",
+    "level": "C",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-12-25", "end": "2027-01-05" }],
+    "discount": "",
+    "category": "礼品/玩具/服饰",
+    "notes": "预估日期"
+  },
+
+  {
+    "id": "super88_2024_01_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-01-08", "end": "2024-01-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_01_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-01-18", "end": "2024-01-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_02_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-02-08", "end": "2024-02-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_02_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-02-18", "end": "2024-02-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_03_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-03-08", "end": "2024-03-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_03_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-03-18", "end": "2024-03-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_04_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-04-08", "end": "2024-04-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_04_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-04-18", "end": "2024-04-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_05_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-05-08", "end": "2024-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_05_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-05-18", "end": "2024-05-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_06_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-06-08", "end": "2024-06-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_06_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-06-18", "end": "2024-06-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_07_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-07-08", "end": "2024-07-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_07_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-07-18", "end": "2024-07-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_08_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-08-08", "end": "2024-08-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_08_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-08-18", "end": "2024-08-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_09_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-09-08", "end": "2024-09-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_09_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-09-18", "end": "2024-09-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_10_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-10-08", "end": "2024-10-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_10_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-10-18", "end": "2024-10-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_11_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-11-08", "end": "2024-11-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_11_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-11-18", "end": "2024-11-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2024_12_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-12-08", "end": "2024-12-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2024_12_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2024,
+    "phases": [{ "name": "正式期", "start": "2024-12-18", "end": "2024-12-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+
+  {
+    "id": "super88_2025_01_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-01-08", "end": "2025-01-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_01_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-01-18", "end": "2025-01-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_02_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-02-08", "end": "2025-02-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_02_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-02-18", "end": "2025-02-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_03_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-03-08", "end": "2025-03-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_03_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-03-18", "end": "2025-03-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_04_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-04-08", "end": "2025-04-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_04_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-04-18", "end": "2025-04-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_05_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-05-08", "end": "2025-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_05_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-05-18", "end": "2025-05-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_06_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-06-08", "end": "2025-06-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_06_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-06-18", "end": "2025-06-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_07_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-08", "end": "2025-07-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_07_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-07-18", "end": "2025-07-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_08_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-08-08", "end": "2025-08-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_08_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-08-18", "end": "2025-08-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_09_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-09-08", "end": "2025-09-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_09_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-09-18", "end": "2025-09-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_10_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-10-08", "end": "2025-10-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_10_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-10-18", "end": "2025-10-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_11_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-11-08", "end": "2025-11-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_11_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-11-18", "end": "2025-11-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+  {
+    "id": "super88_2025_12_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-12-08", "end": "2025-12-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促"
+  },
+  {
+    "id": "super88_2025_12_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2025,
+    "phases": [{ "name": "正式期", "start": "2025-12-18", "end": "2025-12-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促"
+  },
+
+  {
+    "id": "super88_2026_01_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-01-08", "end": "2026-01-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_01_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-01-18", "end": "2026-01-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_02_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-02-08", "end": "2026-02-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_02_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-02-18", "end": "2026-02-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_03_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-03-08", "end": "2026-03-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_03_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-03-18", "end": "2026-03-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_04_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-04-08", "end": "2026-04-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_04_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-04-18", "end": "2026-04-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_05_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-05-08", "end": "2026-05-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_05_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-05-18", "end": "2026-05-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_06_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-06-08", "end": "2026-06-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_06_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-06-18", "end": "2026-06-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_07_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-07-08", "end": "2026-07-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_07_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-07-18", "end": "2026-07-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_08_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-08-08", "end": "2026-08-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_08_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-08-18", "end": "2026-08-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_09_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-09-08", "end": "2026-09-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_09_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-09-18", "end": "2026-09-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_10_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-10-08", "end": "2026-10-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_10_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-10-18", "end": "2026-10-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_11_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-11-08", "end": "2026-11-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_11_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-11-18", "end": "2026-11-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_12_08",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-12-08", "end": "2026-12-08" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月8日超级大促（预估）"
+  },
+  {
+    "id": "super88_2026_12_18",
+    "name": "天猫超级88",
+    "level": "S",
+    "year": 2026,
+    "phases": [{ "name": "正式期", "start": "2026-12-18", "end": "2026-12-18" }],
+    "discount": "",
+    "category": "全品类",
+    "notes": "每月18日超级大促（预估）"
+  }
+]

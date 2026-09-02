@@ -22,7 +22,7 @@ const Utils = {
         }
         const fmt = (d) => {
             if (!d || d.length !== 8) return d;
-            return `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+            return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
         };
         return { start: fmt(start), end: fmt(end) };
     },
@@ -89,11 +89,10 @@ const Utils = {
         ];
         return numKeywords.includes(col);
     },
+    // utils.js - 修改后的 guessColumnType
     guessColumnType(col, data) {
-        const lower = col.toLowerCase();
-        if (lower.includes('日期') || lower.includes('时间') || lower.includes('date')) return 'date';
-        let numCount = 0,
-            totalCount = 0;
+        // 日期列按文本处理，不再返回 'date' 类型
+        let numCount = 0, totalCount = 0;
         for (let i = 0; i < Math.min(data.length, 20); i++) {
             const val = data[i]?.[col];
             if (val !== undefined && val !== null && val !== '') {
@@ -109,10 +108,10 @@ const Utils = {
         try {
             const saved = localStorage.getItem(key);
             if (saved) return JSON.parse(saved);
-        } catch (_) {}
+        } catch (_) { }
         return null;
     },
     saveData(key, value) {
-        try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
+        try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { }
     }
 };

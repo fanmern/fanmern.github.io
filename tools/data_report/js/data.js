@@ -41,13 +41,13 @@ const DataStore = {
                     return parsed;
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
         return null;
     },
     clearRawData() {
         try {
             localStorage.removeItem(CONFIG.RAW_DATA_KEY);
-        } catch (e) {}
+        } catch (e) { }
     },
     // 加载持久化数据
     loadPersisted() {
@@ -85,29 +85,32 @@ const DataStore = {
         Utils.saveData(CONFIG.PAGE_SIZE_KEY, String(this.pageSize));
     },
     // 预处理数据
+    // data.js - 修改后的 preprocess 方法
     preprocess(rows) {
         const dateCol = '日期';
         for (const row of rows) {
             const val = row[dateCol];
             if (val) {
-                const s = String(val).trim();
-                let start = s;
-                if (s.includes('至')) start = s.split('至')[0].trim();
-                if (start.length === 8) {
-                    start = `${start.slice(0,4)}-${start.slice(4,6)}-${start.slice(6,8)}`;
-                }
-                row[dateCol] = start;
+                // 保留原始日期字符串，用于链接生成
                 row['_dateRaw'] = String(val).trim();
+                // 日期列保持原始值，不做格式化
+                // row[dateCol] 保持不变
             }
         }
-        // 数字列转换
+
+        // 数字列转换（跳过日期列）
         const numCols = new Set();
         for (const col of this.allColumns) {
+            // 日期列不转换为数值
+            if (col === '日期') continue;
             for (const row of rows) {
                 const val = row[col];
                 if (val !== undefined && val !== null && val !== '') {
                     const num = parseFloat(val);
-                    if (!isNaN(num)) { numCols.add(col); break; }
+                    if (!isNaN(num)) {
+                        numCols.add(col);
+                        break;
+                    }
                 }
             }
         }
@@ -116,7 +119,9 @@ const DataStore = {
                 const val = row[col];
                 if (val !== undefined && val !== null && val !== '') {
                     const num = parseFloat(val);
-                    if (!isNaN(num)) row[col] = num;
+                    if (!isNaN(num)) {
+                        row[col] = num;
+                    }
                 }
             }
         }

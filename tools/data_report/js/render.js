@@ -98,7 +98,7 @@ const Renderer = {
                         const isNum = Utils.isNumericColumn(col);
                         let cls = isNum ? 'num' : '';
                         let wrapClass = '';
-                        if (col === '计划名字' || col === '主体名称') {
+                        if (col === '计划名字' || col === '主体名称' || col === '日期') {
                             wrapClass = 'wrap';
                         }
                         // 居中：除指定列外，其他居中

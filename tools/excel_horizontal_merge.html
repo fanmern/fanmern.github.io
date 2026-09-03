@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Excel 数据合并工具</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
     </script>
     <style>
@@ -12,16 +15,19 @@
             margin: 0;
             padding: 0;
         }
+
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             background: #f6f8fc;
             padding: 24px 20px;
             color: #1e293b;
         }
+
         .container {
             max-width: 1440px;
             margin: 0 auto;
         }
+
         .header {
             background: linear-gradient(135deg, #1e3a5f, #2a5f8a);
             border-radius: 16px;
@@ -34,6 +40,7 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .header h1 {
             font-weight: 600;
             font-size: 24px;
@@ -41,12 +48,14 @@
             align-items: center;
             gap: 10px;
         }
+
         .header h1 small {
             font-weight: 400;
             font-size: 14px;
             opacity: 0.8;
             margin-left: 6px;
         }
+
         .header .badge {
             background: rgba(255, 255, 255, 0.15);
             padding: 6px 16px;
@@ -54,6 +63,7 @@
             font-size: 13px;
             backdrop-filter: blur(4px);
         }
+
         .card {
             background: #fff;
             border-radius: 14px;
@@ -62,6 +72,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             border: 1px solid #e9edf4;
         }
+
         .card-title {
             font-size: 16px;
             font-weight: 600;
@@ -71,6 +82,7 @@
             align-items: center;
             gap: 10px;
         }
+
         .card-title .step {
             display: inline-flex;
             align-items: center;
@@ -84,16 +96,19 @@
             font-weight: 600;
             flex-shrink: 0;
         }
+
         .upload-section {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 14px 20px;
         }
+
         .upload-btn-wrapper {
             position: relative;
             display: inline-block;
         }
+
         .upload-btn-wrapper input[type="file"] {
             position: absolute;
             left: 0;
@@ -103,6 +118,7 @@
             height: 100%;
             cursor: pointer;
         }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -117,47 +133,57 @@
             background: #eef2f7;
             color: #1e293b;
         }
+
         .btn-primary {
             background: #2a5f8a;
             color: white;
         }
+
         .btn-primary:hover {
             background: #1e4a6f;
             transform: translateY(-1px);
             box-shadow: 0 4px 14px rgba(42, 95, 138, 0.3);
         }
+
         .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
+
         .btn-success {
             background: #0f7b4a;
             color: white;
         }
+
         .btn-success:hover {
             background: #0d663d;
             transform: translateY(-1px);
             box-shadow: 0 4px 14px rgba(15, 123, 74, 0.3);
         }
+
         .btn-outline {
             background: transparent;
             border: 1.5px solid #dce2ec;
         }
+
         .btn-outline:hover {
             background: #f1f5f9;
         }
+
         .btn-sm {
             padding: 4px 14px;
             font-size: 12px;
         }
+
         .file-list {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 12px;
         }
+
         .file-tag {
             display: inline-flex;
             align-items: center;
@@ -170,6 +196,7 @@
             color: #1e3a5f;
             border: 1px solid #dce2ec;
         }
+
         .file-tag .remove {
             cursor: pointer;
             color: #94a3b8;
@@ -179,20 +206,24 @@
             padding: 0 4px;
             transition: color 0.2s;
         }
+
         .file-tag .remove:hover {
             color: #dc2626;
         }
+
         .file-tag .size {
             font-weight: 400;
             color: #64748b;
             font-size: 12px;
         }
+
         .file-config-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 14px;
             margin-top: 6px;
         }
+
         .file-config-item {
             background: #f8faff;
             border-radius: 10px;
@@ -203,14 +234,17 @@
             cursor: grab;
             user-select: none;
         }
+
         .file-config-item.dragging {
             opacity: 0.5;
             border-color: #2a5f8a;
         }
+
         .file-config-item.drag-over {
             border-color: #2a5f8a;
             background: #e6f0ff;
         }
+
         .file-config-item .fname {
             font-weight: 600;
             font-size: 13px;
@@ -221,6 +255,7 @@
             align-items: center;
             gap: 6px;
         }
+
         .file-config-item .fname .idx {
             background: #dce2ec;
             color: #1e3a5f;
@@ -229,6 +264,7 @@
             font-size: 12px;
             font-weight: 600;
         }
+
         .file-config-item .meta {
             font-size: 12px;
             color: #475569;
@@ -237,11 +273,13 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .file-config-item .meta span {
             background: #eef2f7;
             padding: 2px 10px;
             border-radius: 12px;
         }
+
         .file-config-item select {
             width: 100%;
             padding: 5px 8px;
@@ -252,10 +290,12 @@
             outline: none;
             transition: border 0.2s;
         }
+
         .file-config-item select:focus {
             border-color: #2a5f8a;
             box-shadow: 0 0 0 3px rgba(42, 95, 138, 0.12);
         }
+
         .file-config-item .preview-btn {
             margin-top: 6px;
             font-size: 12px;
@@ -266,15 +306,18 @@
             text-decoration: underline dotted;
             padding: 0;
         }
+
         .file-config-item .move-buttons {
             display: flex;
             gap: 6px;
             margin-top: 8px;
         }
+
         .file-config-item .move-buttons button {
             min-width: 50px;
             font-size: 12px;
         }
+
         .merge-key-group {
             display: flex;
             flex-wrap: wrap;
@@ -286,6 +329,7 @@
             border-radius: 10px;
             background: #fafcff;
         }
+
         .merge-key-group label {
             display: flex;
             align-items: center;
@@ -298,14 +342,17 @@
             border-radius: 4px;
             transition: background 0.15s;
         }
+
         .merge-key-group label:hover {
             background: #eef2f7;
         }
+
         .merge-key-group input[type="checkbox"] {
             width: 15px;
             height: 15px;
             accent-color: #2a5f8a;
         }
+
         .merge-settings {
             display: flex;
             flex-wrap: wrap;
@@ -313,10 +360,12 @@
             gap: 16px 24px;
             margin-top: 10px;
         }
+
         .text-muted {
             color: #94a3b8;
             font-size: 13px;
         }
+
         .result-stats {
             display: flex;
             flex-wrap: wrap;
@@ -326,20 +375,24 @@
             padding: 12px 18px;
             margin-bottom: 14px;
         }
+
         .result-stats .stat {
             font-size: 14px;
             color: #475569;
         }
+
         .result-stats .stat strong {
             color: #0b2b44;
             font-weight: 600;
         }
+
         .result-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 14px;
         }
+
         .table-wrap {
             overflow: auto;
             border-radius: 10px;
@@ -347,17 +400,20 @@
             max-height: 550px;
             position: relative;
         }
+
         .table-wrap table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
             white-space: nowrap;
         }
+
         .table-wrap thead {
             position: sticky;
             top: 0;
             z-index: 10;
         }
+
         .table-wrap thead th {
             background: #f1f5f9;
             color: #1e3a5f;
@@ -369,6 +425,7 @@
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
+
         .table-wrap tbody td {
             padding: 6px 12px;
             border-bottom: 1px solid #eef2f7;
@@ -377,15 +434,18 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .table-wrap tbody tr:hover {
             background: #f8faff;
         }
+
         .table-wrap .empty-row td {
             text-align: center;
             padding: 30px 0;
             color: #94a3b8;
             font-size: 14px;
         }
+
         .modal-overlay {
             display: none;
             position: fixed;
@@ -397,9 +457,11 @@
             align-items: center;
             padding: 20px;
         }
+
         .modal-overlay.active {
             display: flex;
         }
+
         .modal-box {
             background: white;
             border-radius: 16px;
@@ -411,6 +473,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
+
         .modal-box .modal-header {
             padding: 14px 20px;
             border-bottom: 1px solid #e9edf4;
@@ -419,11 +482,13 @@
             align-items: center;
             flex-shrink: 0;
         }
+
         .modal-box .modal-header h3 {
             font-size: 16px;
             font-weight: 600;
             color: #0b2b44;
         }
+
         .modal-box .modal-header .close-btn {
             background: none;
             border: none;
@@ -433,19 +498,23 @@
             padding: 0 6px;
             line-height: 1;
         }
+
         .modal-box .modal-header .close-btn:hover {
             color: #dc2626;
         }
+
         .modal-box .modal-body {
             padding: 16px 20px 20px;
             overflow: auto;
             flex: 1;
         }
+
         .modal-box .modal-body table {
             font-size: 13px;
             border-collapse: collapse;
             width: 100%;
         }
+
         .modal-box .modal-body th {
             background: #f1f5f9;
             padding: 6px 10px;
@@ -455,57 +524,71 @@
             top: 0;
             z-index: 2;
         }
+
         .modal-box .modal-body td {
             padding: 5px 10px;
             border-bottom: 1px solid #eef2f7;
         }
+
         @media (max-width: 768px) {
             body {
                 padding: 12px;
             }
+
             .header {
                 padding: 14px 16px;
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
             }
+
             .header h1 {
                 font-size: 20px;
             }
+
             .card {
                 padding: 14px;
             }
+
             .file-config-grid {
                 grid-template-columns: 1fr;
             }
+
             .merge-key-group {
                 max-height: 150px;
             }
+
             .merge-settings {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .result-stats {
                 flex-direction: column;
                 gap: 4px;
             }
+
             .table-wrap {
                 max-height: 350px;
             }
+
             .modal-box {
                 max-width: 100%;
                 max-height: 90vh;
             }
         }
+
         .drag-handle {
             cursor: grab;
             color: #94a3b8;
             font-size: 18px;
             margin-right: 6px;
         }
+
         .drag-handle:active {
             cursor: grabbing;
         }
+
         .sort-hint {
             font-size: 12px;
             color: #94a3b8;
@@ -514,6 +597,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -674,8 +758,10 @@
         function getCellValue(cell) {
             if (cell === null || cell === undefined) return '';
             if (cell.t === 'd') {
-                try { return XLSX.utils.sheet_to_json({ '!ref': 'A1' }, { dateNF: 'yyyy-mm-dd' }); } catch (_) { return String(
-                        cell.v); }
+                try { return XLSX.utils.sheet_to_json({ '!ref': 'A1' }, { dateNF: 'yyyy-mm-dd' }); } catch (_) {
+                    return String(
+                        cell.v);
+                }
             }
             return cell.v !== undefined && cell.v !== null ? String(cell.v) : '';
         }
@@ -722,7 +808,7 @@
             let loaded = 0;
             files.forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     try {
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array', cellDates: true });
@@ -876,7 +962,7 @@
                 `).join('');
 
             fileList.querySelectorAll('.remove').forEach(el => {
-                el.addEventListener('click', function() {
+                el.addEventListener('click', function () {
                     removeFile(parseInt(this.dataset.id));
                 });
             });
@@ -908,33 +994,33 @@
                         <button class="preview-btn" data-id="${f.id}">👁 预览前 10 行</button>
                         <div class="move-buttons">
                             <button class="btn btn-sm btn-outline move-up" data-id="${f.id}" ${idx === 0 ? 'disabled' : ''}>↑ 上移</button>
-                            <button class="btn btn-sm btn-outline move-down" data-id="${f.id}" ${idx === state.files.length-1 ? 'disabled' : ''}>↓ 下移</button>
+                            <button class="btn btn-sm btn-outline move-down" data-id="${f.id}" ${idx === state.files.length - 1 ? 'disabled' : ''}>↓ 下移</button>
                         </div>
                     </div>
                 `).join('');
 
             // Sheet 切换
             fileConfigGrid.querySelectorAll('select').forEach(sel => {
-                sel.addEventListener('change', function() {
+                sel.addEventListener('change', function () {
                     switchFileSheet(parseInt(this.dataset.id), parseInt(this.value));
                 });
             });
 
             // 预览
             fileConfigGrid.querySelectorAll('.preview-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     showPreview(parseInt(this.dataset.id));
                 });
             });
 
             // 移动按钮
             fileConfigGrid.querySelectorAll('.move-up').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     moveFile(parseInt(this.dataset.id), 'up');
                 });
             });
             fileConfigGrid.querySelectorAll('.move-down').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     moveFile(parseInt(this.dataset.id), 'down');
                 });
             });
@@ -1035,7 +1121,7 @@
         }
 
         previewCloseBtn.addEventListener('click', () => previewModal.classList.remove('active'));
-        previewModal.addEventListener('click', function(e) {
+        previewModal.addEventListener('click', function (e) {
             if (e.target === this) previewModal.classList.remove('active');
         });
 
@@ -1208,7 +1294,7 @@
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `合并结果_${new Date().toISOString().slice(0,10)}.xlsx`;
+            link.download = `合并结果_${new Date().toISOString().slice(0, 10)}.xlsx`;
             link.click();
             URL.revokeObjectURL(link.href);
         }
@@ -1224,7 +1310,7 @@
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `合并结果_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `合并结果_${new Date().toISOString().slice(0, 10)}.csv`;
             link.click();
             URL.revokeObjectURL(link.href);
         }
@@ -1253,7 +1339,7 @@
         //  事件绑定
         // ============================================================
 
-        fileInput.addEventListener('change', function() {
+        fileInput.addEventListener('change', function () {
             if (this.files.length) {
                 handleFiles(this.files);
                 this.value = '';
@@ -1274,7 +1360,7 @@
 
         mergeBtn.addEventListener('click', performMerge);
 
-        clearAllBtn.addEventListener('click', function() {
+        clearAllBtn.addEventListener('click', function () {
             if (state.files.length === 0) return;
             if (!confirm('确定要清空所有已上传的文件吗？')) return;
             state.files = [];
@@ -1296,4 +1382,5 @@
     </script>
 
 </body>
+
 </html>

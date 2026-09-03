@@ -11,7 +11,126 @@ const DataStore = {
     sortState: { col: null, asc: true },
     currentPage: 1,
     pageSize: parseInt(localStorage.getItem(CONFIG.PAGE_SIZE_KEY)) || 50,
-    // 初始化默认显示列
+    currentHistoryId: null,  // 当前加载的历史记录ID
+
+    // ---- 历史记录管理 ----
+
+    // 获取所有历史记录
+    getHistoryList() {
+        try {
+            const raw = localStorage.getItem(CONFIG.HISTORY_KEY);
+            if (raw) {
+                const list = JSON.parse(raw);
+                if (Array.isArray(list)) {
+                    return list.sort((a, b) => b.timestamp - a.timestamp);
+                }
+            }
+        } catch (_) {}
+        return [];
+    },
+
+    // 保存历史记录
+    saveHistory(name, data, columns) {
+        const list = this.getHistoryList();
+        const id = 'hist_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+        
+        // 获取当前配置
+        const config = {
+            shownColumns: this.shownColumns || columns,
+            columnWidths: this.columnWidths || {},
+            sortState: this.sortState || { col: null, asc: true },
+            filters: this.filters || {},
+            pageSize: this.pageSize || 20
+        };
+
+        const record = {
+            id: id,
+            name: name,
+            timestamp: Date.now(),
+            rowCount: data.length,
+            columns: columns,
+            data: data,
+            config: config
+        };
+
+        list.unshift(record); // 最新的放在最前面
+
+        // 限制最大数量
+        if (list.length > CONFIG.MAX_HISTORY_COUNT) {
+            list.splice(CONFIG.MAX_HISTORY_COUNT);
+        }
+
+        localStorage.setItem(CONFIG.HISTORY_KEY, JSON.stringify(list));
+        return id;
+    },
+
+    // 加载指定历史记录
+    loadHistory(id) {
+        const list = this.getHistoryList();
+        const record = list.find(item => item.id === id);
+        if (!record) return null;
+        
+        // 恢复数据
+        this.allData = record.data;
+        this.allColumns = record.columns;
+        this.shownColumns = record.config.shownColumns || record.columns;
+        this.columnWidths = record.config.columnWidths || {};
+        this.sortState = record.config.sortState || { col: null, asc: true };
+        this.filters = record.config.filters || {};
+        this.pageSize = record.config.pageSize || 20;
+        this.currentHistoryId = id;
+        
+        // 保存到 sessionStorage，用于多标签页独立
+        sessionStorage.setItem(CONFIG.ACTIVE_HISTORY_KEY, id);
+        
+        // 重新应用筛选和渲染
+        this.applyFilters();
+        return record;
+    },
+
+    // 删除历史记录
+    deleteHistory(id) {
+        let list = this.getHistoryList();
+        list = list.filter(item => item.id !== id);
+        localStorage.setItem(CONFIG.HISTORY_KEY, JSON.stringify(list));
+        
+        // 如果删除的是当前激活的，清除 sessionStorage
+        if (this.currentHistoryId === id) {
+            sessionStorage.removeItem(CONFIG.ACTIVE_HISTORY_KEY);
+            this.currentHistoryId = null;
+            this.allData = [];
+            this.filteredData = [];
+            this.allColumns = [];
+            this.shownColumns = [];
+            return true;
+        }
+        return false;
+    },
+
+    // 清空所有历史
+    clearHistory() {
+        localStorage.removeItem(CONFIG.HISTORY_KEY);
+        sessionStorage.removeItem(CONFIG.ACTIVE_HISTORY_KEY);
+        this.currentHistoryId = null;
+        this.allData = [];
+        this.filteredData = [];
+        this.allColumns = [];
+        this.shownColumns = [];
+    },
+
+    // 获取当前激活的历史记录ID
+    getActiveHistoryId() {
+        return sessionStorage.getItem(CONFIG.ACTIVE_HISTORY_KEY);
+    },
+
+    // 检查是否有历史数据
+    hasHistory() {
+        const list = this.getHistoryList();
+        return list.length > 0;
+    },
+
+    // ---- 原有方法 ---- (保持兼容)
+
     getShownColumns() {
         const saved = Utils.loadData(CONFIG.STORAGE_KEY);
         if (saved && Array.isArray(saved) && saved.length > 0) {
@@ -25,13 +144,16 @@ const DataStore = {
         }
         return Utils.getDefaultShown(this.allColumns);
     },
+
     saveRawData(data) {
+        // 数据已通过 saveHistory 保存，这里保留兼容
         try {
             localStorage.setItem(CONFIG.RAW_DATA_KEY, JSON.stringify(data));
         } catch (e) {
             console.warn('保存原始数据失败', e);
         }
     },
+
     loadRawData() {
         try {
             const raw = localStorage.getItem(CONFIG.RAW_DATA_KEY);
@@ -41,15 +163,16 @@ const DataStore = {
                     return parsed;
                 }
             }
-        } catch (e) { }
+        } catch (e) {}
         return null;
     },
+
     clearRawData() {
         try {
             localStorage.removeItem(CONFIG.RAW_DATA_KEY);
-        } catch (e) { }
+        } catch (e) {}
     },
-    // 加载持久化数据
+
     loadPersisted() {
         this.columnWidths = Utils.loadData(CONFIG.COL_WIDTH_KEY) || {};
         const savedOrder = Utils.loadData(CONFIG.COL_ORDER_KEY);
@@ -63,19 +186,17 @@ const DataStore = {
         if (savedSort && typeof savedSort.col === 'string') {
             this.sortState = savedSort;
         } else {
-            // 默认按计划名字排序
             if (this.allColumns.includes('计划名字')) {
                 this.sortState = { col: '计划名字', asc: true };
             }
         }
-        // 确保显示列都在实际列中
         const allDisp = Utils.getDisplayColumns(this.allColumns);
         this.shownColumns = this.shownColumns.filter(c => allDisp.includes(c));
         if (this.shownColumns.length === 0) {
             this.shownColumns = Utils.getDefaultShown(this.allColumns);
         }
     },
-    // 保存状态
+
     saveAll() {
         Utils.saveData(CONFIG.STORAGE_KEY, this.shownColumns);
         Utils.saveData(CONFIG.COL_WIDTH_KEY, this.columnWidths);
@@ -83,25 +204,35 @@ const DataStore = {
         Utils.saveData(CONFIG.FILTER_STATE_KEY, this.filters);
         Utils.saveData(CONFIG.SORT_STATE_KEY, this.sortState);
         Utils.saveData(CONFIG.PAGE_SIZE_KEY, String(this.pageSize));
+        
+        // 如果有当前历史记录，更新配置
+        if (this.currentHistoryId) {
+            const list = this.getHistoryList();
+            const record = list.find(item => item.id === this.currentHistoryId);
+            if (record) {
+                record.config = {
+                    shownColumns: this.shownColumns,
+                    columnWidths: this.columnWidths,
+                    sortState: this.sortState,
+                    filters: this.filters,
+                    pageSize: this.pageSize
+                };
+                localStorage.setItem(CONFIG.HISTORY_KEY, JSON.stringify(list));
+            }
+        }
     },
-    // 预处理数据
-    // data.js - 修改后的 preprocess 方法
+
     preprocess(rows) {
         const dateCol = '日期';
         for (const row of rows) {
             const val = row[dateCol];
             if (val) {
-                // 保留原始日期字符串，用于链接生成
                 row['_dateRaw'] = String(val).trim();
-                // 日期列保持原始值，不做格式化
-                // row[dateCol] 保持不变
             }
         }
 
-        // 数字列转换（跳过日期列）
         const numCols = new Set();
         for (const col of this.allColumns) {
-            // 日期列不转换为数值
             if (col === '日期') continue;
             for (const row of rows) {
                 const val = row[col];
@@ -127,7 +258,7 @@ const DataStore = {
         }
         return rows;
     },
-    // 筛选
+
     applyFilters() {
         let data = [...this.allData];
         for (const [col, filterVal] of Object.entries(this.filters)) {
@@ -166,7 +297,7 @@ const DataStore = {
         this.filteredData = data;
         this.currentPage = 1;
     },
-    // 排序
+
     sortData(data) {
         if (!this.sortState.col) return data;
         const col = this.sortState.col;
@@ -182,7 +313,7 @@ const DataStore = {
             return asc ? va.localeCompare(vb) : vb.localeCompare(va);
         });
     },
-    // 分页数据
+
     getPageData() {
         const total = this.filteredData.length;
         const totalPages = Math.ceil(total / this.pageSize) || 1;
@@ -192,6 +323,7 @@ const DataStore = {
         const end = Math.min(start + this.pageSize, total);
         return this.filteredData.slice(start, end);
     },
+
     get total() { return this.filteredData.length; },
     get totalPages() { return Math.ceil(this.total / this.pageSize) || 1; }
 };

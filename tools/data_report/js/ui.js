@@ -18,18 +18,6 @@ const UIManager = {
                 return;
             }
 
-            // 检查是否有乱码（表头包含 � 或明显非中文）
-            const firstRow = rows[0] || [];
-            const hasGarbled = firstRow.some(cell => {
-                if (typeof cell !== 'string') return false;
-                return cell.includes('�') || /[^\x00-\x7F]/.test(cell) === false && cell.length > 0;
-            });
-
-            if (hasGarbled) {
-                alert('检测到乱码，请确保 CSV 文件使用 UTF-8 编码保存');
-                return;
-            }
-
             const headers = rows[0].map(h => String(h).trim());
             const validHeaders = headers.filter(h => h !== '');
             if (validHeaders.length === 0) {
@@ -61,22 +49,30 @@ const UIManager = {
                 return;
             }
 
+            // 预处理数据
             DataStore.allData = DataStore.preprocess(data);
             DataStore.loadPersisted();
             DataStore.applyFilters();
+            
+            // 保存到历史记录
+            const historyId = DataStore.saveHistory(fileName, data, validHeaders);
+            DataStore.currentHistoryId = historyId;
+            
             Renderer.render();
             EventManager.rebindTableEvents();
             UIManager.renderSettingsPanel();
-            DataStore.saveRawData(data);
+            UIManager.renderHistoryPanel();
 
             const displayName = fileName || '数据';
             dataStatus.textContent = `✅ 共 ${data.length} 条数据 (${displayName})`;
             rowCount.textContent = `${data.length} 行`;
+            
+            // 更新历史计数
+            UIManager.updateHistoryBadge();
         };
 
         // ---- 解析 CSV（先用 TextDecoder 解码，再交给 XLSX） ----
         const parseCSVFromBuffer = (buffer, fileName, callback) => {
-            // 尝试不同编码
             const encodings = ['gbk', 'gb2312', 'utf-8', 'big5', 'windows-1252'];
             
             for (const encoding of encodings) {
@@ -84,23 +80,17 @@ const UIManager = {
                     const decoder = new TextDecoder(encoding);
                     const text = decoder.decode(buffer);
                     
-                    // 检查是否包含乱码（� 字符）
-                    if (text.includes('�')) {
-                        continue;
-                    }
+                    if (text.includes('�')) continue;
                     
-                    // 检查是否能解析出有效表头
                     const lines = text.split('\n').filter(line => line.trim() !== '');
                     if (lines.length < 2) continue;
                     
-                    // 检查表头是否包含中文（或有效字符）
                     const firstLine = lines[0];
                     const hasChinese = /[\u4e00-\u9fff]/.test(firstLine);
                     const hasGarbled = /�/.test(firstLine);
                     
                     if (hasGarbled) continue;
                     
-                    // 如果检测到中文，说明编码正确
                     if (hasChinese || encoding === 'utf-8') {
                         try {
                             const workbook = XLSX.read(text, {
@@ -124,7 +114,6 @@ const UIManager = {
                 } catch (_) {}
             }
             
-            // 最后尝试：使用 XLSX 直接解析（不经过 TextDecoder）
             try {
                 const workbook = XLSX.read(buffer, {
                     type: 'array',
@@ -275,16 +264,251 @@ const UIManager = {
 
         searchCol.addEventListener('input', UIManager.renderSettingsPanel);
 
+        // ---- 历史面板 ----
+        const historyBtn = document.getElementById('historyBtn');
+        const historyOverlay = document.getElementById('historyOverlay');
+        const historyPanel = document.getElementById('historyPanel');
+        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        const openHistory = () => {
+            historyOverlay.classList.add('open');
+            historyPanel.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            UIManager.renderHistoryPanel();
+        };
+
+        const closeHistory = () => {
+            historyOverlay.classList.remove('open');
+            historyPanel.classList.remove('open');
+            document.body.style.overflow = '';
+        };
+
+        historyBtn.addEventListener('click', openHistory);
+        closeHistoryBtn.addEventListener('click', closeHistory);
+        historyOverlay.addEventListener('click', closeHistory);
+        
+        // 清空历史
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有历史记录吗？此操作不可恢复！')) {
+                DataStore.clearHistory();
+                UIManager.renderHistoryPanel();
+                UIManager.updateHistoryBadge();
+                // 清空表格
+                DataStore.allData = [];
+                DataStore.filteredData = [];
+                DataStore.allColumns = [];
+                DataStore.shownColumns = [];
+                Renderer.render();
+                document.getElementById('dataStatus').textContent = '📂 请上传数据文件或切换历史记录';
+                document.getElementById('rowCount').textContent = '';
+                document.getElementById('totalInfo').textContent = '共 0 条';
+                document.getElementById('fileInfo').textContent = '未选择文件';
+                closeHistory();
+            }
+        });
+
         // ---- 全局 Esc 关闭 ----
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (panel.classList.contains('open')) closeSettings();
+                if (historyPanel.classList.contains('open')) closeHistory();
                 const filterPopup = document.getElementById('filterPopup');
                 if (filterPopup && filterPopup.style.display === 'flex') {
                     filterPopup.style.display = 'none';
                 }
             }
         });
+
+        // ---- 初始化历史面板 ----
+        this.updateHistoryBadge();
+        
+        // ---- 恢复上次激活的历史记录 ----
+        this.restoreActiveHistory();
+    },
+
+    // ---- 恢复上次激活的历史记录 ----
+    restoreActiveHistory() {
+        const activeId = DataStore.getActiveHistoryId();
+        if (activeId) {
+            const record = DataStore.loadHistory(activeId);
+            if (record) {
+                console.log(`📂 恢复历史记录: ${record.name}`);
+                Renderer.render();
+                EventManager.rebindTableEvents();
+                UIManager.renderSettingsPanel();
+                UIManager.renderHistoryPanel();
+                document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
+                document.getElementById('rowCount').textContent = `${record.data.length} 行`;
+                document.getElementById('fileInfo').textContent = `📎 ${record.name}`;
+                return;
+            }
+        }
+        
+        // 没有激活的历史，检查是否有历史记录可恢复
+        const list = DataStore.getHistoryList();
+        if (list.length > 0) {
+            // 自动加载最新的历史
+            const latest = list[0];
+            const record = DataStore.loadHistory(latest.id);
+            if (record) {
+                console.log(`📂 自动加载最新历史: ${record.name}`);
+                Renderer.render();
+                EventManager.rebindTableEvents();
+                UIManager.renderSettingsPanel();
+                UIManager.renderHistoryPanel();
+                document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
+                document.getElementById('rowCount').textContent = `${record.data.length} 行`;
+                document.getElementById('fileInfo').textContent = `📎 ${record.name}`;
+                return;
+            }
+        }
+        
+        // 无数据，显示空状态
+        this.showEmptyState();
+    },
+
+    // ---- 显示空状态 ----
+    showEmptyState() {
+        const tableBody = document.getElementById('tableBody');
+        if (tableBody) {
+            tableBody.innerHTML =
+                `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">💡 请点击 "上传文件" 按钮导入数据，或从历史记录中切换</td></tr>`;
+        }
+        document.getElementById('dataStatus').textContent = '📂 请上传数据文件或切换历史记录';
+        document.getElementById('rowCount').textContent = '';
+        document.getElementById('totalInfo').textContent = '共 0 条';
+        document.getElementById('totalPages').textContent = '1';
+        document.getElementById('pageInput').value = '1';
+        document.getElementById('prevPage').disabled = true;
+        document.getElementById('nextPage').disabled = true;
+        document.getElementById('pageSizeSelect').value = DataStore.pageSize;
+    },
+
+    // ---- 更新历史徽章 ----
+    updateHistoryBadge() {
+        const list = DataStore.getHistoryList();
+        const badge = document.getElementById('historyBadge');
+        if (badge) {
+            badge.textContent = list.length;
+            badge.style.display = list.length > 0 ? 'inline' : 'none';
+        }
+    },
+
+    // ---- 渲染历史面板 ----
+    renderHistoryPanel() {
+        const list = DataStore.getHistoryList();
+        const container = document.getElementById('historyList');
+        const activeId = DataStore.getActiveHistoryId();
+        
+        if (list.length === 0) {
+            container.innerHTML = `
+                <div class="history-empty">
+                    <span style="font-size:32px;">📭</span>
+                    <p>暂无历史记录</p>
+                    <p style="font-size:12px;color:var(--text-muted);">上传数据后会自动保存</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        for (const item of list) {
+            const isActive = item.id === activeId;
+            const date = new Date(item.timestamp);
+            const dateStr = date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            html += `
+                <div class="history-item ${isActive ? 'active' : ''}" data-id="${item.id}">
+                    <div class="history-item-info">
+                        <div class="history-item-name" title="${item.name}">${item.name}</div>
+                        <div class="history-item-meta">
+                            <span>📊 ${item.rowCount} 行</span>
+                            <span>🕐 ${dateStr}</span>
+                        </div>
+                    </div>
+                    <div class="history-item-actions">
+                        <button class="history-btn-load" data-id="${item.id}" title="加载此历史记录">📂</button>
+                        <button class="history-btn-delete" data-id="${item.id}" title="删除此历史记录">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+
+        // 绑定事件
+        container.querySelectorAll('.history-btn-load').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = this.dataset.id;
+                UIManager.loadHistoryRecord(id);
+            });
+        });
+
+        container.querySelectorAll('.history-btn-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = this.dataset.id;
+                if (confirm('确定要删除此历史记录吗？')) {
+                    const isActive = id === DataStore.getActiveHistoryId();
+                    DataStore.deleteHistory(id);
+                    UIManager.renderHistoryPanel();
+                    UIManager.updateHistoryBadge();
+                    if (isActive) {
+                        // 如果删除的是当前激活的，尝试加载其他历史或显示空状态
+                        const list2 = DataStore.getHistoryList();
+                        if (list2.length > 0) {
+                            UIManager.loadHistoryRecord(list2[0].id);
+                        } else {
+                            UIManager.showEmptyState();
+                            document.getElementById('fileInfo').textContent = '未选择文件';
+                        }
+                    }
+                }
+            });
+        });
+
+        // 点击整个条目也可以加载
+        container.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (id && !this.classList.contains('active')) {
+                    UIManager.loadHistoryRecord(id);
+                }
+            });
+        });
+
+        this.updateHistoryBadge();
+    },
+
+    // ---- 加载历史记录 ----
+    loadHistoryRecord(id) {
+        const record = DataStore.loadHistory(id);
+        if (!record) {
+            alert('加载历史记录失败');
+            return;
+        }
+        
+        console.log(`📂 切换到历史记录: ${record.name}`);
+        Renderer.render();
+        EventManager.rebindTableEvents();
+        UIManager.renderSettingsPanel();
+        UIManager.renderHistoryPanel();
+        
+        document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
+        document.getElementById('rowCount').textContent = `${record.data.length} 行`;
+        document.getElementById('fileInfo').textContent = `📎 ${record.name}`;
+        
+        // 关闭历史面板
+        document.getElementById('historyPanel').classList.remove('open');
+        document.getElementById('historyOverlay').classList.remove('open');
+        document.body.style.overflow = '';
     },
 
     // ---- 渲染设置面板 ----
@@ -446,34 +670,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     UIManager.init();
 
-    // 恢复上次的数据
-    const rawData = DataStore.loadRawData();
-    if (rawData && rawData.length > 0) {
-        DataStore.allColumns = Object.keys(rawData[0]);
-        DataStore.allData = DataStore.preprocess(rawData);
-        DataStore.loadPersisted();
-        DataStore.applyFilters();
-        Renderer.render();
-        EventManager.rebindTableEvents();
-        UIManager.renderSettingsPanel();
-        document.getElementById('fileInfo').textContent = '📎 已恢复上次数据';
-        document.getElementById('dataStatus').textContent = `✅ 共 ${rawData.length} 条数据`;
-        document.getElementById('rowCount').textContent = `${rawData.length} 行`;
-    } else {
-        const tableBody = document.getElementById('tableBody');
-        if (tableBody) {
-            tableBody.innerHTML =
-                `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">💡 请点击 "上传文件" 按钮导入数据</td></tr>`;
-        }
-        document.getElementById('dataStatus').textContent = '📂 请上传数据文件';
-        document.getElementById('rowCount').textContent = '';
-        document.getElementById('totalInfo').textContent = '共 0 条';
-        document.getElementById('totalPages').textContent = '1';
-        document.getElementById('pageInput').value = '1';
-        document.getElementById('prevPage').disabled = true;
-        document.getElementById('nextPage').disabled = true;
-        document.getElementById('pageSizeSelect').value = DataStore.pageSize;
-    }
-
-    console.log('📊 分组报表已启动 (支持 ZIP + 多编码)');
+    console.log('📊 分组报表已启动 (支持历史记录 + 多标签页独立)');
 });

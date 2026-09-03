@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Excel 数据合并工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f6f8fc;
+            padding: 24px 20px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a5f, #2a5f8a);
+            border-radius: 16px;
+            padding: 18px 28px;
+            color: white;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 24px rgba(26, 67, 113, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            font-weight: 600;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header h1 small {
+            font-weight: 400;
+            font-size: 14px;
+            opacity: 0.8;
+            margin-left: 6px;
+        }
+        .header .badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            backdrop-filter: blur(4px);
+        }
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e9edf4;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b2b44;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title .step {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #2a5f8a;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .upload-section {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px 20px;
+        }
+        .upload-btn-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .upload-btn-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #eef2f7;
+            color: #1e293b;
+        }
+        .btn-primary {
+            background: #2a5f8a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e4a6f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(42, 95, 138, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-success {
+            background: #0f7b4a;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #0d663d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(15, 123, 74, 0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #dce2ec;
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+        .btn-sm {
+            padding: 4px 14px;
+            font-size: 12px;
+        }
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .file-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eef2f7;
+            border-radius: 30px;
+            padding: 4px 12px 4px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            border: 1px solid #dce2ec;
+        }
+        .file-tag .remove {
+            cursor: pointer;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 1;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .file-tag .remove:hover {
+            color: #dc2626;
+        }
+        .file-tag .size {
+            font-weight: 400;
+            color: #64748b;
+            font-size: 12px;
+        }
+        .file-config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+            margin-top: 6px;
+        }
+        .file-config-item {
+            background: #f8faff;
+            border-radius: 10px;
+            padding: 14px 16px;
+            border: 2px solid #e9edf4;
+            position: relative;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: grab;
+            user-select: none;
+        }
+        .file-config-item.dragging {
+            opacity: 0.5;
+            border-color: #2a5f8a;
+        }
+        .file-config-item.drag-over {
+            border-color: #2a5f8a;
+            background: #e6f0ff;
+        }
+        .file-config-item .fname {
+            font-weight: 600;
+            font-size: 13px;
+            color: #0b2b44;
+            margin-bottom: 6px;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .file-config-item .fname .idx {
+            background: #dce2ec;
+            color: #1e3a5f;
+            border-radius: 12px;
+            padding: 0 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .file-config-item .meta {
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-config-item .meta span {
+            background: #eef2f7;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        .file-config-item select {
+            width: 100%;
+            padding: 5px 8px;
+            border-radius: 8px;
+            border: 1px solid #dce2ec;
+            background: white;
+            font-size: 13px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .file-config-item select:focus {
+            border-color: #2a5f8a;
+            box-shadow: 0 0 0 3px rgba(42, 95, 138, 0.12);
+        }
+        .file-config-item .preview-btn {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #2a5f8a;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-decoration: underline dotted;
+            padding: 0;
+        }
+        .file-config-item .move-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .file-config-item .move-buttons button {
+            min-width: 50px;
+            font-size: 12px;
+        }
+        .merge-key-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            padding: 10px 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e9edf4;
+            border-radius: 10px;
+            background: #fafcff;
+        }
+        .merge-key-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .merge-key-group label:hover {
+            background: #eef2f7;
+        }
+        .merge-key-group input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: #2a5f8a;
+        }
+        .merge-settings {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px 24px;
+            margin-top: 10px;
+        }
+        .text-muted {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+        .result-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 30px;
+            background: #f8faff;
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin-bottom: 14px;
+        }
+        .result-stats .stat {
+            font-size: 14px;
+            color: #475569;
+        }
+        .result-stats .stat strong {
+            color: #0b2b44;
+            font-weight: 600;
+        }
+        .result-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .table-wrap {
+            overflow: auto;
+            border-radius: 10px;
+            border: 1px solid #e9edf4;
+            max-height: 550px;
+            position: relative;
+        }
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .table-wrap thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .table-wrap thead th {
+            background: #f1f5f9;
+            color: #1e3a5f;
+            font-weight: 600;
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 2px solid #dce2ec;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .table-wrap tbody td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #eef2f7;
+            color: #1e293b;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .table-wrap tbody tr:hover {
+            background: #f8faff;
+        }
+        .table-wrap .empty-row td {
+            text-align: center;
+            padding: 30px 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .modal-box .modal-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e9edf4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .modal-box .modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b2b44;
+        }
+        .modal-box .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #94a3b8;
+            padding: 0 6px;
+            line-height: 1;
+        }
+        .modal-box .modal-header .close-btn:hover {
+            color: #dc2626;
+        }
+        .modal-box .modal-body {
+            padding: 16px 20px 20px;
+            overflow: auto;
+            flex: 1;
+        }
+        .modal-box .modal-body table {
+            font-size: 13px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .modal-box .modal-body th {
+            background: #f1f5f9;
+            padding: 6px 10px;
+            text-align: left;
+            border-bottom: 2px solid #dce2ec;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .modal-box .modal-body td {
+            padding: 5px 10px;
+            border-bottom: 1px solid #eef2f7;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .header {
+                padding: 14px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .card {
+                padding: 14px;
+            }
+            .file-config-grid {
+                grid-template-columns: 1fr;
+            }
+            .merge-key-group {
+                max-height: 150px;
+            }
+            .merge-settings {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .result-stats {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .table-wrap {
+                max-height: 350px;
+            }
+            .modal-box {
+                max-width: 100%;
+                max-height: 90vh;
+            }
+        }
+        .drag-handle {
+            cursor: grab;
+            color: #94a3b8;
+            font-size: 18px;
+            margin-right: 6px;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .sort-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-left: 8px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <h1>
+                📊 Excel 数据合并工具
+                <small>多表横向合并</small>
+            </h1>
+            <span class="badge">⚡ 纯前端 · 数据不上传服务器</span>
+        </header>
+
+        <!-- 步骤1：上传 -->
+        <section class="card">
+            <div class="card-title">
+                <span class="step">1</span>
+                上传 Excel 文件
+                <span class="text-muted" style="font-weight:400;margin-left:8px;">支持 .xls / .xlsx</span>
+            </div>
+
+            <div class="upload-section">
+                <div class="upload-btn-wrapper">
+                    <button class="btn btn-primary">📤 选择文件</button>
+                    <input type="file" id="fileInput" accept=".xls,.xlsx" multiple />
+                </div>
+                <span class="text-muted">或拖拽文件到此处</span>
+                <div style="flex:1;min-width:120px;"></div>
+                <button class="btn btn-outline btn-sm" id="clearAllBtn">🗑 清空全部</button>
+            </div>
+
+            <div class="file-list" id="fileList"></div>
+        </section>
+
+        <!-- 步骤2：配置 -->
+        <section class="card" id="configSection" style="display:none;">
+            <div class="card-title">
+                <span class="step">2</span>
+                配置合并规则
+                <span class="sort-hint">💡 拖拽卡片可调整顺序，或使用按钮</span>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <div style="font-weight:500;font-size:14px;color:#1e3a5f;margin-bottom:8px;">
+                    📄 各文件 Sheet 选择 & 顺序调整
+                </div>
+                <div class="file-config-grid" id="fileConfigGrid"></div>
+            </div>
+
+            <div style="border-top:1px solid #e9edf4;padding-top:16px;">
+                <div style="font-weight:500;font-size:14px;color:#1e3a5f;margin-bottom:8px;">
+                    🔑 合并键（勾选一个或多个列作为匹配依据）
+                    <span class="text-muted" style="font-weight:400;margin-left:8px;">默认勾选所有文件共有的字段</span>
+                </div>
+                <div class="merge-key-group" id="mergeKeyGroup"></div>
+                <div class="merge-settings">
+                    <div class="field-group">
+                        <button class="btn btn-primary" id="mergeBtn" disabled>🔗 执行合并</button>
+                    </div>
+                    <span class="text-muted" style="font-size:13px;">💡 勾选多个列会组合匹配</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 步骤3：结果 -->
+        <section class="card" id="resultSection" style="display:none;">
+            <div class="card-title">
+                <span class="step">3</span>
+                合并结果
+                <span style="font-weight:400;font-size:14px;color:#64748b;margin-left:6px;" id="resultMeta"></span>
+            </div>
+
+            <div class="result-stats">
+                <span class="stat">📊 总行数：<strong id="rowCount">0</strong></span>
+                <span class="stat">📋 总列数：<strong id="colCount">0</strong></span>
+                <span class="stat">📂 合并文件数：<strong id="fileCount">0</strong></span>
+            </div>
+
+            <div class="result-actions">
+                <button class="btn btn-success" id="exportExcelBtn">⬇ 导出 Excel (.xlsx)</button>
+                <button class="btn btn-outline" id="exportCsvBtn">⬇ 导出 CSV</button>
+                <button class="btn btn-outline" id="copyTableBtn">📋 复制表格 (TSV)</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead id="resultHead"></thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 预览弹窗 -->
+        <div class="modal-overlay" id="previewModal">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h3 id="previewTitle">数据预览</h3>
+                    <button class="close-btn" id="previewCloseBtn">&times;</button>
+                </div>
+                <div class="modal-body" id="previewBody">
+                    <div style="text-align:center;padding:30px;color:#94a3b8;">加载中…</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        //  全局状态
+        // ============================================================
+        const state = {
+            files: [], // { id, name, size, data, headers, sheets, selectedSheet, rawWorkbook }
+            nextId: 1,
+            mergedData: null,
+        };
+
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
+
+        const fileInput = $('#fileInput');
+        const fileList = $('#fileList');
+        const configSection = $('#configSection');
+        const fileConfigGrid = $('#fileConfigGrid');
+        const mergeKeyGroup = $('#mergeKeyGroup');
+        const mergeBtn = $('#mergeBtn');
+        const clearAllBtn = $('#clearAllBtn');
+        const resultSection = $('#resultSection');
+        const resultMeta = $('#resultMeta');
+        const rowCount = $('#rowCount');
+        const colCount = $('#colCount');
+        const fileCount = $('#fileCount');
+        const resultHead = $('#resultHead');
+        const resultBody = $('#resultBody');
+        const exportExcelBtn = $('#exportExcelBtn');
+        const exportCsvBtn = $('#exportCsvBtn');
+        const copyTableBtn = $('#copyTableBtn');
+        const previewModal = $('#previewModal');
+        const previewTitle = $('#previewTitle');
+        const previewBody = $('#previewBody');
+        const previewCloseBtn = $('#previewCloseBtn');
+
+        // ============================================================
+        //  工具
+        // ============================================================
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function getCellValue(cell) {
+            if (cell === null || cell === undefined) return '';
+            if (cell.t === 'd') {
+                try { return XLSX.utils.sheet_to_json({ '!ref': 'A1' }, { dateNF: 'yyyy-mm-dd' }); } catch (_) { return String(
+                        cell.v); }
+            }
+            return cell.v !== undefined && cell.v !== null ? String(cell.v) : '';
+        }
+
+        function sheetToArray(worksheet) {
+            const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+            const rows = [];
+            const headerRow = [];
+            for (let C = range.s.c; C <= range.e.c; C++) {
+                const addr = XLSX.utils.encode_cell({ r: range.s.r, c: C });
+                const cell = worksheet[addr];
+                const val = cell ? getCellValue(cell) : '';
+                headerRow.push(val || `列${C + 1}`);
+            }
+            rows.push(headerRow);
+            for (let R = range.s.r + 1; R <= range.e.r; R++) {
+                const row = [];
+                for (let C = range.s.c; C <= range.e.c; C++) {
+                    const addr = XLSX.utils.encode_cell({ r: R, c: C });
+                    const cell = worksheet[addr];
+                    row.push(cell ? getCellValue(cell) : '');
+                }
+                if (row.some(v => v !== '')) rows.push(row);
+            }
+            return rows;
+        }
+
+        function extractHeadersAndData(rows) {
+            if (!rows || rows.length === 0) return { headers: [], data: [] };
+            const headers = rows[0].map(h => String(h).trim() || '');
+            const data = rows.slice(1).map(row => {
+                const obj = {};
+                headers.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ''; });
+                return obj;
+            });
+            return { headers, data };
+        }
+
+        // ============================================================
+        //  文件解析
+        // ============================================================
+        function handleFiles(fileList) {
+            const files = Array.from(fileList);
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                        const sheetNames = workbook.SheetNames;
+                        const firstSheet = workbook.Sheets[sheetNames[0]];
+                        const rows = sheetToArray(firstSheet);
+                        const { headers, data: rowsData } = extractHeadersAndData(rows);
+
+                        const fileEntry = {
+                            id: state.nextId++,
+                            name: file.name,
+                            size: file.size,
+                            rawWorkbook: workbook,
+                            sheets: sheetNames,
+                            selectedSheet: 0,
+                            headers: headers,
+                            data: rowsData,
+                            rows: rows,
+                        };
+                        state.files.push(fileEntry);
+                        renderAll();
+                        loaded++;
+                        if (loaded === files.length) {
+                            configSection.style.display = 'block';
+                        }
+                    } catch (err) {
+                        alert(`解析文件 "${file.name}" 失败：${err.message}`);
+                        console.error(err);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function switchFileSheet(fileId, sheetIndex) {
+            const entry = state.files.find(f => f.id === fileId);
+            if (!entry) return;
+            entry.selectedSheet = sheetIndex;
+            const sheetName = entry.sheets[sheetIndex];
+            const worksheet = entry.rawWorkbook.Sheets[sheetName];
+            const rows = sheetToArray(worksheet);
+            const { headers, data } = extractHeadersAndData(rows);
+            entry.headers = headers;
+            entry.data = data;
+            entry.rows = rows;
+            renderAll();
+        }
+
+        // ============================================================
+        //  文件顺序调整（拖拽 + 按钮）
+        // ============================================================
+        function moveFile(id, direction) {
+            const idx = state.files.findIndex(f => f.id === id);
+            if (idx === -1) return;
+            const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+            if (newIdx < 0 || newIdx >= state.files.length) return;
+            [state.files[idx], state.files[newIdx]] = [state.files[newIdx], state.files[idx]];
+            renderAll();
+        }
+
+        function removeFile(id) {
+            state.files = state.files.filter(f => f.id !== id);
+            if (state.files.length === 0) {
+                configSection.style.display = 'none';
+                resultSection.style.display = 'none';
+                state.mergedData = null;
+            }
+            renderAll();
+            checkCanMerge();
+        }
+
+        // 拖拽排序（事件委托）
+        let dragSrcId = null;
+
+        function handleDragStart(e) {
+            const item = e.target.closest('.file-config-item');
+            if (!item) return;
+            dragSrcId = parseInt(item.dataset.id);
+            item.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', String(dragSrcId));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const item = e.target.closest('.file-config-item');
+            if (!item) return;
+            const targetId = parseInt(item.dataset.id);
+            if (targetId === dragSrcId) return;
+            item.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            const item = e.target.closest('.file-config-item');
+            if (item) item.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const item = e.target.closest('.file-config-item');
+            if (!item) return;
+            const targetId = parseInt(item.dataset.id);
+            if (dragSrcId === targetId) {
+                item.classList.remove('drag-over');
+                return;
+            }
+            const srcIdx = state.files.findIndex(f => f.id === dragSrcId);
+            const tgtIdx = state.files.findIndex(f => f.id === targetId);
+            if (srcIdx === -1 || tgtIdx === -1) return;
+            // 交换
+            [state.files[srcIdx], state.files[tgtIdx]] = [state.files[tgtIdx], state.files[srcIdx]];
+            item.classList.remove('drag-over');
+            // 清除所有dragging
+            document.querySelectorAll('.file-config-item.dragging').forEach(el => el.classList.remove('dragging'));
+            renderAll();
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.file-config-item.dragging').forEach(el => el.classList.remove('dragging'));
+            document.querySelectorAll('.file-config-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+        }
+
+        // 绑定拖拽事件到网格容器
+        fileConfigGrid.addEventListener('dragstart', handleDragStart);
+        fileConfigGrid.addEventListener('dragover', handleDragOver);
+        fileConfigGrid.addEventListener('dragleave', handleDragLeave);
+        fileConfigGrid.addEventListener('drop', handleDrop);
+        fileConfigGrid.addEventListener('dragend', handleDragEnd);
+
+        // ============================================================
+        //  渲染
+        // ============================================================
+        function renderAll() {
+            renderFileList();
+            renderFileConfigs();
+            renderMergeKeyOptions();
+            checkCanMerge();
+        }
+
+        function renderFileList() {
+            if (state.files.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+            fileList.innerHTML = state.files.map(f => `
+                    <span class="file-tag">
+                        📄 ${escapeHtml(f.name)}
+                        <span class="size">${formatSize(f.size)}</span>
+                        <span class="remove" data-id="${f.id}" title="移除文件">&times;</span>
+                    </span>
+                `).join('');
+
+            fileList.querySelectorAll('.remove').forEach(el => {
+                el.addEventListener('click', function() {
+                    removeFile(parseInt(this.dataset.id));
+                });
+            });
+        }
+
+        function renderFileConfigs() {
+            if (state.files.length === 0) {
+                fileConfigGrid.innerHTML = '<div class="text-muted" style="padding:8px 0;">暂无文件</div>';
+                return;
+            }
+            fileConfigGrid.innerHTML = state.files.map((f, idx) => `
+                    <div class="file-config-item" draggable="true" data-id="${f.id}">
+                        <div class="fname">
+                            <span class="drag-handle">⠿</span>
+                            <span class="idx">#${idx + 1}</span>
+                            ${escapeHtml(f.name)}
+                        </div>
+                        <div class="meta">
+                            <span>📋 ${f.headers.length} 列</span>
+                            <span>📊 ${f.data.length} 行</span>
+                            <span>📑 ${f.sheets.length} 个 Sheet</span>
+                        </div>
+                        <div style="margin-top:4px;">
+                            <label style="font-size:12px;color:#475569;display:block;margin-bottom:2px;">选择 Sheet：</label>
+                            <select data-id="${f.id}">
+                                ${f.sheets.map((s, i) => `<option value="${i}" ${i === f.selectedSheet ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <button class="preview-btn" data-id="${f.id}">👁 预览前 10 行</button>
+                        <div class="move-buttons">
+                            <button class="btn btn-sm btn-outline move-up" data-id="${f.id}" ${idx === 0 ? 'disabled' : ''}>↑ 上移</button>
+                            <button class="btn btn-sm btn-outline move-down" data-id="${f.id}" ${idx === state.files.length-1 ? 'disabled' : ''}>↓ 下移</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            // Sheet 切换
+            fileConfigGrid.querySelectorAll('select').forEach(sel => {
+                sel.addEventListener('change', function() {
+                    switchFileSheet(parseInt(this.dataset.id), parseInt(this.value));
+                });
+            });
+
+            // 预览
+            fileConfigGrid.querySelectorAll('.preview-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showPreview(parseInt(this.dataset.id));
+                });
+            });
+
+            // 移动按钮
+            fileConfigGrid.querySelectorAll('.move-up').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    moveFile(parseInt(this.dataset.id), 'up');
+                });
+            });
+            fileConfigGrid.querySelectorAll('.move-down').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    moveFile(parseInt(this.dataset.id), 'down');
+                });
+            });
+        }
+
+        // 合并键：默认勾选所有文件共有的字段
+        function renderMergeKeyOptions() {
+            // 去重表头（按文件顺序）
+            const seen = new Set();
+            const orderedHeaders = [];
+            state.files.forEach(f => {
+                f.headers.forEach(h => {
+                    if (h && !seen.has(h)) {
+                        seen.add(h);
+                        orderedHeaders.push(h);
+                    }
+                });
+            });
+
+            // 计算所有文件表头的交集
+            let commonSet = null;
+            state.files.forEach(f => {
+                const set = new Set(f.headers);
+                if (commonSet === null) {
+                    commonSet = set;
+                } else {
+                    commonSet = new Set([...commonSet].filter(h => set.has(h)));
+                }
+            });
+            const commonHeaders = commonSet ? new Set(commonSet) : new Set();
+
+            mergeKeyGroup.innerHTML = '';
+            if (orderedHeaders.length === 0) {
+                mergeKeyGroup.innerHTML = '<span class="text-muted">未检测到表头</span>';
+                return;
+            }
+
+            orderedHeaders.forEach(h => {
+                const label = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = h;
+                // 如果在所有文件中都出现，则默认勾选
+                if (commonHeaders.has(h)) {
+                    cb.checked = true;
+                }
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(' ' + h));
+                mergeKeyGroup.appendChild(label);
+            });
+
+            mergeKeyGroup.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', checkCanMerge);
+            });
+        }
+
+        function checkCanMerge() {
+            const hasFiles = state.files.length >= 2;
+            const checked = mergeKeyGroup.querySelectorAll('input[type="checkbox"]:checked');
+            const hasKeys = checked.length > 0;
+            mergeBtn.disabled = !(hasFiles && hasKeys);
+            if (hasFiles && hasKeys) {
+                mergeBtn.title = '';
+            } else if (!hasFiles) {
+                mergeBtn.title = '至少需要上传 2 个文件';
+            } else {
+                mergeBtn.title = '请勾选至少一个合并键列';
+            }
+        }
+
+        // ============================================================
+        //  预览弹窗
+        // ============================================================
+        function showPreview(fileId) {
+            const entry = state.files.find(f => f.id === fileId);
+            if (!entry) return;
+            const headers = entry.headers;
+            const data = entry.data.slice(0, 10);
+            previewTitle.textContent = `预览：${entry.name} (前 ${data.length} 行)`;
+
+            let html = '<table><thead><tr>';
+            headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
+            html += '</tr></thead><tbody>';
+            if (data.length === 0) {
+                html += '<tr><td colspan="' + headers.length + '" style="text-align:center;color:#94a3b8;padding:20px;">无数据</td></tr>';
+            } else {
+                data.forEach(row => {
+                    html += '<tr>';
+                    headers.forEach(h => {
+                        html += `<td>${escapeHtml(row[h] !== undefined ? row[h] : '')}</td>`;
+                    });
+                    html += '</tr>';
+                });
+            }
+            html += '</tbody></table>';
+            previewBody.innerHTML = html;
+            previewModal.classList.add('active');
+        }
+
+        previewCloseBtn.addEventListener('click', () => previewModal.classList.remove('active'));
+        previewModal.addEventListener('click', function(e) {
+            if (e.target === this) previewModal.classList.remove('active');
+        });
+
+        // ============================================================
+        //  核心合并
+        // ============================================================
+        function performMerge() {
+            const checked = mergeKeyGroup.querySelectorAll('input[type="checkbox"]:checked');
+            const mergeKeys = Array.from(checked).map(cb => cb.value);
+            if (mergeKeys.length === 0) {
+                alert('请至少勾选一个合并键列。');
+                return;
+            }
+
+            for (const f of state.files) {
+                for (const key of mergeKeys) {
+                    if (!f.headers.includes(key)) {
+                        alert(`文件 "${f.name}" 中不存在合并键列 "${key}"，请检查。`);
+                        return;
+                    }
+                }
+            }
+
+            const files = state.files;
+
+            // 统计每个非合并键字段出现在哪些文件索引中
+            const fieldOccurrences = {};
+            files.forEach((f, idx) => {
+                f.headers.forEach(h => {
+                    if (!mergeKeys.includes(h)) {
+                        if (!fieldOccurrences[h]) fieldOccurrences[h] = [];
+                        if (!fieldOccurrences[h].includes(idx)) {
+                            fieldOccurrences[h].push(idx);
+                        }
+                    }
+                });
+            });
+
+            // 为每个文件生成新字段名映射
+            const fileNewHeaders = files.map((f, idx) => {
+                const newMap = {};
+                f.headers.forEach(h => {
+                    if (mergeKeys.includes(h)) {
+                        newMap[h] = h;
+                    } else {
+                        const occurrences = fieldOccurrences[h] || [];
+                        if (occurrences.length > 1) {
+                            newMap[h] = h + (idx + 1);
+                        } else {
+                            newMap[h] = h;
+                        }
+                    }
+                });
+                return newMap;
+            });
+
+            const finalHeadersSet = new Set();
+            mergeKeys.forEach(k => finalHeadersSet.add(k));
+            fileNewHeaders.forEach(fh => {
+                Object.values(fh).forEach(v => {
+                    if (!mergeKeys.includes(v)) {
+                        finalHeadersSet.add(v);
+                    }
+                });
+            });
+            const finalHeaders = Array.from(finalHeadersSet);
+
+            const map = new Map();
+            files.forEach(f => {
+                f.data.forEach(row => {
+                    const key = mergeKeys.map(k => String(row[k] || '')).join('|||');
+                    if (!map.has(key)) {
+                        const obj = {};
+                        finalHeaders.forEach(h => { obj[h] = ''; });
+                        map.set(key, obj);
+                    }
+                });
+            });
+
+            files.forEach((f, idx) => {
+                const newMap = fileNewHeaders[idx];
+                f.data.forEach(row => {
+                    const key = mergeKeys.map(k => String(row[k] || '')).join('|||');
+                    const obj = map.get(key);
+                    if (obj) {
+                        f.headers.forEach(h => {
+                            const target = newMap[h];
+                            if (target && obj.hasOwnProperty(target)) {
+                                const val = row[h] !== undefined ? row[h] : '';
+                                if (obj[target] === '' || obj[target] === null || obj[target] === undefined) {
+                                    obj[target] = val;
+                                } else if (val !== '' && val !== null && val !== undefined) {
+                                    if (obj[target] !== val) {
+                                        obj[target] = String(obj[target]) + '; ' + String(val);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            const resultRows = [];
+            resultRows.push(finalHeaders);
+            for (const [key, obj] of map) {
+                const row = finalHeaders.map(h => obj[h] !== undefined ? obj[h] : '');
+                resultRows.push(row);
+            }
+
+            state.mergedData = { headers: finalHeaders, rows: resultRows };
+            renderResult();
+        }
+
+        // ============================================================
+        //  渲染结果
+        // ============================================================
+        function renderResult() {
+            if (!state.mergedData) {
+                resultSection.style.display = 'none';
+                return;
+            }
+
+            const { headers, rows } = state.mergedData;
+            const dataRows = rows.slice(1);
+            const totalRows = dataRows.length;
+            const totalCols = headers.length;
+
+            rowCount.textContent = totalRows;
+            colCount.textContent = totalCols;
+            fileCount.textContent = state.files.length;
+            const checked = mergeKeyGroup.querySelectorAll('input[type="checkbox"]:checked');
+            const keys = Array.from(checked).map(cb => cb.value).join(' + ');
+            resultMeta.textContent = `（合并键：${keys}）`;
+
+            resultHead.innerHTML = '<tr>' + headers.map(h =>
+                `<th title="${escapeHtml(h)}">${escapeHtml(h)}</th>`
+            ).join('') + '</tr>';
+
+            const maxDisplay = 500;
+            const displayRows = dataRows.slice(0, maxDisplay);
+
+            if (displayRows.length === 0) {
+                resultBody.innerHTML = '<tr class="empty-row"><td colspan="' + headers.length +
+                    '">暂无合并数据</td></tr>';
+            } else {
+                resultBody.innerHTML = displayRows.map(row =>
+                    '<tr>' + row.map(cell =>
+                        `<td title="${escapeHtml(String(cell))}">${escapeHtml(String(cell))}</td>`
+                    ).join('') + '</tr>'
+                ).join('');
+                if (dataRows.length > maxDisplay) {
+                    resultBody.innerHTML +=
+                        `<tr><td colspan="${headers.length}" style="text-align:center;color:#94a3b8;padding:12px;">… 仅显示前 ${maxDisplay} 行，共 ${dataRows.length} 行 …</td></tr>`;
+                }
+            }
+
+            resultSection.style.display = 'block';
+        }
+
+        // ============================================================
+        //  导出
+        // ============================================================
+        function exportExcel() {
+            if (!state.mergedData) return;
+            const { headers, rows } = state.mergedData;
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            XLSX.utils.book_append_sheet(wb, ws, '合并结果');
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `合并结果_${new Date().toISOString().slice(0,10)}.xlsx`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function exportCsv() {
+            if (!state.mergedData) return;
+            const { headers, rows } = state.mergedData;
+            const BOM = '\uFEFF';
+            let csv = BOM + headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(',') + '\n';
+            rows.slice(1).forEach(row => {
+                csv += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `合并结果_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function copyTable() {
+            if (!state.mergedData) return;
+            const { headers, rows } = state.mergedData;
+            let tsv = headers.join('\t') + '\n';
+            rows.slice(1).forEach(row => {
+                tsv += row.map(c => String(c).replace(/\t/g, ' ')).join('\t') + '\n';
+            });
+            navigator.clipboard.writeText(tsv).then(() => {
+                alert('✅ 已复制表格（制表符分隔），可粘贴到 Excel 中。');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = tsv;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ 已复制表格（制表符分隔）。');
+            });
+        }
+
+        // ============================================================
+        //  事件绑定
+        // ============================================================
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length) {
+                handleFiles(this.files);
+                this.value = '';
+            }
+        });
+
+        // 拖拽上传
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                const valid = Array.from(files).some(f => f.name.match(/\.(xls|xlsx)$/i));
+                if (valid) handleFiles(files);
+                else alert('请拖拽 .xls 或 .xlsx 文件');
+            }
+        });
+
+        mergeBtn.addEventListener('click', performMerge);
+
+        clearAllBtn.addEventListener('click', function() {
+            if (state.files.length === 0) return;
+            if (!confirm('确定要清空所有已上传的文件吗？')) return;
+            state.files = [];
+            state.mergedData = null;
+            renderAll();
+            configSection.style.display = 'none';
+            resultSection.style.display = 'none';
+        });
+
+        exportExcelBtn.addEventListener('click', exportExcel);
+        exportCsvBtn.addEventListener('click', exportCsv);
+        copyTableBtn.addEventListener('click', copyTable);
+
+        // ============================================================
+        //  初始化
+        // ============================================================
+        checkCanMerge();
+        console.log('📊 Excel 数据合并工具（支持拖拽排序 + 默认勾选共有字段）已加载');
+    </script>
+
+</body>
+</html>

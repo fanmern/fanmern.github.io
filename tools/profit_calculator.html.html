@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>电商利润计算器</title>
+
+    <!-- CDN 库 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js">
+    </script>
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <style>
+        /* ===== 全局重置 & 变量 ===== */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --orange: #f59e0b;
+            --orange-dark: #d97706;
+            --success: #10b981;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .app-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-header h1 i {
+            color: var(--primary);
+        }
+        .app-header .header-info {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        /* 卡片 */
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* 看板 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: stretch;
+        }
+        .dashboard-item {
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .dashboard-item .label {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+        .dashboard-item .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.3;
+        }
+        .dashboard-item .value.orange {
+            color: var(--orange-dark);
+        }
+        .dashboard-item .value.green {
+            color: var(--success);
+        }
+        .dashboard-item .value.red {
+            color: var(--danger);
+        }
+        .dashboard-item .sub {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+        .dashboard-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            font-size: 13px;
+            color: var(--gray-500);
+            gap: 2px;
+            padding-left: 16px;
+            border-left: 1px solid var(--gray-200);
+        }
+        .dashboard-meta strong {
+            color: var(--gray-700);
+        }
+
+        /* 表单网格 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .form-group label .unit {
+            font-weight: 400;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+        .form-group input {
+            padding: 8px 12px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: var(--transition);
+            background: #fff;
+            color: var(--gray-800);
+            width: 100%;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+
+        /* 按钮 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--gray-600);
+            border: 1.5px solid var(--gray-300);
+        }
+        .btn-outline:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-400);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .gap-2 {
+            gap: 8px;
+        }
+        .gap-3 {
+            gap: 12px;
+        }
+        .mt-2 {
+            margin-top: 12px;
+        }
+        .mt-3 {
+            margin-top: 16px;
+        }
+        .mt-4 {
+            margin-top: 24px;
+        }
+        .mb-2 {
+            margin-bottom: 12px;
+        }
+        .text-muted {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+        .text-sm {
+            font-size: 13px;
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        /* 模式切换 (单选按钮模拟) */
+        .mode-toggle {
+            display: flex;
+            gap: 0;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            width: fit-content;
+            margin-bottom: 16px;
+        }
+        .mode-toggle label {
+            padding: 6px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+        .mode-toggle label.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        .mode-toggle input {
+            display: none;
+        }
+
+        /* 表格 */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table th {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 600;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+        table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+        table .row-danger td {
+            background: #fef2f2 !important;
+        }
+        table .row-danger td:first-child {
+            border-left: 3px solid var(--danger);
+        }
+
+        /* 上传区 */
+        .upload-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--gray-50);
+        }
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+        .upload-zone i {
+            font-size: 36px;
+            color: var(--gray-400);
+            margin-bottom: 6px;
+        }
+        .upload-zone p {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+        .upload-zone .hint {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-400);
+        }
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .empty-state p {
+            font-size: 15px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .dashboard-meta {
+                grid-column: span 2;
+                align-items: flex-start;
+                border-left: none;
+                padding-left: 0;
+                padding-top: 8px;
+                border-top: 1px solid var(--gray-200);
+            }
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .dashboard-item .value {
+                font-size: 22px;
+            }
+        }
+        @media (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            .dashboard-meta {
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="app">
+
+        <!-- ===== 头部 ===== -->
+        <header class="app-header">
+            <h1><i class="fas fa-calculator"></i> 电商利润计算器</h1>
+            <div class="header-info">
+                <i class="far fa-clock"></i> 数据仅保存在本地 · <i class="fas fa-shield-alt"></i> 不上传任何服务器
+            </div>
+        </header>
+
+        <!-- ===== 看板 ===== -->
+        <div class="card">
+            <div class="dashboard" id="dashboard">
+                <div class="dashboard-item">
+                    <span class="label"><i class="fas fa-chart-line"></i> 销售额</span>
+                    <span class="value orange" id="dashSales">0.00</span>
+                    <span class="sub">万元</span>
+                </div>
+                <div class="dashboard-item">
+                    <span class="label"><i class="fas fa-coins"></i> 利润</span>
+                    <span class="value" id="dashProfit">0.00</span>
+                    <span class="sub">元</span>
+                </div>
+                <div class="dashboard-item">
+                    <span class="label"><i class="fas fa-percent"></i> 利润率</span>
+                    <span class="value" id="dashMargin">0.00%</span>
+                    <span class="sub">净利润率</span>
+                </div>
+                <div class="dashboard-meta">
+                    <span><i class="far fa-user"></i> 测算人：<strong id="dashUser">运营</strong></span>
+                    <span><i class="far fa-calendar-alt"></i> <span id="dashTime">--</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 输入表单 ===== -->
+        <div class="card">
+            <div class="flex-between mb-2">
+                <div class="card-title" style="margin-bottom:0;"><i class="fas fa-sliders-h"></i> 参数配置</div>
+                <div class="mode-toggle" id="modeToggle">
+                    <input type="radio" name="adMode" id="modePpc" value="ppc" checked />
+                    <label for="modePpc" class="active">访客成本 PPC</label>
+                    <input type="radio" name="adMode" id="modeRatio" value="ratio" />
+                    <label for="modeRatio">推广占比</label>
+                </div>
+            </div>
+
+            <div class="form-grid" id="calcForm">
+                <!-- 基础参数 -->
+                <div class="form-group">
+                    <label>销量预估 <span class="unit">(件)</span></label>
+                    <input type="number" id="fSales" value="100" step="1" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>客单价 <span class="unit">(元)</span></label>
+                    <input type="number" id="fPrice" value="465.00" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>转化率 <span class="unit">(%)</span></label>
+                    <input type="number" id="fConversion" value="2.40" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>产品成本预估 <span class="unit">(元/件)</span></label>
+                    <input type="number" id="fProductCost" value="0" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>邮寄成本 <span class="unit">(元/件)</span></label>
+                    <input type="number" id="fShipping" value="0" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>包装成本 <span class="unit">(元/件)</span></label>
+                    <input type="number" id="fPackaging" value="0" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>其他费用率 <span class="unit">(%)</span></label>
+                    <input type="number" id="fOtherRate" value="0" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>退款率 <span class="unit">(%)</span></label>
+                    <input type="number" id="fReturnRate" value="0" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>平台佣金 <span class="unit">(%)</span></label>
+                    <input type="number" id="fCommission" value="5.50" step="0.01" min="0" />
+                </div>
+                <!-- 推广费 - PPC -->
+                <div class="form-group" id="groupPpc">
+                    <label>访客成本 PPC <span class="unit">(元/访客)</span></label>
+                    <input type="number" id="fPpc" value="0" step="0.01" min="0" />
+                </div>
+                <!-- 推广费 - 占比 (默认隐藏) -->
+                <div class="form-group" id="groupRatio" style="display:none;">
+                    <label>推广占比 <span class="unit">(%)</span></label>
+                    <input type="number" id="fAdRatio" value="0" step="0.01" min="0" />
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-3" style="flex-wrap:wrap;">
+                <button class="btn btn-primary" id="btnCalc"><i class="fas fa-play"></i> 开始测算</button>
+                <button class="btn btn-outline" id="btnSaveConfig"><i class="fas fa-save"></i> 保存配置</button>
+                <button class="btn btn-outline" id="btnLoadConfig"><i class="fas fa-undo"></i> 加载配置</button>
+            </div>
+        </div>
+
+        <!-- ===== 批量测算 ===== -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-upload"></i> 批量测算 <span class="text-muted text-sm" style="font-weight:400;">上传 Excel 批量计算</span></div>
+
+            <div class="flex gap-3 mb-2" style="flex-wrap:wrap;">
+                <button class="btn btn-outline btn-sm" id="btnDownloadTemplate"><i class="fas fa-download"></i> 下载模板</button>
+                <button class="btn btn-outline btn-sm" id="btnUploadExcel"><i class="fas fa-file-upload"></i> 上传 Excel</button>
+                <input type="file" id="fileBatchInput" accept=".xlsx,.xls" class="hidden-input" />
+                <span class="text-muted text-sm" style="align-self:center;">支持 .xlsx / .xls</span>
+            </div>
+
+            <div id="batchResultArea">
+                <div class="empty-state">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>上传 Excel 文件后，批量计算结果将显示在此</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-2" id="batchActions" style="display:none;">
+                <button class="btn btn-success btn-sm" id="btnExportBatch"><i class="fas fa-file-excel"></i> 导出结果</button>
+                <button class="btn btn-outline btn-sm" id="btnClearBatch"><i class="fas fa-trash-alt"></i> 清空结果</button>
+            </div>
+        </div>
+
+    </div>
+    <!-- /app-container -->
+
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            // 工具函数
+            // ============================================================
+            const Utils = {
+                getEl: (id) => document.getElementById(id),
+                formatNum: (v, d = 2) => Number(v).toFixed(d),
+                now: () => {
+                    const d = new Date();
+                    return d.getFullYear() + '-' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(d.getDate()).padStart(2, '0') + ' ' +
+                        String(d.getHours()).padStart(2, '0') + ':' +
+                        String(d.getMinutes()).padStart(2, '0');
+                },
+                lsGet: (key, def) => {
+                    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch (
+                    e) { return def; }
+                },
+                lsSet: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
+                uid: () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            };
+
+            // ============================================================
+            // 利润计算器核心模块
+            // ============================================================
+            const Calculator = {
+
+                el: {},
+                batchData: [],
+                batchHeaders: [],
+                _batchCalcResults: [],
+
+                init() {
+                    const e = this.el;
+                    // 看板
+                    e.dashSales = Utils.getEl('dashSales');
+                    e.dashProfit = Utils.getEl('dashProfit');
+                    e.dashMargin = Utils.getEl('dashMargin');
+                    e.dashUser = Utils.getEl('dashUser');
+                    e.dashTime = Utils.getEl('dashTime');
+
+                    // 表单
+                    e.fSales = Utils.getEl('fSales');
+                    e.fPrice = Utils.getEl('fPrice');
+                    e.fConversion = Utils.getEl('fConversion');
+                    e.fProductCost = Utils.getEl('fProductCost');
+                    e.fShipping = Utils.getEl('fShipping');
+                    e.fPackaging = Utils.getEl('fPackaging');
+                    e.fOtherRate = Utils.getEl('fOtherRate');
+                    e.fReturnRate = Utils.getEl('fReturnRate');
+                    e.fCommission = Utils.getEl('fCommission');
+                    e.fPpc = Utils.getEl('fPpc');
+                    e.fAdRatio = Utils.getEl('fAdRatio');
+                    e.groupPpc = Utils.getEl('groupPpc');
+                    e.groupRatio = Utils.getEl('groupRatio');
+
+                    // 按钮
+                    e.btnCalc = Utils.getEl('btnCalc');
+                    e.btnSaveConfig = Utils.getEl('btnSaveConfig');
+                    e.btnLoadConfig = Utils.getEl('btnLoadConfig');
+
+                    // 模式切换
+                    e.modePpc = Utils.getEl('modePpc');
+                    e.modeRatio = Utils.getEl('modeRatio');
+
+                    // 批量
+                    e.btnDownloadTemplate = Utils.getEl('btnDownloadTemplate');
+                    e.btnUploadExcel = Utils.getEl('btnUploadExcel');
+                    e.fileBatchInput = Utils.getEl('fileBatchInput');
+                    e.batchResultArea = Utils.getEl('batchResultArea');
+                    e.batchActions = Utils.getEl('batchActions');
+                    e.btnExportBatch = Utils.getEl('btnExportBatch');
+                    e.btnClearBatch = Utils.getEl('btnClearBatch');
+
+                    this.bindEvents();
+
+                    // 加载保存的配置
+                    this.loadConfig();
+
+                    // 默认计算一次
+                    this.calculateAndUpdate();
+
+                    // 设置时间
+                    e.dashTime.textContent = Utils.now();
+
+                    // 测算人
+                    const savedUser = Utils.lsGet('calc_user', '运营');
+                    e.dashUser.textContent = savedUser;
+                },
+
+                bindEvents() {
+                    const e = this.el;
+
+                    // 模式切换
+                    e.modePpc.addEventListener('change', () => this.toggleMode('ppc'));
+                    e.modeRatio.addEventListener('change', () => this.toggleMode('ratio'));
+
+                    // 测算
+                    e.btnCalc.addEventListener('click', () => {
+                        this.calculateAndUpdate();
+                        e.dashTime.textContent = Utils.now();
+                    });
+
+                    // 保存/加载配置
+                    e.btnSaveConfig.addEventListener('click', () => this.saveConfig());
+                    e.btnLoadConfig.addEventListener('click', () => this.loadConfig());
+
+                    // 下载模板
+                    e.btnDownloadTemplate.addEventListener('click', () => this.downloadTemplate());
+
+                    // 上传Excel
+                    e.btnUploadExcel.addEventListener('click', () => e.fileBatchInput.click());
+                    e.fileBatchInput.addEventListener('change', (ev) => {
+                        if (ev.target.files.length) {
+                            this.handleBatchUpload(ev.target.files[0]);
+                        }
+                        ev.target.value = '';
+                    });
+
+                    // 导出批量结果
+                    e.btnExportBatch.addEventListener('click', () => this.exportBatchResult());
+
+                    // 清空批量结果
+                    e.btnClearBatch.addEventListener('click', () => {
+                        this.batchData = [];
+                        this.batchHeaders = [];
+                        this._batchCalcResults = [];
+                        this.renderBatchResult();
+                        e.batchActions.style.display = 'none';
+                    });
+
+                    // 回车触发测算
+                    document.querySelectorAll('#calcForm input').forEach(inp => {
+                        inp.addEventListener('keydown', (ev) => {
+                            if (ev.key === 'Enter') {
+                                ev.preventDefault();
+                                e.btnCalc.click();
+                            }
+                        });
+                    });
+                },
+
+                toggleMode(mode) {
+                    const e = this.el;
+                    if (mode === 'ppc') {
+                        e.groupPpc.style.display = 'block';
+                        e.groupRatio.style.display = 'none';
+                        e.modePpc.checked = true;
+                        document.querySelector('label[for="modePpc"]').classList.add('active');
+                        document.querySelector('label[for="modeRatio"]').classList.remove('active');
+                    } else {
+                        e.groupPpc.style.display = 'none';
+                        e.groupRatio.style.display = 'block';
+                        e.modeRatio.checked = true;
+                        document.querySelector('label[for="modeRatio"]').classList.add('active');
+                        document.querySelector('label[for="modePpc"]').classList.remove('active');
+                    }
+                },
+
+                // ----- 核心计算函数 -----
+                calculateProfit(data) {
+                    const d = data;
+                    const sv = Number(d.sales_volume) || 0;
+                    const up = Number(d.unit_price) || 0;
+                    const pc = Number(d.product_cost) || 0;
+                    const sc = Number(d.shipping_cost) || 0;
+                    const pac = Number(d.packaging_cost) || 0;
+                    const oer = Number(d.other_expense_rate) || 0;
+                    const rr = Number(d.return_rate) || 0;
+                    const pcr = Number(d.platform_commission_rate) || 0;
+                    const cr = Number(d.conversion_rate) || 0;
+
+                    const gross_sales = sv * up;
+                    const total_product_cost = pc * sv;
+                    const total_shipping_cost = sc * sv;
+                    const total_packaging_cost = pac * sv;
+                    const total_other_expense = gross_sales * (oer / 100);
+                    const refund_amount = gross_sales * (rr / 100);
+                    const platform_commission = (pcr / 100) * (gross_sales - refund_amount);
+
+                    let ad_cost = 0;
+                    const ad_mode = d.ad_mode || 'ppc';
+                    if (ad_mode === 'ppc') {
+                        const ppc = Number(d.ppc_value) || 0;
+                        const traffic_needed = cr > 0 ? sv / (cr / 100) : 0;
+                        ad_cost = traffic_needed * ppc;
+                    } else {
+                        const ad_ratio = Number(d.ad_ratio) || 0;
+                        ad_cost = gross_sales * (ad_ratio / 100);
+                    }
+
+                    const net_profit = gross_sales - ad_cost - total_product_cost - total_shipping_cost -
+                        total_packaging_cost - total_other_expense - platform_commission - refund_amount;
+                    const profit_margin = gross_sales > 0 ? (net_profit / gross_sales) * 100 : 0;
+
+                    return {
+                        gross_sales,
+                        total_product_cost,
+                        total_shipping_cost,
+                        total_packaging_cost,
+                        total_other_expense,
+                        refund_amount,
+                        platform_commission,
+                        ad_cost,
+                        net_profit,
+                        profit_margin,
+                    };
+                },
+
+                // ----- 从表单读取数据 -----
+                getFormData() {
+                    const e = this.el;
+                    const mode = e.modePpc.checked ? 'ppc' : 'ratio';
+                    return {
+                        sales_volume: parseFloat(e.fSales.value) || 0,
+                        unit_price: parseFloat(e.fPrice.value) || 0,
+                        product_cost: parseFloat(e.fProductCost.value) || 0,
+                        shipping_cost: parseFloat(e.fShipping.value) || 0,
+                        packaging_cost: parseFloat(e.fPackaging.value) || 0,
+                        other_expense_rate: parseFloat(e.fOtherRate.value) || 0,
+                        return_rate: parseFloat(e.fReturnRate.value) || 0,
+                        platform_commission_rate: parseFloat(e.fCommission.value) || 0,
+                        conversion_rate: parseFloat(e.fConversion.value) || 0,
+                        ad_mode: mode,
+                        ppc_value: parseFloat(e.fPpc.value) || 0,
+                        ad_ratio: parseFloat(e.fAdRatio.value) || 0,
+                    };
+                },
+
+                // ----- 计算并更新看板 -----
+                calculateAndUpdate() {
+                    const data = this.getFormData();
+                    const result = this.calculateProfit(data);
+                    const e = this.el;
+
+                    const salesWan = result.gross_sales / 10000;
+                    e.dashSales.textContent = salesWan.toFixed(2);
+                    e.dashProfit.textContent = result.net_profit.toFixed(2);
+                    e.dashMargin.textContent = result.profit_margin.toFixed(2) + '%';
+
+                    // 颜色
+                    const marginEl = e.dashMargin;
+                    marginEl.className = 'value';
+                    if (result.profit_margin > 0) marginEl.classList.add('green');
+                    else if (result.profit_margin < 0) marginEl.classList.add('red');
+
+                    const profitEl = e.dashProfit;
+                    profitEl.className = 'value';
+                    if (result.net_profit > 0) profitEl.classList.add('green');
+                    else if (result.net_profit < 0) profitEl.classList.add('red');
+
+                    return result;
+                },
+
+                // ----- 保存配置 -----
+                saveConfig() {
+                    const e = this.el;
+                    const data = {
+                        sales_volume: e.fSales.value,
+                        unit_price: e.fPrice.value,
+                        product_cost: e.fProductCost.value,
+                        shipping_cost: e.fShipping.value,
+                        packaging_cost: e.fPackaging.value,
+                        other_expense_rate: e.fOtherRate.value,
+                        return_rate: e.fReturnRate.value,
+                        platform_commission_rate: e.fCommission.value,
+                        conversion_rate: e.fConversion.value,
+                        ppc_value: e.fPpc.value,
+                        ad_ratio: e.fAdRatio.value,
+                        ad_mode: e.modePpc.checked ? 'ppc' : 'ratio',
+                        user: e.dashUser.textContent,
+                    };
+                    Utils.lsSet('calc_config', data);
+                    const btn = e.btnSaveConfig;
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> 已保存';
+                    setTimeout(() => { btn.innerHTML = orig; }, 1500);
+                },
+
+                // ----- 加载配置 -----
+                loadConfig() {
+                    const data = Utils.lsGet('calc_config', null);
+                    if (!data) return;
+                    const e = this.el;
+                    e.fSales.value = data.sales_volume || '';
+                    e.fPrice.value = data.unit_price || '';
+                    e.fProductCost.value = data.product_cost || '';
+                    e.fShipping.value = data.shipping_cost || '';
+                    e.fPackaging.value = data.packaging_cost || '';
+                    e.fOtherRate.value = data.other_expense_rate || '';
+                    e.fReturnRate.value = data.return_rate || '';
+                    e.fCommission.value = data.platform_commission_rate || '';
+                    e.fConversion.value = data.conversion_rate || '';
+                    e.fPpc.value = data.ppc_value || '';
+                    e.fAdRatio.value = data.ad_ratio || '';
+                    if (data.ad_mode === 'ratio') {
+                        this.toggleMode('ratio');
+                    } else {
+                        this.toggleMode('ppc');
+                    }
+                    if (data.user) {
+                        e.dashUser.textContent = data.user;
+                    }
+                    this.calculateAndUpdate();
+                },
+
+                // ----- 下载模板 -----
+                downloadTemplate() {
+                    const headers = [
+                        '销量预估', '客单价', '转化率(%)', '产品成本预估', '邮寄成本',
+                        '包装成本', '其他费用率(%)', '退款率(%)', '平台佣金(%)',
+                        '推广模式(ppc/ratio)', '访客成本PPC', '推广占比(%)'
+                    ];
+                    const example = [100, 465, 2.4, 50, 10, 2, 1, 3, 5.5, 'ppc', 1.2, 0];
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+                    XLSX.utils.book_append_sheet(wb, ws, '模板');
+                    XLSX.writeFile(wb, '利润测算模板.xlsx');
+                },
+
+                // ----- 批量上传处理 -----
+                handleBatchUpload(file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        try {
+                            const data = new Uint8Array(ev.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const json = XLSX.utils.sheet_to_json(firstSheet);
+                            if (!json || json.length === 0) {
+                                alert('文件为空或格式不正确');
+                                return;
+                            }
+                            this.batchData = json;
+                            this.batchHeaders = Object.keys(json[0]);
+                            this.renderBatchResult();
+                            this.el.batchActions.style.display = 'flex';
+                        } catch (err) {
+                            alert('解析失败: ' + err.message);
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                },
+
+                // ----- 渲染批量结果 -----
+                renderBatchResult() {
+                    const area = this.el.batchResultArea;
+                    const data = this.batchData;
+                    if (!data || data.length === 0) {
+                        area.innerHTML =
+                        `
+                                <div class="empty-state">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>上传 Excel 文件后，批量计算结果将显示在此</p>
+                                </div>
+                            `;
+                        return;
+                    }
+
+                    const mapFields = (row) => {
+                        const get = (keys) => {
+                            for (const k of keys) {
+                                if (row[k] !== undefined && row[k] !== null && row[k] !== '') return Number(row[
+                                k]) || 0;
+                            }
+                            return 0;
+                        };
+                        const sales = get(['销量预估', '销量', 'sales', 'sales_volume']);
+                        const price = get(['客单价', '单价', 'price', 'unit_price']);
+                        const pc = get(['产品成本预估', '产品成本', 'product_cost', '成本']);
+                        const sc = get(['邮寄成本', '运费', 'shipping_cost']);
+                        const pac = get(['包装成本', '包装', 'packaging_cost']);
+                        const oer = get(['其他费用率', '其他费用', 'other_expense_rate']);
+                        const rr = get(['退款率', '退款', 'return_rate']);
+                        const pcr = get(['平台佣金', '佣金', 'platform_commission_rate']);
+                        const cr = get(['转化率', 'conversion_rate']);
+                        let adMode = 'ppc';
+                        let ppcVal = 0,
+                            adRatioVal = 0;
+                        const modeRaw = row['推广模式'] || row['ad_mode'] || '';
+                        if (modeRaw && String(modeRaw).toLowerCase().includes('ratio')) {
+                            adMode = 'ratio';
+                        }
+                        ppcVal = get(['访客成本PPC', 'ppc', 'ppc_value']);
+                        adRatioVal = get(['推广占比', 'ad_ratio']);
+                        if (ppcVal === 0 && adRatioVal === 0) {
+                            if (row['访客成本PPC'] !== undefined) adMode = 'ppc';
+                            else if (row['推广占比'] !== undefined) adMode = 'ratio';
+                        }
+                        return {
+                            sales_volume: sales,
+                            unit_price: price,
+                            product_cost: pc,
+                            shipping_cost: sc,
+                            packaging_cost: pac,
+                            other_expense_rate: oer,
+                            return_rate: rr,
+                            platform_commission_rate: pcr,
+                            conversion_rate: cr,
+                            ad_mode: adMode,
+                            ppc_value: ppcVal,
+                            ad_ratio: adRatioVal,
+                            _raw: row,
+                        };
+                    };
+
+                    const results = [];
+                    const headers = this.batchHeaders;
+                    for (const row of data) {
+                        const mapped = mapFields(row);
+                        const calcData = {
+                            sales_volume: mapped.sales_volume,
+                            unit_price: mapped.unit_price,
+                            product_cost: mapped.product_cost,
+                            shipping_cost: mapped.shipping_cost,
+                            packaging_cost: mapped.packaging_cost,
+                            other_expense_rate: mapped.other_expense_rate,
+                            return_rate: mapped.return_rate,
+                            platform_commission_rate: mapped.platform_commission_rate,
+                            conversion_rate: mapped.conversion_rate,
+                            ad_mode: mapped.ad_mode,
+                            ppc_value: mapped.ppc_value,
+                            ad_ratio: mapped.ad_ratio,
+                        };
+                        const result = this.calculateProfit(calcData);
+                        results.push({
+                            ...result,
+                            _raw: row,
+                            _mapped: mapped,
+                        });
+                    }
+                    this._batchCalcResults = results;
+
+                    let html = `
+                            <div class="table-wrap batch-result">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        ${headers.map(h => `<th>${h}</th>`).join('')}
+                                        <th>销售额</th>
+                                        <th>利润</th>
+                                        <th>利润率</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                    results.forEach((r, idx) => {
+                        const cls = r.net_profit < 0 ? 'row-danger' : '';
+                        html += `<tr class="${cls}">
+                                <td>${idx + 1}</td>
+                                ${headers.map(h => {
+                                    const val = r._raw[h];
+                                    return `<td>${val !== undefined && val !== null ? val : ''}</td>`;
+                                }).join('')}
+                                <td>${r.gross_sales.toFixed(2)}</td>
+                                <td>${r.net_profit.toFixed(2)}</td>
+                                <td>${r.profit_margin.toFixed(2)}%</td>
+                            </tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                    html +=
+                        `<div class="text-muted text-sm mt-2">共 ${results.length} 条记录，其中 ${results.filter(r => r.net_profit < 0).length} 条亏损（标红）</div>`;
+
+                    area.innerHTML = html;
+                },
+
+                // ----- 导出批量结果 -----
+                exportBatchResult() {
+                    const results = this._batchCalcResults;
+                    if (!results || results.length === 0) {
+                        alert('没有可导出的数据');
+                        return;
+                    }
+                    const headers = this.batchHeaders || [];
+                    const rows = results.map((r) => {
+                        const row = {};
+                        headers.forEach(h => {
+                            row[h] = r._raw[h] !== undefined ? r._raw[h] : '';
+                        });
+                        row['销售额'] = r.gross_sales;
+                        row['利润'] = r.net_profit;
+                        row['利润率(%)'] = r.profit_margin;
+                        return row;
+                    });
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(rows);
+                    XLSX.utils.book_append_sheet(wb, ws, '测算结果');
+                    XLSX.writeFile(wb, '批量测算结果.xlsx');
+                },
+
+            };
+
+            // ============================================================
+            // 启动
+            // ============================================================
+            document.addEventListener('DOMContentLoaded', () => Calculator.init());
+
+        })();
+    </script>
+
+</body>
+</html>

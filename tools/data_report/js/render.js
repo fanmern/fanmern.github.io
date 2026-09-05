@@ -140,7 +140,8 @@ const Renderer = {
                                         tab: '',
                                         startTime: start,
                                         endTime: end,
-                                        campaignId: planId
+                                        campaignId: planId,
+                                        orderBy: 'desc'
                                     });
                                     link = `https://one.alimama.com/index.html#!/manage/display-detail?${params.toString()}`;
                                 }

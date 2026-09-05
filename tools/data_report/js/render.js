@@ -123,29 +123,23 @@ const Renderer = {
                             const sceneId = String(row['场景ID'] ?? row['原二级场景ID'] ?? '');
                             let link = '#';
 
-                            // ---- 日期预处理 ----
-                            let dateStr = dateRaw || '';
-                            // 如果包含“至”，只取开始日期
-                            if (dateStr.includes('至')) {
-                                dateStr = dateStr.split('至')[0].trim();
-                            }
-                            // 如果日期是 8 位数字，转为 YYYY-MM-DD
-                            if (dateStr.length === 8 && /^\d{8}$/.test(dateStr)) {
-                                dateStr = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
-                            }
+                            // 使用工具函数解析日期范围
+                            const dateRange = Utils.parseDateRange(dateRaw);
+                            const start = dateRange.start;
+                            const end = dateRange.end;
 
                             if (sceneId === '371') {
                                 // 关键词推广：使用原始日期范围（包含结束日期）
                                 link = Utils.buildPlanLink(planId, dateRaw);
                             } else if (sceneId === '372') {
-                                // 人群推广：只使用开始日期
-                                if (dateStr) {
+                                // 人群推广：使用拆分后的开始和结束日期
+                                if (start && end) {
                                     const params = new URLSearchParams({
                                         mx_bizCode: 'onebpDisplay',
                                         bizCode: 'onebpDisplay',
                                         tab: '',
-                                        startTime: dateStr,
-                                        endTime: dateStr,
+                                        startTime: start,
+                                        endTime: end,
                                         campaignId: planId
                                     });
                                     link = `https://one.alimama.com/index.html#!/manage/display-detail?${params.toString()}`;

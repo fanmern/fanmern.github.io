@@ -116,28 +116,42 @@ const Renderer = {
                         let cellContent = Utils.escapeHtml(String(displayVal));
                         // ---- 链接处理 ----
                         // 1. 计划名字链接
+                        // 在 render.js 的 render() 方法中，处理计划名字链接的部分
                         if (col === '计划名字') {
                             const planId = row['计划ID'] || '';
                             const dateRaw = row['_dateRaw'] || row['日期'] || '';
-                            const sceneId = String(row['场景ID'] ?? row['原二级场景ID'] ?? ''); // 优先取"场景ID"，若无则取"原二级场景ID"
+                            const sceneId = String(row['场景ID'] ?? row['原二级场景ID'] ?? '');
                             let link = '#';
 
+                            // ---- 日期预处理 ----
+                            let dateStr = dateRaw || '';
+                            // 如果包含“至”，只取开始日期
+                            if (dateStr.includes('至')) {
+                                dateStr = dateStr.split('至')[0].trim();
+                            }
+                            // 如果日期是 8 位数字，转为 YYYY-MM-DD
+                            if (dateStr.length === 8 && /^\d{8}$/.test(dateStr)) {
+                                dateStr = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+                            }
+
                             if (sceneId === '371') {
-                                // 保持原逻辑
+                                // 关键词推广：使用原始日期范围（包含结束日期）
                                 link = Utils.buildPlanLink(planId, dateRaw);
                             } else if (sceneId === '372') {
-                                // 日期使用数据中的日期，若无效则用当前日期
-                                const dateStr = dateRaw || new Date().toISOString().slice(0, 10);
-                                const params = new URLSearchParams({
-                                    mx_bizCode: 'onebpDisplay',
-                                    bizCode: 'onebpDisplay',
-                                    tab: '',
-                                    startTime: dateStr,
-                                    endTime: dateStr,
-                                    campaignId: planId
-                                });
-                                link = `https://one.alimama.com/index.html#!/manage/display-detail?${params.toString()}`;
+                                // 人群推广：只使用开始日期
+                                if (dateStr) {
+                                    const params = new URLSearchParams({
+                                        mx_bizCode: 'onebpDisplay',
+                                        bizCode: 'onebpDisplay',
+                                        tab: '',
+                                        startTime: dateStr,
+                                        endTime: dateStr,
+                                        campaignId: planId
+                                    });
+                                    link = `https://one.alimama.com/index.html#!/manage/display-detail?${params.toString()}`;
+                                }
                             } else if (sceneId === '436') {
+                                // 商品推广（场景436）
                                 const subjectId = row['主体ID'] || '';
                                 if (subjectId) {
                                     const params = new URLSearchParams({
@@ -148,7 +162,7 @@ const Renderer = {
                                     link = `https://one.alimama.com/index.html#!/manage/onesite?${params.toString()}`;
                                 }
                             }
-                            // 如果 link 有效，则包裹链接
+
                             if (link !== '#') {
                                 cellContent = `<a href="${link}" target="_blank">${cellContent}</a>`;
                             }

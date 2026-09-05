@@ -33,12 +33,21 @@ const EventManager = {
             }
         });
         // 筛选图标
+        // 筛选图标点击（使用防抖）
+        let filterDebounceTimer = null;
         document.addEventListener('click', (e) => {
             const filterIcon = e.target.closest('.filter-icon');
             if (filterIcon) {
                 e.stopPropagation();
                 const col = filterIcon.dataset.col;
-                this.openFilterPopup(col, filterIcon);
+                if (filterDebounceTimer) {
+                    clearTimeout(filterDebounceTimer);
+                    filterDebounceTimer = null;
+                }
+                filterDebounceTimer = setTimeout(() => {
+                    this.openFilterPopup(col, filterIcon);
+                    filterDebounceTimer = null;
+                }, 50);
             }
         });
         // 列宽调整
@@ -154,11 +163,18 @@ const EventManager = {
         handle.classList.add('active');
     },
     // ---- 筛选浮层 ----
+    // events.js 中的 openFilterPopup 方法
     openFilterPopup(col, iconEl) {
+        // 如果已存在浮层，先关闭
+        if (this.filterPopup.style.display === 'flex') {
+            this.filterPopup.style.display = 'none';
+        }
+
         const data = DataStore;
         const type = Utils.guessColumnType(col, data.allData);
         const currentFilter = data.filters[col] || null;
         this.filterPopupTitle.textContent = `筛选: ${col}`;
+
         let bodyHtml = '';
         if (type === 'text') {
             const val = typeof currentFilter === 'string' ? currentFilter : '';
@@ -173,6 +189,7 @@ const EventManager = {
             bodyHtml = `<input type="date" id="filterStart" placeholder="开始日期" value="${start}"><input type="date" id="filterEnd" placeholder="结束日期" value="${end}">`;
         }
         this.filterPopupBody.innerHTML = bodyHtml;
+
         const rect = iconEl.getBoundingClientRect();
         let left = rect.left,
             top = rect.bottom + 4;
@@ -181,15 +198,25 @@ const EventManager = {
         this.filterPopup.style.left = left + 'px';
         this.filterPopup.style.top = top + 'px';
         this.filterPopup.style.display = 'flex';
-        const closePopup = () => { this.filterPopup.style.display = 'none'; };
+
+        // 清除旧的事件监听（通过移除并重新添加）
+        const newClearBtn = this.filterClearBtn.cloneNode(true);
+        this.filterClearBtn.parentNode.replaceChild(newClearBtn, this.filterClearBtn);
+        this.filterClearBtn = newClearBtn;
+
+        const newApplyBtn = this.filterApplyBtn.cloneNode(true);
+        this.filterApplyBtn.parentNode.replaceChild(newApplyBtn, this.filterApplyBtn);
+        this.filterApplyBtn = newApplyBtn;
+
         this.filterClearBtn.onclick = () => {
             delete data.filters[col];
             data.saveAll();
             data.applyFilters();
             Renderer.render();
-            this.rebindTableEvents();
-            closePopup();
+            EventManager.rebindTableEvents();
+            this.filterPopup.style.display = 'none';
         };
+
         this.filterApplyBtn.onclick = () => {
             let newFilter = null;
             if (type === 'text') {
@@ -209,16 +236,19 @@ const EventManager = {
             data.saveAll();
             data.applyFilters();
             Renderer.render();
-            this.rebindTableEvents();
-            closePopup();
+            EventManager.rebindTableEvents();
+            this.filterPopup.style.display = 'none';
         };
+
+        // 点击外部关闭
         const closeHandler = (e) => {
             if (!this.filterPopup.contains(e.target) && e.target !== iconEl) {
-                closePopup();
+                this.filterPopup.style.display = 'none';
                 document.removeEventListener('click', closeHandler);
             }
         };
         setTimeout(() => document.addEventListener('click', closeHandler), 10);
+
         const input = this.filterPopupBody.querySelector('input');
         if (input) {
             input.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.filterApplyBtn.click(); });

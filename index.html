@@ -200,77 +200,102 @@
         }
 
         function doSearch() {
-        var q = searchInput.value.trim();
-        clearHighlights();
-        if (!q) {
-                searchCount.textContent = '';
-                matchList = [];
-                currentMatchIndex = -1;
-                return;
-        }
+                var q = searchInput.value.trim();
+                clearHighlights();
+                if (!q) {
+                        searchCount.textContent = '';
+                        matchList = [];
+                        currentMatchIndex = -1;
+                        return;
+                }
 
-        // 支持用逗号、空格、中文逗号、换行分隔多个关键词
-        var keywords = q.split(/[,，\s\n]+/).filter(function(k) { return k.length > 0; });
-        var attr = searchField === 'code' ? 'data-code' : 'data-id';
+                // 支持用逗号、空格、中文逗号、换行分隔多个关键词
+                var keywords = q.split(/[,，\s\n]+/).filter(function (k) { return k.length > 0; });
+                var attr = searchField === 'code' ? 'data-code' : 'data-id';
 
-        matchList = allCards().filter(function(card) {
-                var text = (card.getAttribute(attr) || '').toLowerCase();
-                return keywords.some(function(kw) {
-                        return text.indexOf(kw.toLowerCase()) !== -1;
+                matchList = allCards().filter(function (card) {
+                        var text = (card.getAttribute(attr) || '').toLowerCase();
+                        return keywords.some(function (kw) {
+                                return text.indexOf(kw.toLowerCase()) !== -1;
+                        });
                 });
-        });
 
-        if (matchList.length > 0) {
-                currentMatchIndex = 0;
-                highlightAllMatches();
-        } else {
-                searchCount.textContent = '无匹配';
-                currentMatchIndex = -1;
+                if (matchList.length > 0) {
+                        currentMatchIndex = 0;
+                        highlightAllMatches();
+                } else {
+                        searchCount.textContent = '无匹配';
+                        currentMatchIndex = -1;
+                }
         }
-}
 
         function highlightAllMatches() {
-        if (matchList.length === 0) return;
-        allCards().forEach(function(c) { c.classList.remove('found', 'found-current'); });
-        matchList.forEach(function(card) {
-                void card.offsetWidth;
-                card.classList.add('found');
-        });
-        searchCount.textContent = '匹配 ' + matchList.length + ' 个';
-        var firstCard = matchList[0];
-        if (firstCard) {
-                firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (matchList.length === 0) return;
+                allCards().forEach(function (c) { c.classList.remove('found', 'found-current'); });
+                matchList.forEach(function (card) {
+                        void card.offsetWidth;
+                        card.classList.add('found');
+                });
+                searchCount.textContent = '匹配 ' + matchList.length + ' 个';
+                var firstCard = matchList[0];
+                if (firstCard) {
+                        scrollToCard(firstCard);
+                }
         }
-}
 
-function highlightSingleMatch() {
-        if (matchList.length === 0) return;
-        matchList.forEach(function(c) {
-                c.classList.add('found');
-                c.classList.remove('found-current');
-        });
-        var card = matchList[currentMatchIndex];
-        card.classList.add('found-current');
-        searchCount.textContent = (currentMatchIndex + 1) + ' / ' + matchList.length;
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
+        function highlightSingleMatch() {
+                if (matchList.length === 0) return;
+                matchList.forEach(function (c) {
+                        c.classList.add('found');
+                        c.classList.remove('found-current');
+                });
+                var card = matchList[currentMatchIndex];
+                card.classList.add('found-current');
+                searchCount.textContent = (currentMatchIndex + 1) + ' / ' + matchList.length;
+                scrollToCard(card);
+        }
+
+        function scrollToCard(card) {
+                const container = document.documentElement;
+                const rect = card.getBoundingClientRect();
+                const targetY = window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
+
+                const startY = window.scrollY;
+                const distance = targetY - startY;
+                const duration = 300; // 毫秒，数字越小越快
+                const startTime = performance.now();
+
+                function step(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // easeInOut 缓动函数
+                        const ease = progress < 0.5
+                                ? 2 * progress * progress
+                                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                        window.scrollTo(0, startY + distance * ease);
+                        if (progress < 1) {
+                                requestAnimationFrame(step);
+                        }
+                }
+                requestAnimationFrame(step);
+        }
 
         function clearHighlights() {
-        allCards().forEach(function (c) {
-                c.classList.remove('found', 'found-current');
-        });
-}
+                allCards().forEach(function (c) {
+                        c.classList.remove('found', 'found-current');
+                });
+        }
 
         searchInput.addEventListener('input', doSearch);
         searchInput.addEventListener('keydown', function (eve) {
-        if (eve.key === 'Enter') {
-                eve.preventDefault();
-                if (matchList.length > 0) {
-                        currentMatchIndex = (currentMatchIndex + 1) % matchList.length;
-                        highlightSingleMatch();
+                if (eve.key === 'Enter') {
+                        eve.preventDefault();
+                        if (matchList.length > 0) {
+                                currentMatchIndex = (currentMatchIndex + 1) % matchList.length;
+                                highlightSingleMatch();
+                        }
                 }
-        }
-});
+        });
 
         // 编码 / ID 搜索模式切换
         document.getElementById('search-field-toggle').addEventListener('click', function (eve) {
@@ -417,7 +442,7 @@ function highlightSingleMatch() {
                 color: #fff;
         }
 
-        
+
 
         @keyframes foundPulse {
                 0% {
@@ -538,21 +563,21 @@ function highlightSingleMatch() {
                 display: block;
         }
 
-/* 所有匹配项：淡红色背景 + 脉冲 */
-.product.found {
-        border-radius: 12px;
-        animation: foundPulse 1s ease;
-        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.45), 0 8px 30px rgba(255, 77, 79, 0.25);
-        background: rgba(255, 77, 79, 0.06);
-}
+        /* 所有匹配项：淡红色背景 + 脉冲 */
+        .product.found {
+                border-radius: 12px;
+                animation: foundPulse 1s ease;
+                box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.45), 0 8px 30px rgba(255, 77, 79, 0.25);
+                background: rgba(255, 77, 79, 0.06);
+        }
 
-/* 当前选中项：更亮的边框 + 更强的阴影 */
-.product.found-current {
-        border-radius: 12px;
-        box-shadow: 0 0 0 4px #ff4d4f, 0 8px 40px rgba(255, 77, 79, 0.5);
-        background: rgba(255, 77, 79, 0.12);
-        animation: foundPulse 0.6s ease;
-}
+        /* 当前选中项：更亮的边框 + 更强的阴影 */
+        .product.found-current {
+                border-radius: 12px;
+                box-shadow: 0 0 0 4px #ff4d4f, 0 8px 40px rgba(255, 77, 79, 0.5);
+                background: rgba(255, 77, 79, 0.12);
+                animation: foundPulse 0.6s ease;
+        }
 </style>
 
 </html>

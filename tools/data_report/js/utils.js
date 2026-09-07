@@ -91,6 +91,9 @@ const Utils = {
     },
     // utils.js - 修改后的 guessColumnType
     guessColumnType(col, data) {
+        if (CONFIG.TEXT_COLS && CONFIG.TEXT_COLS.has(col)) {
+            return 'text';
+        }
         // 日期列按文本处理，不再返回 'date' 类型
         let numCount = 0, totalCount = 0;
         for (let i = 0; i < Math.min(data.length, 20); i++) {

@@ -368,6 +368,10 @@ body {
     color: var(--blue-600);
     border-bottom-style: solid;
 }
+/* 新增：已访问链接颜色 */
+.table-scroll td a:visited {
+    color: #f3888a; /* 紫色，您可换成其他颜色，如 #9333ea、#a855f7 或 #6b7280 */
+}
 .table-scroll tbody tr.group-even {
     background-color: var(--group-even-bg);
 }

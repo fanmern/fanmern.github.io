@@ -8,7 +8,7 @@ const CONFIG = {
     MAX_HISTORY_COUNT: 50,                    // 最大历史记录数
 
     HIDDEN_COLS: new Set(['原二级场景ID', '原二级场景名字', '计划ID', '主体类型']),
-    DEFAULT_SHOWN_COLS: new Set(['日期', '场景名字', '计划名字', '主体名称', '花费', '投入产出比', '加购成本', '平均点击花费', '点击率']),
+    DEFAULT_SHOWN_COLS: new Set(['日期', '主体ID', '场景名字', '计划名字', '主体名称', '花费', '投入产出比', '加购成本', '平均点击花费', '点击率']),
     TEXT_COLS: new Set(['场景ID', '日期', '计划ID', '主体ID']),
     STORAGE_KEY: 'data_tool_column_settings',
     COL_WIDTH_KEY: 'data_tool_col_widths',

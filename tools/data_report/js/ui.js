@@ -1,7 +1,13 @@
 // ================================================================
 // 6. UI模块 (ui.js) - 设置面板、上传等
 // ================================================================
-
+// 移除 UTF-8 BOM
+function stripBOM(text) {
+    if (text.charCodeAt(0) === 0xFEFF) {
+        return text.slice(1);
+    }
+    return text;
+}
 // ---- UI 管理器 ----
 const UIManager = {
     init() {
@@ -13,6 +19,16 @@ const UIManager = {
 
         // ---- 通用解析回调 ----
         const onParseData = (rows, fileName) => {
+            // 重置之前可能存在的过滤器，避免影响新数据
+            DataStore.filters = {};
+            DataStore.sortState = { col: null, asc: true };
+            // 清除可能存在的旧列配置干扰
+            // 不重置 shownColumns，因为后面会重新设置
+            // 注意：如果存在历史数据，加载新数据时会覆盖，但我们要确保旧数据不干扰
+            // 在设置 allColumns 前，先清空旧数据
+            DataStore.allData = [];
+            DataStore.filteredData = [];
+            
             if (!rows || rows.length < 2) {
                 alert('文件为空或格式不正确');
                 return;
@@ -53,11 +69,11 @@ const UIManager = {
             DataStore.allData = DataStore.preprocess(data);
             DataStore.loadPersisted();
             DataStore.applyFilters();
-            
+
             // 保存到历史记录
             const historyId = DataStore.saveHistory(fileName, data, validHeaders);
             DataStore.currentHistoryId = historyId;
-            
+
             Renderer.render();
             EventManager.rebindTableEvents();
             UIManager.renderSettingsPanel();
@@ -66,36 +82,43 @@ const UIManager = {
             const displayName = fileName || '数据';
             dataStatus.textContent = `✅ 共 ${data.length} 条数据 (${displayName})`;
             rowCount.textContent = `${data.length} 行`;
-            
+
             // 更新历史计数
             UIManager.updateHistoryBadge();
         };
 
         // ---- 解析 CSV（先用 TextDecoder 解码，再交给 XLSX） ----
         const parseCSVFromBuffer = (buffer, fileName, callback) => {
-            const encodings = ['gbk', 'gb2312', 'utf-8', 'big5', 'windows-1252'];
-            
+            const encodings = ['utf-8', 'gbk', 'gb2312', 'big5', 'windows-1252'];
+            // 优先尝试 utf-8，然后 gbk 等
+
             for (const encoding of encodings) {
                 try {
                     const decoder = new TextDecoder(encoding);
-                    const text = decoder.decode(buffer);
-                    
+                    let text = decoder.decode(buffer);
+                    // 移除 BOM
+                    text = stripBOM(text);
+
                     if (text.includes('�')) continue;
-                    
+
+                    // 处理换行符：统一为 \n
+                    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
                     const lines = text.split('\n').filter(line => line.trim() !== '');
                     if (lines.length < 2) continue;
-                    
+
                     const firstLine = lines[0];
                     const hasChinese = /[\u4e00-\u9fff]/.test(firstLine);
                     const hasGarbled = /�/.test(firstLine);
-                    
+
                     if (hasGarbled) continue;
-                    
-                    if (hasChinese || encoding === 'utf-8') {
+
+                    // 如果是 utf-8 或者有中文，尝试解析
+                    if (encoding === 'utf-8' || hasChinese) {
                         try {
                             const workbook = XLSX.read(text, {
                                 type: 'string',
-                                raw: true
+                                raw: true,
+                                codepage: encoding === 'utf-8' ? 65001 : (encoding === 'gbk' ? 936 : undefined)
                             });
                             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                             const rows = XLSX.utils.sheet_to_json(firstSheet, {
@@ -109,11 +132,14 @@ const UIManager = {
                                 callback(filteredRows, fileName);
                                 return;
                             }
-                        } catch (_) {}
+                        } catch (_) {
+                            // 解析失败，继续下一个编码
+                        }
                     }
-                } catch (_) {}
+                } catch (_) { }
             }
-            
+
+            // 最后尝试用 XLSX 自动检测
             try {
                 const workbook = XLSX.read(buffer, {
                     type: 'array',
@@ -132,7 +158,7 @@ const UIManager = {
                     callback(filteredRows, fileName);
                     return;
                 }
-            } catch (_) {}
+            } catch (_) { }
 
             alert('解析 CSV 失败: 无法识别文件编码，请确保文件为 UTF-8 或 GBK 编码');
         };
@@ -179,7 +205,7 @@ const UIManager = {
 
             if (ext === 'csv') {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     try {
                         const buffer = e.target.result;
                         parseCSVFromBuffer(buffer, file.name, onParseData);
@@ -193,7 +219,7 @@ const UIManager = {
 
             // Excel 文件
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array', raw: true });
@@ -208,7 +234,7 @@ const UIManager = {
         };
 
         // ---- 文件输入事件 ----
-        fileInput.addEventListener('change', function() {
+        fileInput.addEventListener('change', function () {
             if (this.files && this.files.length > 0) {
                 const file = this.files[0];
                 fileInfo.textContent = '📎 ' + file.name;
@@ -288,7 +314,7 @@ const UIManager = {
         historyBtn.addEventListener('click', openHistory);
         closeHistoryBtn.addEventListener('click', closeHistory);
         historyOverlay.addEventListener('click', closeHistory);
-        
+
         // 清空历史
         clearHistoryBtn.addEventListener('click', () => {
             if (confirm('确定要清空所有历史记录吗？此操作不可恢复！')) {
@@ -323,7 +349,7 @@ const UIManager = {
 
         // ---- 初始化历史面板 ----
         this.updateHistoryBadge();
-        
+
         // ---- 恢复上次激活的历史记录 ----
         this.restoreActiveHistory();
     },
@@ -345,7 +371,7 @@ const UIManager = {
                 return;
             }
         }
-        
+
         // 没有激活的历史，检查是否有历史记录可恢复
         const list = DataStore.getHistoryList();
         if (list.length > 0) {
@@ -364,7 +390,7 @@ const UIManager = {
                 return;
             }
         }
-        
+
         // 无数据，显示空状态
         this.showEmptyState();
     },
@@ -401,7 +427,7 @@ const UIManager = {
         const list = DataStore.getHistoryList();
         const container = document.getElementById('historyList');
         const activeId = DataStore.getActiveHistoryId();
-        
+
         if (list.length === 0) {
             container.innerHTML = `
                 <div class="history-empty">
@@ -423,7 +449,7 @@ const UIManager = {
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            
+
             html += `
                 <div class="history-item ${isActive ? 'active' : ''}" data-id="${item.id}">
                     <div class="history-item-info">
@@ -444,7 +470,7 @@ const UIManager = {
 
         // 绑定事件
         container.querySelectorAll('.history-btn-load').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const id = this.dataset.id;
                 UIManager.loadHistoryRecord(id);
@@ -452,7 +478,7 @@ const UIManager = {
         });
 
         container.querySelectorAll('.history-btn-delete').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const id = this.dataset.id;
                 if (confirm('确定要删除此历史记录吗？')) {
@@ -476,7 +502,7 @@ const UIManager = {
 
         // 点击整个条目也可以加载
         container.querySelectorAll('.history-item').forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 const id = this.dataset.id;
                 if (id && !this.classList.contains('active')) {
                     UIManager.loadHistoryRecord(id);
@@ -494,17 +520,17 @@ const UIManager = {
             alert('加载历史记录失败');
             return;
         }
-        
+
         console.log(`📂 切换到历史记录: ${record.name}`);
         Renderer.render();
         EventManager.rebindTableEvents();
         UIManager.renderSettingsPanel();
         UIManager.renderHistoryPanel();
-        
+
         document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
         document.getElementById('rowCount').textContent = `${record.data.length} 行`;
         document.getElementById('fileInfo').textContent = `📎 ${record.name}`;
-        
+
         // 关闭历史面板
         document.getElementById('historyPanel').classList.remove('open');
         document.getElementById('historyOverlay').classList.remove('open');
@@ -543,7 +569,7 @@ const UIManager = {
         });
 
         colList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            cb.addEventListener('change', function() {
+            cb.addEventListener('change', function () {
                 const col = this.value;
                 if (this.checked) {
                     if (!DataStore.shownColumns.includes(col)) {
@@ -643,7 +669,7 @@ const UIManager = {
 // ================================================================
 // 主入口
 // ================================================================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     Renderer.init({
         tableHead: document.getElementById('tableHead'),
         tableBody: document.getElementById('tableBody'),

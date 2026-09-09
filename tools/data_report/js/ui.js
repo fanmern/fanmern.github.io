@@ -12,7 +12,7 @@ const UIManager = {
         const rowCount = document.getElementById('rowCount');
 
         // ---- 通用解析回调 ----
-        const onParseData = (rows, fileName) => {
+        const onParseData = async (rows, fileName) => {
             // ===== 重要：完全重置 DataStore 状态，避免历史残留 =====
             DataStore.allData = [];
             DataStore.filteredData = [];
@@ -68,94 +68,80 @@ const UIManager = {
             DataStore.applyFilters();
             
             // 保存到历史记录
-            const historyId = DataStore.saveHistory(fileName, data, validHeaders);
+            const historyId = await DataStore.saveHistory(fileName, data, validHeaders);
             DataStore.currentHistoryId = historyId;
             
             Renderer.render();
             EventManager.rebindTableEvents();
             UIManager.renderSettingsPanel();
-            UIManager.renderHistoryPanel();
+            await UIManager.renderHistoryPanel();
 
             const displayName = fileName || '数据';
             dataStatus.textContent = `✅ 共 ${data.length} 条数据 (${displayName})`;
             rowCount.textContent = `${data.length} 行`;
             
             // 更新历史计数
-            UIManager.updateHistoryBadge();
+            await UIManager.updateHistoryBadge();
         };
 
         // ---- 增强版 CSV 解析（支持 BOM、UTF-8、GBK、GB2312） ----
-        const parseCSVFromBuffer = (buffer, fileName, callback) => {
-            // 1. 尝试 UTF-8（含 BOM）
-            let text = '';
+        // 尝试用指定编码解码并解析 CSV；成功返回行数组，失败返回 null。
+        // 只有"解码/解析"错误在这里吞掉（用于继续尝试下一种编码）；
+        // callback 一律在 try 之外调用——回调内部抛错不会被误判成"编码不对"，
+        // 也不会穿透到下一个编码分支，真实错误直接上抛、一眼可见。
+        const decodeAndParseRows = (buffer, encoding) => {
             try {
-                const uint8 = new Uint8Array(buffer);
-                // 检查 BOM
-                if (uint8.length >= 3 && uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF) {
-                    text = new TextDecoder('utf-8').decode(buffer.slice(3));
-                } else {
-                    text = new TextDecoder('utf-8').decode(buffer);
-                }
-                // 检查是否包含乱码字符
-                if (!text.includes('�')) {
-                    const workbook = XLSX.read(text, { type: 'string', raw: true });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
-                    const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
-                    if (filteredRows.length > 0) {
-                        console.log('✅ 使用编码: UTF-8');
-                        callback(filteredRows, fileName);
-                        return;
-                    }
-                }
-            } catch (_) {}
+                const decoder = new TextDecoder(encoding);
+                const text = decoder.decode(buffer);
+                if (text.includes('\ufffd')) return null;
+                const workbook = XLSX.read(text, { type: 'string', raw: true });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
+                const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
+                return filteredRows.length > 0 ? filteredRows : null;
+            } catch (_) {
+                return null;
+            }
+        };
 
-            // 2. 尝试 GBK
-            try {
-                const decoder = new TextDecoder('gbk');
-                const textGBK = decoder.decode(buffer);
-                if (!textGBK.includes('�')) {
-                    const workbook = XLSX.read(textGBK, { type: 'string', raw: true });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
-                    const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
-                    if (filteredRows.length > 0) {
-                        console.log('✅ 使用编码: GBK');
-                        callback(filteredRows, fileName);
-                        return;
-                    }
-                }
-            } catch (_) {}
+        const parseCSVFromBuffer = async (buffer, fileName, callback) => {
+            // 统一去掉 UTF-8 BOM（避免 BOM 干扰后续 GBK 解码判断）
+            const uint8 = new Uint8Array(buffer);
+            let payload = buffer;
+            if (uint8.length >= 3 && uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF) {
+                payload = buffer.slice(3);
+            }
 
-            // 3. 尝试 GB2312
-            try {
-                const decoder = new TextDecoder('gb2312');
-                const textGB2312 = decoder.decode(buffer);
-                if (!textGB2312.includes('�')) {
-                    const workbook = XLSX.read(textGB2312, { type: 'string', raw: true });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
-                    const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
-                    if (filteredRows.length > 0) {
-                        console.log('✅ 使用编码: GB2312');
-                        callback(filteredRows, fileName);
-                        return;
-                    }
+            // 1-3. 依次尝试 UTF-8 / GBK / GB2312
+            // 注：TextDecoder 中 gb2312 与 gbk 是同一套解码器，GBK 分支失败时 GB2312 基本也不会成功
+            const encodings = [
+                { encoding: 'utf-8',  label: 'UTF-8' },
+                { encoding: 'gbk',    label: 'GBK' },
+                { encoding: 'gb2312', label: 'GB2312' }
+            ];
+            for (const { encoding, label } of encodings) {
+                const rows = decodeAndParseRows(payload, encoding);
+                if (rows) {
+                    console.log(`\u2705 使用编码: ${label}`);
+                    await callback(rows, fileName); // 在 try 之外：回调抛错直接上抛给调用方，不再被吞、不再继续尝试下一种编码
+                    return;
                 }
-            } catch (_) {}
+            }
 
             // 4. 最后尝试 XLSX 直接解析（可能自动检测）
+            let xlsxRows = null;
             try {
                 const workbook = XLSX.read(buffer, { type: 'array', raw: true, cellDates: false });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
                 const filteredRows = rows.filter(row => row.some(cell => cell !== '' && cell !== undefined && cell !== null));
-                if (filteredRows.length > 0) {
-                    console.log('✅ 使用 XLSX 自动检测');
-                    callback(filteredRows, fileName);
-                    return;
-                }
+                if (filteredRows.length > 0) xlsxRows = filteredRows;
             } catch (_) {}
+            if (xlsxRows) {
+                console.log('\u2705 使用 XLSX 自动检测');
+                await callback(xlsxRows, fileName); // 同样在 try 之外
+                return;
+            }
 
             alert('解析 CSV 失败: 无法识别文件编码，请确保文件为 UTF-8 或 GBK 编码');
         };
@@ -182,7 +168,7 @@ const UIManager = {
                 }
 
                 const buffer = await csvFile.async('arraybuffer');
-                parseCSVFromBuffer(buffer, csvFileName, onParseData);
+                await parseCSVFromBuffer(buffer, csvFileName, onParseData);
                 fileInfo.textContent = `📦 ${file.name} → 📎 ${csvFileName}`;
 
             } catch (err) {
@@ -202,10 +188,10 @@ const UIManager = {
 
             if (ext === 'csv') {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
                     try {
                         const buffer = e.target.result;
-                        parseCSVFromBuffer(buffer, file.name, onParseData);
+                        await parseCSVFromBuffer(buffer, file.name, onParseData);
                     } catch (err) {
                         alert('解析 CSV 失败: ' + err.message);
                     }
@@ -216,13 +202,13 @@ const UIManager = {
 
             // Excel 文件
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array', raw: true });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-                    onParseData(rows, file.name);
+                    await onParseData(rows, file.name);
                 } catch (err) {
                     alert('解析 Excel 失败: ' + err.message);
                 }
@@ -313,11 +299,11 @@ const UIManager = {
         historyOverlay.addEventListener('click', closeHistory);
         
         // 清空历史
-        clearHistoryBtn.addEventListener('click', () => {
+        clearHistoryBtn.addEventListener('click', async () => {
             if (confirm('确定要清空所有历史记录吗？此操作不可恢复！')) {
-                DataStore.clearHistory();
-                UIManager.renderHistoryPanel();
-                UIManager.updateHistoryBadge();
+                await DataStore.clearHistory();
+                await UIManager.renderHistoryPanel();
+                await UIManager.updateHistoryBadge();
                 // 清空表格
                 DataStore.allData = [];
                 DataStore.filteredData = [];
@@ -345,23 +331,25 @@ const UIManager = {
         });
 
         // ---- 初始化历史面板 ----
-        this.updateHistoryBadge();
+        this.updateHistoryBadge().catch(e => console.error(e));
         
         // ---- 恢复上次激活的历史记录 ----
-        this.restoreActiveHistory();
+        this.restoreActiveHistory().catch(e => console.error(e));
     },
 
     // ---- 恢复上次激活的历史记录 ----
-    restoreActiveHistory() {
+    async restoreActiveHistory() {
+        // 首次运行：把旧版 localStorage 中的历史迁移到 IndexedDB
+        await DataStore.migrateLegacyHistory();
         const activeId = DataStore.getActiveHistoryId();
         if (activeId) {
-            const record = DataStore.loadHistory(activeId);
+            const record = await DataStore.loadHistory(activeId);
             if (record) {
                 console.log(`📂 恢复历史记录: ${record.name}`);
                 Renderer.render();
                 EventManager.rebindTableEvents();
                 UIManager.renderSettingsPanel();
-                UIManager.renderHistoryPanel();
+                await UIManager.renderHistoryPanel();
                 document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
                 document.getElementById('rowCount').textContent = `${record.data.length} 行`;
                 document.getElementById('fileInfo').textContent = `📎 ${record.name}`;
@@ -370,17 +358,17 @@ const UIManager = {
         }
         
         // 没有激活的历史，检查是否有历史记录可恢复
-        const list = DataStore.getHistoryList();
+        const list = await DataStore.getHistoryList();
         if (list.length > 0) {
             // 自动加载最新的历史
             const latest = list[0];
-            const record = DataStore.loadHistory(latest.id);
+            const record = await DataStore.loadHistory(latest.id);
             if (record) {
                 console.log(`📂 自动加载最新历史: ${record.name}`);
                 Renderer.render();
                 EventManager.rebindTableEvents();
                 UIManager.renderSettingsPanel();
-                UIManager.renderHistoryPanel();
+                await UIManager.renderHistoryPanel();
                 document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
                 document.getElementById('rowCount').textContent = `${record.data.length} 行`;
                 document.getElementById('fileInfo').textContent = `📎 ${record.name}`;
@@ -410,8 +398,8 @@ const UIManager = {
     },
 
     // ---- 更新历史徽章 ----
-    updateHistoryBadge() {
-        const list = DataStore.getHistoryList();
+    async updateHistoryBadge() {
+        const list = await DataStore.getHistoryList();
         const badge = document.getElementById('historyBadge');
         if (badge) {
             badge.textContent = list.length;
@@ -420,8 +408,8 @@ const UIManager = {
     },
 
     // ---- 渲染历史面板 ----
-    renderHistoryPanel() {
-        const list = DataStore.getHistoryList();
+    async renderHistoryPanel() {
+        const list = await DataStore.getHistoryList();
         const container = document.getElementById('historyList');
         const activeId = DataStore.getActiveHistoryId();
         
@@ -467,27 +455,27 @@ const UIManager = {
 
         // 绑定事件
         container.querySelectorAll('.history-btn-load').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', async function(e) {
                 e.stopPropagation();
                 const id = this.dataset.id;
-                UIManager.loadHistoryRecord(id);
+                await UIManager.loadHistoryRecord(id);
             });
         });
 
         container.querySelectorAll('.history-btn-delete').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', async function(e) {
                 e.stopPropagation();
                 const id = this.dataset.id;
                 if (confirm('确定要删除此历史记录吗？')) {
                     const isActive = id === DataStore.getActiveHistoryId();
-                    DataStore.deleteHistory(id);
-                    UIManager.renderHistoryPanel();
-                    UIManager.updateHistoryBadge();
+                    await DataStore.deleteHistory(id);
+                    await UIManager.renderHistoryPanel();
+                    await UIManager.updateHistoryBadge();
                     if (isActive) {
                         // 如果删除的是当前激活的，尝试加载其他历史或显示空状态
-                        const list2 = DataStore.getHistoryList();
+                        const list2 = await DataStore.getHistoryList();
                         if (list2.length > 0) {
-                            UIManager.loadHistoryRecord(list2[0].id);
+                            await UIManager.loadHistoryRecord(list2[0].id);
                         } else {
                             UIManager.showEmptyState();
                             document.getElementById('fileInfo').textContent = '未选择文件';
@@ -499,20 +487,20 @@ const UIManager = {
 
         // 点击整个条目也可以加载
         container.querySelectorAll('.history-item').forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', async function() {
                 const id = this.dataset.id;
                 if (id && !this.classList.contains('active')) {
-                    UIManager.loadHistoryRecord(id);
+                    await UIManager.loadHistoryRecord(id);
                 }
             });
         });
 
-        this.updateHistoryBadge();
+        await this.updateHistoryBadge();
     },
 
     // ---- 加载历史记录 ----
-    loadHistoryRecord(id) {
-        const record = DataStore.loadHistory(id);
+    async loadHistoryRecord(id) {
+        const record = await DataStore.loadHistory(id);
         if (!record) {
             alert('加载历史记录失败');
             return;
@@ -522,7 +510,7 @@ const UIManager = {
         Renderer.render();
         EventManager.rebindTableEvents();
         UIManager.renderSettingsPanel();
-        UIManager.renderHistoryPanel();
+        await UIManager.renderHistoryPanel();
         
         document.getElementById('dataStatus').textContent = `✅ 共 ${record.data.length} 条数据 (${record.name})`;
         document.getElementById('rowCount').textContent = `${record.data.length} 行`;

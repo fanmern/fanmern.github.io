@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>搜索词类型合并处理工具</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#ffffff; --line:#e6eaf2; --text:#1f2937; --muted:#6b7280;
+    --tb:#2563eb; --kw:#ea580c; --both:#7c3aed;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:14px; line-height:1.5;
+  }
+  .wrap{max-width:1500px; margin:0 auto; padding:24px 20px 60px;}
+  h1{font-size:20px; margin:0 0 6px;}
+  .sub{color:var(--muted); font-size:13px; margin-bottom:18px;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 1px 3px rgba(16,24,40,.04); padding:18px;}
+  .card + .card{margin-top:18px;}
+
+  /* 上传区 */
+  .drop{
+    border:2px dashed #c8d2e4; border-radius:12px; padding:30px 20px; text-align:center;
+    cursor:pointer; transition:.15s; background:#fbfcff;
+  }
+  .drop:hover,.drop.dragover{border-color:var(--tb); background:#eff5ff;}
+  .drop .big{font-size:15px; font-weight:600; margin-bottom:6px;}
+  .drop .small{color:var(--muted); font-size:12.5px;}
+  .fileName{margin-top:12px; color:var(--tb); font-size:13px; word-break:break-all;}
+
+  /* 统计条 */
+  .stats{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+  .stat{background:#f4f7fd; border:1px solid var(--line); border-radius:8px; padding:8px 14px; font-size:13px;}
+  .stat b{color:var(--tb); font-size:15px; margin-left:4px;}
+
+  /* 工具条 */
+  .toolbar{display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:14px;}
+  .toolbar input[type=search]{
+    flex:1; min-width:200px; padding:9px 12px; border:1px solid var(--line); border-radius:8px;
+    font-size:13px; outline:none; background:#fff;
+  }
+  .toolbar input[type=search]:focus{border-color:var(--tb); box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+  button{
+    border:0; border-radius:8px; padding:9px 18px; font-size:13px; cursor:pointer;
+    background:var(--tb); color:#fff; font-weight:600; transition:.15s;
+  }
+  button:hover{filter:brightness(1.08);}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  button.ghost{background:#fff; color:var(--text); border:1px solid var(--line);}
+
+  /* 表格 */
+  .tableBox{overflow:auto; max-height:70vh; border:1px solid var(--line); border-radius:10px;}
+  table{border-collapse:separate; border-spacing:0; width:100%; font-size:13px; min-width:1150px;}
+  thead th{
+    position:sticky; background:#f7f9fd; z-index:3; font-weight:600; color:#374151;
+    border-bottom:1px solid var(--line); padding:9px 12px; text-align:left; white-space:nowrap;
+  }
+  thead tr.grp th{top:0; height:38px; text-align:center; font-size:12.5px; letter-spacing:.5px;}
+  thead tr.head th{top:38px;}
+  .grpBase{color:#374151;}
+  .grpTb{color:var(--tb); background:#eef4ff;}
+  .grpKw{color:var(--kw); background:#fff5ec;}
+  .headTb{background:#eef4ff !important;}
+  .headKw{background:#fff5ec !important;}
+
+  tbody td{padding:8px 12px; border-bottom:1px solid #f1f4f9; vertical-align:middle;}
+  tbody tr:hover td{background:#fafcff;}
+  tbody tr:last-child td{border-bottom:0;}
+  td.num{text-align:right; font-variant-numeric:tabular-nums;}
+  td.mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;}
+  td.empty{color:#c3c9d4;}
+  .tbCol{background:#fbfdff;}
+  .kwCol{background:#fffcf8;}
+
+  .tag{display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; white-space:nowrap;}
+  .tag.tb{background:#e8f0fe; color:var(--tb);}
+  .tag.kw{background:#ffeee0; color:var(--kw);}
+  .tag.both{background:#f1e9ff; color:var(--both); font-weight:600;}
+
+  .hint{font-size:12.5px; color:var(--muted); margin-top:10px; line-height:1.7;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>搜索词类型合并处理工具</h1>
+  <div class="sub">
+    按「商品ID + 搜索词」合并：原三列填「手淘搜索」数据，新增三列填「关键词推广」数据；
+    两种类型都存在时，搜索词类型显示为「手淘搜索、关键词推广」。
+  </div>
+
+  <div class="card">
+    <div class="drop" id="dropZone">
+      <div class="big">点击选择 Excel 文件，或把文件拖到这里</div>
+      <div class="small">支持 .xlsx / .xls / .csv</div>
+      <div class="fileName" id="fileName"></div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" class="hidden" />
+
+    <div class="stats hidden" id="stats">
+      <div class="stat">原始数据行<b id="statRaw">0</b></div>
+      <div class="stat">输出行数<b id="statOut">0</b></div>
+      <div class="stat">两种类型合并<b id="statMerged">0</b></div>
+      <div class="stat">忽略未知类型<b id="statSkip">0</b></div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <div class="toolbar">
+      <input type="search" id="filterInput" placeholder="输入关键词筛选（商品ID / 搜索词 / 类型）…" />
+      <button id="btnExport">导出 Excel</button>
+      <button class="ghost" id="btnReset">重新上传</button>
+    </div>
+
+    <div class="tableBox">
+      <table>
+        <thead>
+          <tr class="grp">
+            <th colspan="4" class="grpBase">基础信息</th>
+            <th colspan="3" class="grpTb">手淘搜索数据</th>
+            <th colspan="3" class="grpKw">关键词推广数据</th>
+          </tr>
+          <tr class="head">
+            <th>统计日期</th>
+            <th>商品ID</th>
+            <th>搜索词类型</th>
+            <th>搜索词</th>
+            <th class="headTb">访客数</th>
+            <th class="headTb">支付买家数</th>
+            <th class="headTb">支付转化率</th>
+            <th class="headKw">访客数</th>
+            <th class="headKw">支付买家数</th>
+            <th class="headKw">支付转化率</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="hint">
+      说明：<br />
+      1. 同一「商品ID + 搜索词」只输出一行；<br />
+      2. 左侧三列（手淘搜索数据）为空，表示该搜索词在源表中没有「手淘搜索」类型的数据；右侧三列同理；<br />
+      3. 支付转化率 = 支付买家数 ÷ 访客数，保留两位小数；若同类型存在重复行，访客数与支付买家数按行累加后重新计算转化率。
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const TYPE_KW = '关键词推广';
+  const TYPE_TB = '手淘搜索';
+  const TYPE_BOTH = '手淘搜索、关键词推广';
+
+  let resultRows = [];
+  let rawRowCount = 0;
+  let skippedCount = 0;
+  let mergedCount = 0;
+
+  const $ = (id) => document.getElementById(id);
+  const dropZone = $('dropZone');
+  const fileInput = $('fileInput');
+
+  /* ---------------- 文件读取 ---------------- */
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
+    fileInput.value = '';
+  });
+
+  ['dragenter', 'dragover'].forEach((ev) => {
+    dropZone.addEventListener(ev, (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach((ev) => {
+    dropZone.addEventListener(ev, (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', (e) => {
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) readFile(f);
+  });
+
+  function readFile(file) {
+    if (!/\.(xlsx|xls|csv)$/i.test(file.name)) {
+      alert('请上传 .xlsx / .xls / .csv 格式的文件');
+      return;
+    }
+    $('fileName').textContent = '已选择：' + file.name;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+        process(aoa);
+      } catch (err) {
+        console.error(err);
+        alert('文件解析失败：' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /* ---------------- 核心处理 ---------------- */
+
+  function process(aoa) {
+    if (!aoa || !aoa.length) { alert('文件内容为空'); return; }
+
+    // 1. 定位表头行
+    let headerIdx = 0;
+    for (let i = 0; i < Math.min(aoa.length, 15); i++) {
+      const line = (aoa[i] || []).map((c) => String(c == null ? '' : c).replace(/\s/g, ''));
+      if (line.indexOf('搜索词') >= 0 && line.indexOf('商品ID') >= 0) { headerIdx = i; break; }
+    }
+
+    const headers = (aoa[headerIdx] || []).map((h) => String(h == null ? '' : h).replace(/\s/g, ''));
+    const need = ['统计日期', '商品ID', '搜索词类型', '搜索词', '访客数', '支付买家数', '支付转化率'];
+
+    const colIdx = {};
+    need.forEach((n) => {
+      let i = headers.indexOf(n);
+      if (i < 0) i = headers.findIndex((h) => h.indexOf(n) >= 0);
+      colIdx[n] = i;
+    });
+
+    const missing = need.filter((n) => colIdx[n] < 0);
+    if (missing.length) {
+      alert('表头缺少以下列，无法处理：\n' + missing.join('、'));
+      return;
+    }
+
+    // 2. 分组聚合
+    const groups = new Map();
+    rawRowCount = 0;
+    skippedCount = 0;
+
+    for (let i = headerIdx + 1; i < aoa.length; i++) {
+      const r = aoa[i] || [];
+      const get = (n) => {
+        const k = colIdx[n];
+        return k >= 0 && r[k] != null ? String(r[k]).trim() : '';
+      };
+
+      const pid = get('商品ID');
+      const word = get('搜索词');
+      if (!pid && !word) continue;
+      rawRowCount++;
+
+      const type = get('搜索词类型');
+      const bucket = type.indexOf('关键词') >= 0 ? 'kw'
+                   : type.indexOf('手淘') >= 0 ? 'tb'
+                   : null;
+      if (!bucket) { skippedCount++; continue; }
+
+      const key = pid + '\u0001' + word;
+      let g = groups.get(key);
+      if (!g) {
+        g = { date: get('统计日期'), pid: pid, word: word, tb: null, kw: null };
+        groups.set(key, g);
+      }
+
+      const v = toNum(get('访客数'));
+      const b = toNum(get('支付买家数'));
+
+      if (!g[bucket]) g[bucket] = { v: 0, b: 0 };
+      g[bucket].v += v;
+      g[bucket].b += b;
+    }
+
+    // 3. 输出行
+    resultRows = [];
+    mergedCount = 0;
+
+    groups.forEach((g) => {
+      const hasTb = !!g.tb;
+      const hasKw = !!g.kw;
+      if (hasTb && hasKw) mergedCount++;
+
+      const label = hasTb && hasKw ? TYPE_BOTH : (hasTb ? TYPE_TB : TYPE_KW);
+
+      resultRows.push([
+        g.date,
+        g.pid,
+        label,
+        g.word,
+        hasTb ? g.tb.v : '',
+        hasTb ? g.tb.b : '',
+        hasTb ? fmtPct(g.tb.v, g.tb.b) : '',
+        hasKw ? g.kw.v : '',
+        hasKw ? g.kw.b : '',
+        hasKw ? fmtPct(g.kw.v, g.kw.b) : ''
+      ]);
+    });
+
+    // 4. 更新界面
+    $('statRaw').textContent = rawRowCount;
+    $('statOut').textContent = resultRows.length;
+    $('statMerged').textContent = mergedCount;
+    $('statSkip').textContent = skippedCount;
+    $('stats').classList.remove('hidden');
+    $('resultCard').classList.remove('hidden');
+    $('filterInput').value = '';
+
+    render();
+  }
+
+  /* ---------------- 渲染 ---------------- */
+
+  function render() {
+    const q = $('filterInput').value.trim().toLowerCase();
+    const list = q
+      ? resultRows.filter((r) => r.join(' ').toLowerCase().indexOf(q) >= 0)
+      : resultRows;
+
+    const html = list.map((r) => {
+      const cls = r[2] === TYPE_BOTH ? 'both' : (r[2] === TYPE_TB ? 'tb' : 'kw');
+      return '<tr>' +
+        '<td>' + esc(r[0]) + '</td>' +
+        '<td class="mono">' + esc(r[1]) + '</td>' +
+        '<td><span class="tag ' + cls + '">' + esc(r[2]) + '</span></td>' +
+        '<td>' + esc(r[3]) + '</td>' +
+        cell(r[4], 'tbCol') +
+        cell(r[5], 'tbCol') +
+        cell(r[6], 'tbCol') +
+        cell(r[7], 'kwCol') +
+        cell(r[8], 'kwCol') +
+        cell(r[9], 'kwCol') +
+      '</tr>';
+    }).join('');
+
+    $('tbody').innerHTML = html ||
+      '<tr><td colspan="10" style="text-align:center;color:#9aa3b2;padding:30px;">没有匹配的数据</td></tr>';
+  }
+
+  function cell(v, cls) {
+    if (v === '' || v === null || v === undefined) {
+      return '<td class="num empty ' + cls + '">—</td>';
+    }
+    return '<td class="num ' + cls + '">' + esc(v) + '</td>';
+  }
+
+  /* ---------------- 导出 ---------------- */
+
+  $('btnExport').addEventListener('click', function () {
+    if (!resultRows.length) return;
+
+    const header = [
+      '统计日期', '商品ID', '搜索词类型', '搜索词',
+      '访客数', '支付买家数', '支付转化率',
+      '访客数', '支付买家数', '支付转化率'
+    ];
+
+    const aoa = [header].concat(resultRows);
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [
+      { wch: 20 }, { wch: 16 }, { wch: 22 }, { wch: 32 },
+      { wch: 10 }, { wch: 12 }, { wch: 12 },
+      { wch: 10 }, { wch: 12 }, { wch: 12 }
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '处理结果');
+
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const stamp = '' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) +
+                  '_' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+
+    XLSX.writeFile(wb, '处理结果_' + stamp + '.xlsx');
+  });
+
+  $('btnReset').addEventListener('click', function () {
+    resultRows = [];
+    $('resultCard').classList.add('hidden');
+    $('stats').classList.add('hidden');
+    $('fileName').textContent = '';
+    fileInput.click();
+  });
+
+  $('filterInput').addEventListener('input', render);
+
+  /* ---------------- 工具函数 ---------------- */
+
+  function toNum(x) {
+    if (x === null || x === undefined) return 0;
+    const s = String(x).replace(/[,，\s%]/g, '');
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function fmtPct(visitors, buyers) {
+    if (!visitors || visitors <= 0) return '0.00%';
+    return ((buyers / visitors) * 100).toFixed(2) + '%';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+})();
+</script>
+</body>
+</html>

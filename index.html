@@ -328,17 +328,18 @@
         //长按并松开只触发一次(点击Home到店铺主页)
         document.onkeyup = keyboard;
         function keyboard(eve) {
-                if (eve.key == "Home") {
+                if (eve.key === 'Home') {
                         window.open("https://fanmeiren.tmall.com/search.htm?scene=taobao_shop&search=y&orderType=newOn_desc&tsearch=y");
+                } else if (eve.altKey && eve.key.toLowerCase() === 't') {
+                        window.open('https://fanmern.com/tools');
                 }
         }
-        document.onkeyup = keyboard;
 
 
 </script>
 <style>
         * {
-                padding: 0;
+                · padding: 0;
                 margin: 0;
         }
 

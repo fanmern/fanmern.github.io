@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Excel 数据合并工具</title>
+    <title>Excel 数据合并工具 · 可指定表头行</title>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
@@ -280,8 +280,9 @@
             border-radius: 12px;
         }
 
-        .file-config-item select {
-            width: 100%;
+        .file-config-item select,
+        .file-config-item input[type="number"] {
+            width: 30%;
             padding: 5px 8px;
             border-radius: 8px;
             border: 1px solid #dce2ec;
@@ -291,7 +292,8 @@
             transition: border 0.2s;
         }
 
-        .file-config-item select:focus {
+        .file-config-item select:focus,
+        .file-config-item input[type="number"]:focus {
             border-color: #2a5f8a;
             box-shadow: 0 0 0 3px rgba(42, 95, 138, 0.12);
         }
@@ -316,6 +318,36 @@
         .file-config-item .move-buttons button {
             min-width: 50px;
             font-size: 12px;
+        }
+
+        .header-row-config {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+
+        .header-row-config label {
+            font-size: 12px;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .header-row-config input {
+            width: 70px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1px solid #dce2ec;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .header-row-config .hint {
+            font-size: 11px;
+            color: #94a3b8;
         }
 
         .merge-key-group {
@@ -605,7 +637,7 @@
         <header class="header">
             <h1>
                 📊 Excel 数据合并工具
-                <small>多表横向合并</small>
+                <small>多表横向合并 · 支持自定义表头行</small>
             </h1>
             <span class="badge">⚡ 纯前端 · 数据不上传服务器</span>
         </header>
@@ -636,12 +668,12 @@
             <div class="card-title">
                 <span class="step">2</span>
                 配置合并规则
-                <span class="sort-hint">💡 拖拽卡片可调整顺序，或使用按钮</span>
+                <span class="sort-hint">💡 拖拽卡片可调整顺序，可指定表头行数</span>
             </div>
 
             <div style="margin-bottom:16px;">
                 <div style="font-weight:500;font-size:14px;color:#1e3a5f;margin-bottom:8px;">
-                    📄 各文件 Sheet 选择 & 顺序调整
+                    📄 各文件 Sheet 选择 & 表头行设置 & 顺序调整
                 </div>
                 <div class="file-config-grid" id="fileConfigGrid"></div>
             </div>
@@ -709,7 +741,7 @@
         //  全局状态
         // ============================================================
         const state = {
-            files: [], // { id, name, size, data, headers, sheets, selectedSheet, rawWorkbook }
+            files: [], // { id, name, size, data, headers, sheets, selectedSheet, rawWorkbook, headerRowIndex }
             nextId: 1,
             mergedData: null,
         };
@@ -757,46 +789,43 @@
 
         function getCellValue(cell) {
             if (cell === null || cell === undefined) return '';
-            if (cell.t === 'd') {
-                try { return XLSX.utils.sheet_to_json({ '!ref': 'A1' }, { dateNF: 'yyyy-mm-dd' }); } catch (_) {
-                    return String(
-                        cell.v);
-                }
-            }
             return cell.v !== undefined && cell.v !== null ? String(cell.v) : '';
         }
 
+        // 从 worksheet 提取二维数组（原始行）
         function sheetToArray(worksheet) {
             const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
             const rows = [];
-            const headerRow = [];
-            for (let C = range.s.c; C <= range.e.c; C++) {
-                const addr = XLSX.utils.encode_cell({ r: range.s.r, c: C });
-                const cell = worksheet[addr];
-                const val = cell ? getCellValue(cell) : '';
-                headerRow.push(val || `列${C + 1}`);
-            }
-            rows.push(headerRow);
-            for (let R = range.s.r + 1; R <= range.e.r; R++) {
+            for (let R = range.s.r; R <= range.e.r; R++) {
                 const row = [];
                 for (let C = range.s.c; C <= range.e.c; C++) {
                     const addr = XLSX.utils.encode_cell({ r: R, c: C });
                     const cell = worksheet[addr];
                     row.push(cell ? getCellValue(cell) : '');
                 }
-                if (row.some(v => v !== '')) rows.push(row);
+                // 保留空行? 暂时保留以维持行号对应，但后面提取数据时会跳过全空行
+                rows.push(row);
             }
             return rows;
         }
 
-        function extractHeadersAndData(rows) {
+        // 根据表头行索引，从 rows 中提取 headers 和 data（对象数组）
+        function extractHeadersAndData(rows, headerRowIndex) {
             if (!rows || rows.length === 0) return { headers: [], data: [] };
-            const headers = rows[0].map(h => String(h).trim() || '');
-            const data = rows.slice(1).map(row => {
+            const idx = Math.max(0, Math.min(headerRowIndex, rows.length - 1));
+            const headerRow = rows[idx].map(h => String(h).trim() || '');
+            // 如果表头行全为空，用“列1”“列2”…
+            const headers = headerRow.map((h, i) => h || `列${i + 1}`);
+
+            const data = [];
+            for (let i = idx + 1; i < rows.length; i++) {
+                const row = rows[i];
+                // 跳过全空行
+                if (row.every(v => v === '' || v === null || v === undefined)) continue;
                 const obj = {};
-                headers.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ''; });
-                return obj;
-            });
+                headers.forEach((h, j) => { obj[h] = row[j] !== undefined ? row[j] : ''; });
+                data.push(obj);
+            }
             return { headers, data };
         }
 
@@ -815,7 +844,9 @@
                         const sheetNames = workbook.SheetNames;
                         const firstSheet = workbook.Sheets[sheetNames[0]];
                         const rows = sheetToArray(firstSheet);
-                        const { headers, data: rowsData } = extractHeadersAndData(rows);
+                        // 默认表头行索引 0
+                        const headerRowIndex = 0;
+                        const { headers, data: rowsData } = extractHeadersAndData(rows, headerRowIndex);
 
                         const fileEntry = {
                             id: state.nextId++,
@@ -824,6 +855,7 @@
                             rawWorkbook: workbook,
                             sheets: sheetNames,
                             selectedSheet: 0,
+                            headerRowIndex: headerRowIndex,
                             headers: headers,
                             data: rowsData,
                             rows: rows,
@@ -850,15 +882,29 @@
             const sheetName = entry.sheets[sheetIndex];
             const worksheet = entry.rawWorkbook.Sheets[sheetName];
             const rows = sheetToArray(worksheet);
-            const { headers, data } = extractHeadersAndData(rows);
+            // 保留原有的表头行索引（但若超出范围则修正）
+            const headerIdx = Math.min(entry.headerRowIndex, Math.max(0, rows.length - 1));
+            const { headers, data } = extractHeadersAndData(rows, headerIdx);
             entry.headers = headers;
             entry.data = data;
             entry.rows = rows;
+            entry.headerRowIndex = headerIdx;
+            renderAll();
+        }
+
+        function setHeaderRow(fileId, headerRowIndex) {
+            const entry = state.files.find(f => f.id === fileId);
+            if (!entry) return;
+            const idx = Math.max(0, Math.min(headerRowIndex, entry.rows.length - 1));
+            entry.headerRowIndex = idx;
+            const { headers, data } = extractHeadersAndData(entry.rows, idx);
+            entry.headers = headers;
+            entry.data = data;
             renderAll();
         }
 
         // ============================================================
-        //  文件顺序调整（拖拽 + 按钮）
+        //  文件顺序调整
         // ============================================================
         function moveFile(id, direction) {
             const idx = state.files.findIndex(f => f.id === id);
@@ -880,7 +926,7 @@
             checkCanMerge();
         }
 
-        // 拖拽排序（事件委托）
+        // 拖拽排序
         let dragSrcId = null;
 
         function handleDragStart(e) {
@@ -918,10 +964,8 @@
             const srcIdx = state.files.findIndex(f => f.id === dragSrcId);
             const tgtIdx = state.files.findIndex(f => f.id === targetId);
             if (srcIdx === -1 || tgtIdx === -1) return;
-            // 交换
             [state.files[srcIdx], state.files[tgtIdx]] = [state.files[tgtIdx], state.files[srcIdx]];
             item.classList.remove('drag-over');
-            // 清除所有dragging
             document.querySelectorAll('.file-config-item.dragging').forEach(el => el.classList.remove('dragging'));
             renderAll();
         }
@@ -931,7 +975,6 @@
             document.querySelectorAll('.file-config-item.drag-over').forEach(el => el.classList.remove('drag-over'));
         }
 
-        // 绑定拖拽事件到网格容器
         fileConfigGrid.addEventListener('dragstart', handleDragStart);
         fileConfigGrid.addEventListener('dragover', handleDragOver);
         fileConfigGrid.addEventListener('dragleave', handleDragLeave);
@@ -973,7 +1016,9 @@
                 fileConfigGrid.innerHTML = '<div class="text-muted" style="padding:8px 0;">暂无文件</div>';
                 return;
             }
-            fileConfigGrid.innerHTML = state.files.map((f, idx) => `
+            fileConfigGrid.innerHTML = state.files.map((f, idx) => {
+                const maxHeaderRow = f.rows.length > 0 ? f.rows.length - 1 : 0;
+                return `
                     <div class="file-config-item" draggable="true" data-id="${f.id}">
                         <div class="fname">
                             <span class="drag-handle">⠿</span>
@@ -987,9 +1032,14 @@
                         </div>
                         <div style="margin-top:4px;">
                             <label style="font-size:12px;color:#475569;display:block;margin-bottom:2px;">选择 Sheet：</label>
-                            <select data-id="${f.id}">
+                            <select data-id="${f.id}" class="sheet-select">
                                 ${f.sheets.map((s, i) => `<option value="${i}" ${i === f.selectedSheet ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
                             </select>
+                        </div>
+                        <div class="header-row-config">
+                            <label>📌 表头行：</label>
+                            <input type="number" min="0" max="${maxHeaderRow}" value="${f.headerRowIndex}" data-id="${f.id}" class="header-row-input" />
+                            <span class="hint">（0=第一行）</span>
                         </div>
                         <button class="preview-btn" data-id="${f.id}">👁 预览前 10 行</button>
                         <div class="move-buttons">
@@ -997,12 +1047,35 @@
                             <button class="btn btn-sm btn-outline move-down" data-id="${f.id}" ${idx === state.files.length - 1 ? 'disabled' : ''}>↓ 下移</button>
                         </div>
                     </div>
-                `).join('');
+                `;
+            }).join('');
 
             // Sheet 切换
-            fileConfigGrid.querySelectorAll('select').forEach(sel => {
+            fileConfigGrid.querySelectorAll('.sheet-select').forEach(sel => {
                 sel.addEventListener('change', function () {
                     switchFileSheet(parseInt(this.dataset.id), parseInt(this.value));
+                });
+            });
+
+            // 表头行输入
+            fileConfigGrid.querySelectorAll('.header-row-input').forEach(inp => {
+                inp.addEventListener('change', function () {
+                    const val = parseInt(this.value);
+                    if (!isNaN(val) && val >= 0) {
+                        setHeaderRow(parseInt(this.dataset.id), val);
+                    } else {
+                        this.value = 0;
+                        setHeaderRow(parseInt(this.dataset.id), 0);
+                    }
+                });
+                // 限制输入范围
+                inp.addEventListener('blur', function () {
+                    const max = parseInt(this.max);
+                    let val = parseInt(this.value);
+                    if (isNaN(val) || val < 0) val = 0;
+                    if (val > max) val = max;
+                    this.value = val;
+                    setHeaderRow(parseInt(this.dataset.id), val);
                 });
             });
 
@@ -1028,7 +1101,6 @@
 
         // 合并键：默认勾选所有文件共有的字段
         function renderMergeKeyOptions() {
-            // 去重表头（按文件顺序）
             const seen = new Set();
             const orderedHeaders = [];
             state.files.forEach(f => {
@@ -1040,7 +1112,6 @@
                 });
             });
 
-            // 计算所有文件表头的交集
             let commonSet = null;
             state.files.forEach(f => {
                 const set = new Set(f.headers);
@@ -1063,7 +1134,6 @@
                 const cb = document.createElement('input');
                 cb.type = 'checkbox';
                 cb.value = h;
-                // 如果在所有文件中都出现，则默认勾选
                 if (commonHeaders.has(h)) {
                     cb.checked = true;
                 }
@@ -1099,7 +1169,7 @@
             if (!entry) return;
             const headers = entry.headers;
             const data = entry.data.slice(0, 10);
-            previewTitle.textContent = `预览：${entry.name} (前 ${data.length} 行)`;
+            previewTitle.textContent = `预览：${entry.name} (表头行: 第${entry.headerRowIndex + 1}行, 前 ${data.length} 行)`;
 
             let html = '<table><thead><tr>';
             headers.forEach(h => { html += `<th>${escapeHtml(h)}</th>`; });
@@ -1126,7 +1196,7 @@
         });
 
         // ============================================================
-        //  核心合并
+        //  核心合并（与之前一致）
         // ============================================================
         function performMerge() {
             const checked = mergeKeyGroup.querySelectorAll('input[type="checkbox"]:checked');
@@ -1147,7 +1217,6 @@
 
             const files = state.files;
 
-            // 统计每个非合并键字段出现在哪些文件索引中
             const fieldOccurrences = {};
             files.forEach((f, idx) => {
                 f.headers.forEach(h => {
@@ -1160,7 +1229,6 @@
                 });
             });
 
-            // 为每个文件生成新字段名映射
             const fileNewHeaders = files.map((f, idx) => {
                 const newMap = {};
                 f.headers.forEach(h => {
@@ -1235,9 +1303,6 @@
             renderResult();
         }
 
-        // ============================================================
-        //  渲染结果
-        // ============================================================
         function renderResult() {
             if (!state.mergedData) {
                 resultSection.style.display = 'none';
@@ -1346,7 +1411,6 @@
             }
         });
 
-        // 拖拽上传
         document.addEventListener('dragover', (e) => e.preventDefault());
         document.addEventListener('drop', (e) => {
             e.preventDefault();
@@ -1378,7 +1442,7 @@
         //  初始化
         // ============================================================
         checkCanMerge();
-        console.log('📊 Excel 数据合并工具（支持拖拽排序 + 默认勾选共有字段）已加载');
+        console.log('📊 Excel 数据合并工具（支持自定义表头行）已加载');
     </script>
 
 </body>

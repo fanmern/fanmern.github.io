@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3d3d45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>JUST SEARCH· 直接搜索</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#3d3d45;
+    --card:#dfdfe4;
+    --line:rgba(255,255,255,.07);
+    --text:#f4f4f5;
+    --dim:#8a8a93;
+    --accent:#d3ff3e;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC","Helvetica Neue",Arial,"Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;justify-content:center;
+    min-height:100dvh;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    background-image:radial-gradient(120% 55% at 50% -8%, rgba(211,255,62,.10), transparent 62%);
+    background-repeat:no-repeat;
+  }
+  .wrap{
+    width:100%;max-width:480px;
+    padding:30px 20px 34px;
+    display:flex;flex-direction:column;gap:24px;
+  }
+
+  /* ---------- 头部 ---------- */
+  .head{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+  .logo{
+    font-size:31px;font-weight:800;letter-spacing:-.03em;
+    display:flex;align-items:center;line-height:1;
+  }
+  .logo em{font-style:normal;color:var(--accent)}
+  .logo .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--accent);
+    margin-left:9px;box-shadow:0 0 12px var(--accent);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+  .tagline{color:var(--dim);font-size:13.5px;letter-spacing:.02em;margin:0}
+
+  /* ---------- 搜索框 ---------- */
+  .searchbox{
+    display:flex;align-items:center;gap:11px;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:0 14px;height:57px;
+    transition:border-color .2s,box-shadow .2s;
+  }
+  .searchbox:focus-within{
+    border-color:rgba(211,255,62,.45);
+    box-shadow:0 0 0 4px rgba(211,255,62,.08);
+  }
+  .searchbox svg{flex:none;color:var(--dim)}
+  #kw{
+    flex:1;min-width:0;background:none;border:0;outline:0;
+    color:var(--text);font-size:16px;font-family:inherit;height:100%;
+  }
+  #kw::placeholder{color:#55555c}
+  .clear{
+    flex:none;width:24px;height:24px;border-radius:50%;border:0;
+    background:#61616c;color:#a1a1aa;font-size:12px;line-height:1;
+    display:grid;place-items:center;cursor:pointer;padding:0;
+    transition:background .15s;
+  }
+  .clear:active{background:#3a3a42}
+
+  /* ---------- 通用区块 ---------- */
+  section{display:flex;flex-direction:column;gap:13px}
+  .sec-title{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:11px;color:#6c6c75;letter-spacing:.14em;
+    text-transform:uppercase;font-weight:700;
+  }
+  .link-btn{
+    background:none;border:0;color:#6c6c75;font-size:11px;
+    font-family:inherit;letter-spacing:.08em;cursor:pointer;padding:2px 0;
+  }
+  .link-btn:active{color:var(--accent)}
+
+  /* ---------- App 网格 ---------- */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px}
+  .app{
+    background:none;border:0;padding:4px 2px;
+    display:flex;flex-direction:column;align-items:center;gap:9px;
+    cursor:pointer;border-radius:16px;font-family:inherit;
+    transition:transform .14s ease, background .14s;
+  }
+  .app:active{transform:scale(.9)}
+  .app-icon{
+    width:52px;height:52px;border-radius:16px;
+    display:grid;place-items:center;
+    font-size:20px;font-weight:700;color:#fff;letter-spacing:-.02em;
+    box-shadow:0 8px 18px -8px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.28);
+  }
+  .app-name{
+    font-size:11.5px;color:var(--dim);
+    max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
+  /* ---------- 最近搜索 ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    background:var(--card);border:1px solid var(--line);color:#c8c8cf;
+    border-radius:999px;padding:7px 14px;font-size:13px;
+    font-family:inherit;cursor:pointer;max-width:100%;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    transition:background .15s,border-color .15s;
+  }
+  .chip:active{background:#1e1e23;border-color:rgba(211,255,62,.3)}
+
+  /* ---------- 提示 ---------- */
+  .hint{
+    text-align:center;font-size:11.5px;color:#4a4a52;
+    line-height:1.7;
+  }
+
+  /* ---------- 页脚 ---------- */
+  .foot{
+    text-align:center;font-size:11.5px;color:#4a4a52;
+    line-height:1.8;margin-top:auto;padding-top:6px;
+  }
+
+  /* ---------- 动画 ---------- */
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-6px)}
+    40%{transform:translateX(6px)}
+    60%{transform:translateX(-4px)}
+    80%{transform:translateX(4px)}
+  }
+  .shake{animation:shake .4s ease}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="head">
+    <div class="logo">JUST&nbsp;<em>SEARCH</em><i class="dot"></i></div>
+    <p class="tagline">输入关键词 → 直达 App 搜索结果，不刷信息流</p>
+  </header>
+
+  <div class="searchbox" id="searchbox">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M20 20l-3.7-3.7"></path>
+    </svg>
+    <input id="kw" type="text" inputmode="search" enterkeyhint="search"
+           placeholder="想搜什么？" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="clear" id="clear" type="button" hidden aria-label="清空">✕</button>
+  </div>
+
+  <section>
+    <div class="sec-title"><span>选择 App 直接搜索</span></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="recentWrap" hidden>
+    <div class="sec-title">
+      <span>最近</span>
+      <button class="link-btn" id="clearRecent" type="button">清除</button>
+    </div>
+    <div class="chips" id="recent"></div>
+  </section>
+
+  <p class="hint">手机上点击即唤起对应 App，不会打开网页版</p>
+
+  <footer class="foot">JUST SEARCH· 直接搜索</footer>
+</div>
+
+<script>
+/* =========================================================
+   App 配置表
+   scheme : App 的 URL Scheme，{kw} 会被替换成关键词
+   web    : 网页版地址，仅在「桌面浏览器」或「未配置 scheme」时使用
+   ========================================================= */
+const APPS = [
+  { id:'bilibili', name:'哔哩哔哩', badge:'B', color:'#FB7299',
+    scheme:'bilibili://search?keyword={kw}',
+    web:'https://search.bilibili.com/all?keyword={kw}' },
+
+  { id:'xhs', name:'小红书', badge:'红', color:'#FF2442',
+    scheme:'xhsdiscover://search/result?keyword={kw}',
+    web:'https://www.xiaohongshu.com/search_result?keyword={kw}' },
+
+  { id:'taobao', name:'淘宝', badge:'淘', color:'#FF5000',
+    scheme:'taobao://s.taobao.com/search?q={kw}',
+    web:'https://s.taobao.com/search?q={kw}' },
+
+  { id:'douyin', name:'抖音', badge:'抖', color:'#FE2C55',
+    scheme:'snssdk1128://search?keyword={kw}',
+    web:'https://www.douyin.com/search/{kw}' },
+
+  { id:'zhihu', name:'知乎', badge:'知', color:'#0084FF',
+    scheme:'zhihu://search?q={kw}',
+    web:'https://www.zhihu.com/search?q={kw}' },
+
+  { id:'weibo', name:'微博', badge:'微', color:'#E6162D',
+    scheme:'sinaweibo://searchall?q={kw}',
+    web:'https://s.weibo.com/weibo?q={kw}' },
+
+  { id:'douban', name:'豆瓣', badge:'豆', color:'#2E963B',
+    scheme:'douban://douban.com/search?q={kw}',
+    web:'https://www.douban.com/search?q={kw}' },
+
+  { id:'netease', name:'网易云', badge:'云', color:'#C20C0C',
+    scheme:'orpheus://search?keyword={kw}',
+    web:'https://music.163.com/#/search/m/?s={kw}' },
+
+  { id:'github', name:'GitHub', badge:'G', color:'#6E40C9',
+    scheme:null,
+    web:'https://github.com/search?q={kw}' },
+
+  { id:'baidu', name:'百度', badge:'度', color:'#2932E1',
+    scheme:null,
+    web:'https://www.baidu.com/s?wd={kw}' }
+];
+
+const $ = s => document.querySelector(s);
+const kwInput   = $('#kw');
+const searchbox = $('#searchbox');
+const grid      = $('#grid');
+
+const IS_MOBILE = /Android|iPhone|iPad|iPod|HarmonyOS|Mobile|Windows Phone/i.test(navigator.userAgent);
+
+/* ---------------- 渲染 App 网格 ---------------- */
+function renderApps(){
+  grid.innerHTML = '';
+  APPS.forEach(app => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'app';
+    btn.setAttribute('aria-label', '用' + app.name + '搜索');
+    btn.innerHTML =
+      '<span class="app-icon" style="background:' + app.color + '">' + app.badge + '</span>' +
+      '<span class="app-name">' + app.name + '</span>';
+    btn.addEventListener('click', () => launch(app));
+    grid.appendChild(btn);
+  });
+}
+
+/* =========================================================
+   核心：跳转
+   手机端：只执行 URL Scheme，绝不打开网页版
+   桌面端 / 无 scheme 的 App：才打开网页
+   ========================================================= */
+let launching = false;
+
+function launch(app){
+  const kw = kwInput.value.trim();
+
+  if(!kw){
+    kwInput.focus();
+    searchbox.classList.remove('shake');
+    void searchbox.offsetWidth;   // 强制重排以重启动画
+    searchbox.classList.add('shake');
+    setTimeout(() => searchbox.classList.remove('shake'), 450);
+    return;
+  }
+
+  // 防连点
+  if(launching) return;
+  launching = true;
+  setTimeout(() => launching = false, 1200);
+
+  saveRecent(kw);
+  localStorage.setItem('nf:last', app.id);
+
+  // 桌面端，或该 App 没有 scheme → 打开网页版
+  if(!app.scheme || !IS_MOBILE){
+    window.open(app.web.replace('{kw}', encodeURIComponent(kw)), '_blank', 'noopener');
+    return;
+  }
+
+  // 手机端 + 有 scheme → 只唤起 App，绝不打开网页
+  const schemeUrl = app.scheme.replace('{kw}', encodeURIComponent(kw));
+  showToast('正在打开 ' + app.name + '…');
+  window.location.href = schemeUrl;
+}
+
+/* ---------------- 轻提示 ---------------- */
+let toastTimer = null;
+function showToast(msg){
+  let t = document.getElementById('nf-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'nf-toast';
+    t.style.cssText = [
+      'position:fixed','left:50%','bottom:40px','transform:translateX(-50%)',
+      'background:rgba(255,255,255,.10)','backdrop-filter:blur(12px)',
+      '-webkit-backdrop-filter:blur(12px)',
+      'color:#f4f4f5','font-size:13px','padding:10px 18px',
+      'border-radius:999px','border:1px solid rgba(255,255,255,.12)',
+      'pointer-events:none','opacity:0','transition:opacity .25s','z-index:99',
+      'white-space:nowrap'
+    ].join(';');
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  requestAnimationFrame(() => t.style.opacity = '1');
+
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+  }, 1200);
+}
+
+/* ---------------- 最近搜索 ---------------- */
+function getRecent(){
+  try{ return JSON.parse(localStorage.getItem('nf:recent') || '[]'); }
+  catch(e){ return []; }
+}
+
+function saveRecent(kw){
+  let arr = getRecent().filter(x => x !== kw);
+  arr.unshift(kw);
+  arr = arr.slice(0, 8);
+  try{ localStorage.setItem('nf:recent', JSON.stringify(arr)); }catch(e){}
+  renderRecent();
+}
+
+function renderRecent(){
+  const arr = getRecent();
+  const wrap = $('#recentWrap');
+  const box  = $('#recent');
+
+  if(!arr.length){ wrap.hidden = true; return; }
+  wrap.hidden = false;
+  box.innerHTML = '';
+
+  arr.forEach(kw => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = kw;
+    chip.title = kw;
+    chip.addEventListener('click', () => {
+      kwInput.value = kw;
+      $('#clear').hidden = false;
+      kwInput.focus();
+    });
+    box.appendChild(chip);
+  });
+}
+
+/* ---------------- 输入框交互 ---------------- */
+kwInput.addEventListener('input', () => {
+  $('#clear').hidden = !kwInput.value;
+});
+
+$('#clear').addEventListener('click', () => {
+  kwInput.value = '';
+  $('#clear').hidden = true;
+  kwInput.focus();
+});
+
+// 回车：用上次用过的 App 搜索（默认百度）
+kwInput.addEventListener('keydown', e => {
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    const lastId = localStorage.getItem('nf:last');
+    const app = APPS.find(a => a.id === lastId) || APPS.find(a => a.id === 'baidu');
+    launch(app);
+  }
+});
+
+// 清除最近记录
+$('#clearRecent').addEventListener('click', () => {
+  try{ localStorage.removeItem('nf:recent'); }catch(e){}
+  renderRecent();
+});
+
+/* ---------------- 启动 ---------------- */
+renderApps();
+renderRecent();
+
+// 桌面端自动聚焦（移动端不自动弹键盘）
+if(!IS_MOBILE){
+  setTimeout(() => kwInput.focus(), 120);
+}
+</script>
+</body>
+</html>

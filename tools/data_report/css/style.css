@@ -306,16 +306,30 @@ body {
 }
 .filter-icon.active {
     color: var(--blue-500);
-    background: var(--blue-50);
+    background: #dbeafe;
+}
+/* 激活时漏斗变实心 */
+.filter-icon.active svg {
+    fill: currentColor;
 }
 .filter-icon svg {
     width: 14px;
     height: 14px;
-    fill: none;
+    fill: none;                /* 默认空心 */
     stroke: currentColor;
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
+    transition: fill 0.2s ease; /* 平滑过渡 */
+}
+/* 悬停时轻微提示 */
+.filter-icon:hover svg {
+    fill: rgba(59, 130, 246, 0.15); /* 淡蓝色半透明填充 */
+}
+
+/* 激活（有筛选条件）时实心 */
+.filter-icon.active svg {
+    fill: currentColor;
 }
 .col-resize-handle {
     position: absolute;

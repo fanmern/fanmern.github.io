@@ -261,7 +261,7 @@
         .card-profit .enter-hint { color: #d97706; }
         .card-profit:hover { border-color: #fcd34d; }
 
-        /* ===== 新增卡片13：搜索词类型合并 ===== */
+        /* 卡片13 特殊颜色 - 搜索词类型合并 */
         .card-searchmerge .icon-wrapper {
             background: linear-gradient(135deg, #2563eb, #ea580c);
             box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.30);
@@ -269,6 +269,15 @@
         .card-searchmerge .badge { background: #eef4ff; border-color: #c7dbff; color: #1e40af; }
         .card-searchmerge .enter-hint { color: #2563eb; }
         .card-searchmerge:hover { border-color: #93c5fd; }
+
+        /* ===== 新增卡片14：类目转化率计算器 ===== */
+        .card-catrate .icon-wrapper {
+            background: linear-gradient(135deg, #c026d3, #a21caf);
+            box-shadow: 0 8px 16px -6px rgba(192, 38, 211, 0.30);
+        }
+        .card-catrate .badge { background: #fdf4ff; border-color: #f5d0fe; color: #86198f; }
+        .card-catrate .enter-hint { color: #c026d3; }
+        .card-catrate:hover { border-color: #f0abfc; }
 
         /* 响应式 */
         @media (max-width: 1100px) {
@@ -469,7 +478,7 @@
                 <div class="enter-hint">点击进入 →</div>
             </a>
 
-            <!-- ===== 新增工具13：搜索词类型合并 ===== -->
+            <!-- 工具13：搜索词类型合并 -->
             <a href="tools/search_term_merge.html" class="nav-card card-searchmerge" target="_blank"
                 title="按商品ID+搜索词合并手淘搜索与关键词推广数据">
                 <div class="icon-wrapper">🔍</div>
@@ -479,6 +488,21 @@
                     <span class="badge"><i>📊</i>.xlsx</span>
                     <span class="badge"><i>🔀</i>类型合并</span>
                     <span class="badge"><i>📤</i>导出</span>
+                </div>
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- ===== 新增工具14：类目转化率计算器 ===== -->
+            <a href="tools/category_conversion.html" class="nav-card card-catrate" target="_blank"
+                title="导入 Excel，勾选类目查看转化率，支持模板与话术生成">
+                <div class="icon-wrapper">📐</div>
+                <h2 class="card-title">类目转化率计算器</h2>
+                <p class="card-desc">导入 Excel 勾选类目算转化率，模板保存 + 一键生成话术。</p>
+                <div class="badge-group">
+                    <span class="badge"><i>📊</i>.xlsx</span>
+                    <span class="badge"><i>📐</i>转化率</span>
+                    <span class="badge"><i>💾</i>模板</span>
+                    <span class="badge"><i>📋</i>话术</span>
                 </div>
                 <div class="enter-hint">点击进入 →</div>
             </a>

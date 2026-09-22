@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>类目转化率计算器 · 导入 Excel 勾选类目</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 22px 22px 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(180deg, #f7f9fc, #eef2f9 460px);
+    color: #1f2937; min-height: 100vh;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 21px; margin: 0 0 6px; letter-spacing: .3px; }
+  .sub { color: #6b7280; font-size: 13px; margin: 0 0 16px; }
+  .sub code { background:#eef2ff; color:#4338ca; padding:1px 6px; border-radius:6px; font-size:12px; }
+
+  .card {
+    background: #fff; border: 1px solid #e6eaf2; border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(16,24,40,.04);
+  }
+
+  /* ---------- 上传区 ---------- */
+  .upload {
+    padding: 24px 18px; text-align: center; cursor: pointer;
+    border: 1.5px dashed #cbd5e1; background: #fbfdff;
+    transition: .18s; margin-bottom: 12px;
+  }
+  .upload:hover { border-color: #93c5fd; background: #f5faff; }
+  .upload.over { border-color: #3b82f6; background: #eff6ff; transform: scale(1.005); }
+  .upload.done { border-style: solid; border-color: #bbf7d0; background: #f6fef9; }
+  .up-icon { font-size: 24px; line-height: 1; margin-bottom: 7px; }
+  .up-title { font-size: 14.5px; font-weight: 600; color: #334155; }
+  .up-sub { font-size: 12px; color: #94a3b8; margin-top: 5px; }
+  .up-sub b { color: #64748b; font-weight: 600; }
+
+  /* ---------- 工具栏 ---------- */
+  .toolbar {
+    padding: 11px 14px; display: flex; gap: 8px; align-items: center;
+    flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .input {
+    height: 34px; padding: 0 11px; border: 1px solid #dbe2ee; border-radius: 9px;
+    font-size: 13px; background: #fff; color: #1f2937; outline: none;
+    transition: .15s; font-family: inherit;
+  }
+  .input:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+  .btn {
+    height: 34px; padding: 0 13px; border-radius: 9px; border: 1px solid #dbe2ee;
+    background: #fff; color: #334155; font-size: 13px; cursor: pointer;
+    transition: .15s; font-family: inherit; white-space: nowrap;
+  }
+  .btn:hover { background: #f8fafc; border-color: #c7d2e4; }
+  .btn.primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+  .btn.primary:hover { background: #2563eb; }
+  .btn.danger { color: #dc2626; border-color: #fecaca; }
+  .btn.danger:hover { background: #fef2f2; }
+  .btn.sm { height: 30px; padding: 0 11px; font-size: 12.5px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .tag { font-size: 12.5px; color: #64748b; }
+  .spacer { flex: 1; }
+  .meta { font-size: 12px; color: #94a3b8; }
+  .meta b { color: #475569; }
+
+  /* ---------- 主体两栏 ---------- */
+  .main { display: grid; grid-template-columns: 320px 1fr; gap: 14px; align-items: stretch; }
+  .panel { display: flex; flex-direction: column; height: 520px; overflow: hidden; }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-bottom: 1px solid #eef2f7;
+    font-size: 13.5px; font-weight: 600; color: #334155; flex: 0 0 auto;
+  }
+  .panel-head .count { font-size: 12px; font-weight: 500; color: #94a3b8; }
+  .panel-search { padding: 10px 12px 6px; flex: 0 0 auto; }
+  .panel-search .input { width: 100%; }
+  .panel-body { flex: 1 1 auto; overflow: auto; }
+  .panel-body.no-pad { padding: 0; }
+  .panel-foot {
+    padding: 9px 12px; border-top: 1px solid #eef2f7;
+    display: flex; gap: 7px; flex: 0 0 auto; background: #fcfdff;
+  }
+  .panel-foot .btn { flex: 1; }
+
+  /* ---------- 类目列表 ---------- */
+  .cat-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 14px; cursor: pointer; font-size: 13px;
+    border-bottom: 1px solid #f5f7fb; transition: background .12s;
+  }
+  .cat-item:hover { background: #f8fbff; }
+  .cat-item.on { background: #eff6ff; }
+  .cat-item.on .nm { color: #1d4ed8; font-weight: 600; }
+  .cat-item input { width: 15px; height: 15px; accent-color: #3b82f6; flex: 0 0 auto; cursor: pointer; }
+  .cat-item .nm {
+    flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cat-item .sub {
+    flex: 0 0 auto; font-size: 11px; color: #a3aec0; max-width: 110px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .blank {
+    padding: 40px 18px; text-align: center; color: #94a3b8; font-size: 13px; line-height: 1.8;
+  }
+
+  /* ---------- 结果表格 ---------- */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  thead th {
+    position: sticky; top: 0; z-index: 2; background: #f8fafc;
+    text-align: left; font-weight: 600; color: #475569; font-size: 12.5px;
+    padding: 10px 14px; border-bottom: 1px solid #e6eaf2; white-space: nowrap;
+    cursor: pointer; user-select: none;
+  }
+  thead th:hover { background: #f1f5f9; }
+  thead th.num { text-align: right; }
+  thead th[data-sort]::after { content: '⇅'; opacity: .22; margin-left: 5px; font-size: 10px; }
+  thead th[data-dir="asc"]::after { content: '▲'; opacity: 1; color: #3b82f6; }
+  thead th[data-dir="desc"]::after { content: '▼'; opacity: 1; color: #3b82f6; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #f1f5f9; }
+  tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: #f8fbff; }
+  .strong { font-weight: 600; color: #1e293b; }
+  .dim { color: #94a3b8; font-size: 12px; }
+
+  .rate {
+    display: inline-block; min-width: 62px; text-align: right;
+    padding: 2px 8px; border-radius: 7px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .rate.lv1 { background: #f1f5f9; color: #64748b; }
+  .rate.lv2 { background: #fef3c7; color: #b45309; }
+  .rate.lv3 { background: #e0f2fe; color: #0369a1; }
+  .rate.lv4 { background: #dcfce7; color: #15803d; }
+  .rate.na  { background: #f8fafc; color: #cbd5e1; }
+
+  .del {
+    border: 0; background: transparent; cursor: pointer; color: #cbd5e1;
+    font-size: 16px; line-height: 1; padding: 4px 6px; border-radius: 6px;
+    opacity: 0; transition: .15s;
+  }
+  tr:hover .del { opacity: 1; }
+  .del:hover { background: #fef2f2; color: #ef4444; }
+
+  /* ---------- 话术生成 ---------- */
+  .talk {
+    margin-top: 14px; padding: 14px 18px;
+    display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+  }
+  .talk-left { flex: 0 0 auto; }
+  .talk-title { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px; }
+  .talk-fields { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .field { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #475569; white-space: nowrap; }
+  .field .input { width: 116px; height: 32px; font-size: 13px; }
+  .field b { color: #1e293b; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .talk-right { flex: 1 1 400px; display: flex; gap: 10px; align-items: center; min-width: 280px; }
+  .preview {
+    flex: 1 1 auto; background: #f8fafc; border: 1px solid #eef2f7; border-radius: 9px;
+    padding: 9px 13px; font-size: 13px; color: #475569; line-height: 1.55;
+    word-break: break-all;
+  }
+  .preview .hl { color: #2563eb; font-weight: 600; }
+
+  /* ---------- 底部汇总 ---------- */
+  .summary {
+    position: sticky; bottom: 14px; z-index: 5; margin-top: 14px;
+    padding: 13px 18px; background: #0f172a; color: #fff; border-radius: 14px;
+    display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+    box-shadow: 0 10px 30px rgba(15,23,42,.25);
+  }
+  .summary .item { display: flex; flex-direction: column; gap: 3px; }
+  .summary .label { font-size: 11px; color: #94a3b8; letter-spacing: .4px; }
+  .summary .value { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .summary .value.hl { color: #4ade80; }
+  .summary .btn { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.22); color: #fff; }
+  .summary .btn:hover { background: rgba(255,255,255,.18); }
+
+  /* ---------- Toast ---------- */
+  #toast {
+    position: fixed; left: 50%; bottom: 40px; transform: translate(-50%, 20px);
+    background: #1e293b; color: #fff; padding: 10px 20px; border-radius: 10px;
+    font-size: 13px; opacity: 0; pointer-events: none; transition: .25s; z-index: 99;
+    box-shadow: 0 8px 24px rgba(15,23,42,.3); max-width: 80vw;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 880px) {
+    .main { grid-template-columns: 1fr; }
+    .panel { height: auto; max-height: 60vh; }
+    .summary { gap: 18px; }
+    .summary .value { font-size: 15px; }
+    .talk-right { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>类目转化率计算器</h1>
+  <p class="sub">
+    导入 Excel → 勾选类目 → 查看 <code>转化率 = 支付买家数 ÷ 商品访客数</code> → 填写花费目标生成话术
+  </p>
+
+  <!-- 上传区 -->
+  <div class="card upload" id="dropZone">
+    <div class="up-icon">📄</div>
+    <div class="up-title">点击或拖拽 Excel 文件到此处</div>
+    <div class="up-sub">支持 .xls / .xlsx / .csv，需包含 <b>类目名称</b>、<b>商品访客数</b>、<b>支付买家数</b> 列</div>
+    <input type="file" id="fileInput" accept=".xls,.xlsx,.csv" hidden />
+  </div>
+
+  <!-- 模板工具栏 -->
+  <div class="card toolbar">
+    <span class="tag">📁 模板</span>
+    <select id="tplSelect" class="input" style="min-width:190px"></select>
+    <button id="btnApplyTpl" class="btn primary">载入</button>
+    <button id="btnSaveTpl" class="btn">保存当前选择为模板</button>
+    <button id="btnDelTpl" class="btn danger">删除</button>
+    <span class="spacer"></span>
+    <span class="meta" id="fileMeta">尚未导入文件</span>
+  </div>
+
+  <!-- 主体 -->
+  <div class="main">
+    <!-- 左：类目选择 -->
+    <div class="card panel">
+      <div class="panel-head">
+        <span>类目名称</span>
+        <span class="count" id="catCount">0 / 0</span>
+      </div>
+      <div class="panel-search">
+        <input id="catSearch" class="input" placeholder="🔍 搜索类目名称" />
+      </div>
+      <div class="panel-body" id="catList">
+        <div class="blank">请先导入 Excel 文件<br />类目列表将显示在这里</div>
+      </div>
+      <div class="panel-foot">
+        <button class="btn sm" id="btnSelAll" disabled>全选</button>
+        <button class="btn sm" id="btnInv" disabled>反选</button>
+        <button class="btn sm" id="btnClr" disabled>清空</button>
+      </div>
+    </div>
+
+    <!-- 右：结果 -->
+    <div class="card panel">
+      <div class="panel-head">
+        <span>转化率结果</span>
+        <span class="count" id="resCount">0 个类目</span>
+      </div>
+      <div class="panel-body no-pad">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="cat">类目名称</th>
+              <th data-sort="visitors" class="num">商品访客数</th>
+              <th data-sort="buyers" class="num">支付买家数</th>
+              <th data-sort="rate" class="num">转化率</th>
+              <th style="width:46px;cursor:default"></th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 话术生成 -->
+  <div class="card talk">
+    <div class="talk-left">
+      <div class="talk-title">📝 生成话术</div>
+      <div class="talk-fields">
+        <label class="field">昨天花费目标 a
+          <input id="inpA" class="input" type="number" step="any" min="0" placeholder="如 1000" />
+        </label>
+        <label class="field">昨天实际花费 b
+          <input id="inpB" class="input" type="number" step="any" min="0" placeholder="如 950" />
+        </label>
+        <span class="field">达成率 <b id="achieveRate">—</b></span>
+      </div>
+    </div>
+    <div class="talk-right">
+      <div class="preview" id="talkPreview"></div>
+      <button id="btnCopyTalk" class="btn primary">📋 复制文案</button>
+    </div>
+  </div>
+
+  <!-- 汇总 -->
+  <div class="summary" id="summary"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   状态
+   ========================================================= */
+const STORAGE_KEY = 'cat_rate_templates_v2';
+
+const state = {
+  items: [],            // [{id, cat, l1, l2, visitors, buyers, rate}]
+  selected: new Set(),  // 选中的 item.id
+  catQuery: '',
+  sortKey: null,
+  sortDir: 1,
+  templates: [],
+  fileName: ''
+};
+
+const $ = id => document.getElementById(id);
+
+/* ---------- 格式化 ---------- */
+const fmtInt = n => Number(n || 0).toLocaleString('en-US');
+const fmtPct = r => (r == null || !isFinite(r)) ? '—' : (r * 100).toFixed(2) + '%';
+const fmtNum = n => {
+  if (n == null || !isFinite(n)) return '';
+  return String(+Number(n).toFixed(2));   // 去掉多余小数位
+};
+function rateClass(r) {
+  if (r == null || !isFinite(r)) return 'na';
+  if (r >= 0.05) return 'lv4';
+  if (r >= 0.03) return 'lv3';
+  if (r >= 0.01) return 'lv2';
+  return 'lv1';
+}
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function toNum(v) {
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  if (v == null) return 0;
+  const n = parseFloat(String(v).replace(/,/g, '').replace(/%/g, '').trim());
+  return isNaN(n) ? 0 : n;
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* =========================================================
+   Excel 解析
+   ========================================================= */
+function parseAoa(aoa) {
+  const headerIdx = aoa.findIndex(r =>
+    Array.isArray(r) && r.some(c => String(c == null ? '' : c).trim() === '类目名称')
+  );
+  if (headerIdx < 0) return null;
+
+  const header = aoa[headerIdx].map(c => String(c == null ? '' : c).trim());
+  const col = n => header.indexOf(n);
+
+  const cCat = col('类目名称');
+  const cV = col('商品访客数');
+  const cB = col('支付买家数');
+  const cL1 = col('一级类目名称');
+  const cL2 = col('二级类目名称');
+
+  if (cCat < 0 || cV < 0 || cB < 0) return null;
+
+  const items = [];
+  for (let i = headerIdx + 1; i < aoa.length; i++) {
+    const r = aoa[i];
+    if (!Array.isArray(r)) continue;
+
+    const cat = String(r[cCat] == null ? '' : r[cCat]).trim();
+    if (!cat) continue;
+
+    const visitors = toNum(r[cV]);
+    const buyers = toNum(r[cB]);
+
+    items.push({
+      id: items.length,
+      cat,
+      l1: cL1 >= 0 ? String(r[cL1] == null ? '' : r[cL1]).trim() : '',
+      l2: cL2 >= 0 ? String(r[cL2] == null ? '' : r[cL2]).trim() : '',
+      visitors,
+      buyers,
+      rate: visitors > 0 ? buyers / visitors : null
+    });
+  }
+  return items.length ? items : null;
+}
+
+/* =========================================================
+   计算
+   ========================================================= */
+function getSelectedRows() {
+  let rows = state.items.filter(it => state.selected.has(it.id));
+  if (state.sortKey) {
+    const k = state.sortKey, dir = state.sortDir;
+    rows = rows.slice().sort((a, b) => {
+      let av, bv;
+      if (k === 'rate') {
+        av = a.rate == null ? -1 : a.rate;
+        bv = b.rate == null ? -1 : b.rate;
+      } else { av = a[k]; bv = b[k]; }
+      if (typeof av === 'string') return av.localeCompare(bv, 'zh') * dir;
+      return (av - bv) * dir;
+    });
+  }
+  return rows;
+}
+
+/** 综合支付转化率 = 选中类目支付买家合计 / 访客合计 */
+function getOverallRate() {
+  const rows = getSelectedRows();
+  const v = rows.reduce((s, r) => s + r.visitors, 0);
+  const b = rows.reduce((s, r) => s + r.buyers, 0);
+  return v > 0 ? b / v : null;
+}
+
+/* =========================================================
+   渲染：类目列表
+   ========================================================= */
+function renderCatList() {
+  const box = $('catList');
+  const disabled = state.items.length === 0;
+  ['btnSelAll', 'btnInv', 'btnClr'].forEach(id => $(id).disabled = disabled);
+
+  if (!state.items.length) {
+    box.innerHTML = '<div class="blank">请先导入 Excel 文件<br />类目列表将显示在这里</div>';
+    $('catCount').textContent = '0 / 0';
+    return;
+  }
+
+  const q = state.catQuery.trim().toLowerCase();
+  const list = state.items.filter(it => !q || it.cat.toLowerCase().includes(q));
+
+  $('catCount').textContent = `${state.selected.size} / ${state.items.length}`;
+
+  if (!list.length) {
+    box.innerHTML = '<div class="blank">没有匹配的类目</div>';
+    return;
+  }
+
+  // 重名类目辅助显示二级类目
+  const nameCount = {};
+  state.items.forEach(it => { nameCount[it.cat] = (nameCount[it.cat] || 0) + 1; });
+
+  box.innerHTML = list.map(it => {
+    const on = state.selected.has(it.id);
+    const sub = nameCount[it.cat] > 1 && it.l2 && it.l2 !== it.cat
+      ? `<span class="sub">${esc(it.l2)}</span>` : '';
+    return `<label class="cat-item ${on ? 'on' : ''}" data-id="${it.id}">
+      <input type="checkbox" ${on ? 'checked' : ''} />
+      <span class="nm" title="${esc(it.cat)}">${esc(it.cat)}</span>
+      ${sub}
+    </label>`;
+  }).join('');
+}
+
+/* =========================================================
+   渲染：结果表
+   ========================================================= */
+function renderResult() {
+  const tbody = $('resultBody');
+
+  if (!state.items.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="blank">导入文件后，勾选左侧类目即可查看转化率</td></tr>';
+    $('resCount').textContent = '0 个类目';
+    updateSortIndicators();
+    return;
+  }
+
+  const rows = getSelectedRows();
+  $('resCount').textContent = `${rows.length} 个类目`;
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="blank">请从左侧勾选要查看的类目</td></tr>';
+    updateSortIndicators();
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="strong">${esc(r.cat)}</td>
+      <td class="num">${fmtInt(r.visitors)}</td>
+      <td class="num">${fmtInt(r.buyers)}</td>
+      <td class="num"><span class="rate ${rateClass(r.rate)}">${fmtPct(r.rate)}</span></td>
+      <td style="text-align:center">
+        <button class="del" data-del="${r.id}" title="移除">×</button>
+      </td>
+    </tr>
+  `).join('');
+
+  updateSortIndicators();
+}
+
+/* =========================================================
+   渲染：汇总条
+   ========================================================= */
+function renderSummary() {
+  const rows = getSelectedRows();
+  const v = rows.reduce((s, r) => s + r.visitors, 0);
+  const b = rows.reduce((s, r) => s + r.buyers, 0);
+  const rate = v > 0 ? b / v : null;
+
+  $('summary').innerHTML = `
+    <div class="item"><span class="label">已选类目</span><span class="value">${rows.length}</span></div>
+    <div class="item"><span class="label">商品访客合计</span><span class="value">${fmtInt(v)}</span></div>
+    <div class="item"><span class="label">支付买家合计</span><span class="value">${fmtInt(b)}</span></div>
+    <div class="item"><span class="label">综合转化率</span><span class="value hl">${fmtPct(rate)}</span></div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnCopy">📋 复制结果表</button>
+  `;
+}
+
+/* =========================================================
+   渲染：话术生成
+   ========================================================= */
+function readAB() {
+  const aRaw = $('inpA').value.trim();
+  const bRaw = $('inpB').value.trim();
+  const aNum = aRaw === '' ? NaN : Number(aRaw);
+  const bNum = bRaw === '' ? NaN : Number(bRaw);
+  return {
+    aRaw, bRaw,
+    aNum, bNum,
+    aOk: aRaw !== '' && isFinite(aNum),
+    bOk: bRaw !== '' && isFinite(bNum)
+  };
+}
+
+function renderTalk() {
+  const { aOk, bOk, aNum, bNum } = readAB();
+  const rate = getOverallRate();
+
+  // 达成率
+  let achStr = '—';
+  let achOk = false;
+  if (aOk && bOk && aNum !== 0) {
+    achStr = (bNum / aNum * 100).toFixed(2) + '%';
+    achOk = true;
+  }
+  $('achieveRate').textContent = achOk ? achStr : '—';
+
+  const aShow = aOk ? fmtNum(aNum) : '__';
+  const bShow = bOk ? fmtNum(bNum) : '__';
+  const achShow = achOk ? achStr : '__';
+  const rateShow = rate == null ? '__' : (rate * 100).toFixed(2) + '%';
+
+  $('talkPreview').innerHTML =
+    `昨天的花费目标<span class="hl">${esc(aShow)}</span>，` +
+    `昨天实际花费<span class="hl">${esc(bShow)}</span>，` +
+    `花费目标达成率<span class="hl">${esc(achShow)}</span>，` +
+    `支付转化率：<span class="hl">${esc(rateShow)}</span>`;
+}
+
+/* =========================================================
+   总渲染
+   ========================================================= */
+function renderAll() {
+  renderCatList();
+  renderResult();
+  renderSummary();
+  renderTalk();
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    if (th.dataset.sort === state.sortKey) {
+      th.dataset.dir = state.sortDir === 1 ? 'asc' : 'desc';
+    } else {
+      th.removeAttribute('data-dir');
+    }
+  });
+}
+
+/* =========================================================
+   模板
+   ========================================================= */
+function loadTemplates() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch (e) { return []; }
+}
+function persistTemplates() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.templates)); }
+  catch (e) { toast('本地存储不可用，模板未能保存'); }
+}
+function renderTemplates() {
+  const sel = $('tplSelect');
+  if (!state.templates.length) {
+    sel.innerHTML = '<option value="">暂无模板</option>';
+    return;
+  }
+  sel.innerHTML = state.templates
+    .map((t, i) => `<option value="${i}">${esc(t.name)}（${t.cats.length} 个类目）</option>`)
+    .join('');
+}
+
+function saveTemplate() {
+  if (!state.items.length) return toast('请先导入 Excel 文件');
+  if (!state.selected.size) return toast('请先勾选要保存的类目');
+
+  const cats = Array.from(new Set(
+    state.items.filter(it => state.selected.has(it.id)).map(it => it.cat)
+  ));
+
+  const d = new Date();
+  const def = `模板 ${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const input = prompt(`模板名称（将保存当前选中的 ${cats.length} 个类目）：`, def);
+  if (input === null) return;
+
+  const name = input.trim();
+  if (!name) return toast('模板名称不能为空');
+
+  const exist = state.templates.find(t => t.name === name);
+  if (exist) {
+    if (!confirm(`模板「${name}」已存在，是否覆盖？`)) return;
+    exist.cats = cats;
+    exist.time = Date.now();
+  } else {
+    state.templates.push({ name, cats, time: Date.now() });
+  }
+
+  persistTemplates();
+  renderTemplates();
+  $('tplSelect').value = String(state.templates.findIndex(t => t.name === name));
+  toast(`已保存模板「${name}」`);
+}
+
+function applyTemplate() {
+  const idx = $('tplSelect').value;
+  if (idx === '') return toast('暂无模板可载入');
+  const tpl = state.templates[+idx];
+  if (!tpl) return;
+
+  if (!state.items.length) return toast('请先导入 Excel 文件，再载入模板');
+
+  const want = new Set(tpl.cats);
+  const matchedIds = new Set();
+  state.items.forEach(it => { if (want.has(it.cat)) matchedIds.add(it.id); });
+
+  state.selected = matchedIds;
+  renderAll();
+
+  const gotCats = new Set(
+    state.items.filter(it => matchedIds.has(it.id)).map(it => it.cat)
+  );
+  const miss = tpl.cats.length - gotCats.size;
+
+  if (miss > 0) {
+    toast(`已载入 ${matchedIds.size} 个类目（${miss} 个在当前文件中未找到）`);
+  } else {
+    toast(`已载入模板「${tpl.name}」，共 ${matchedIds.size} 个类目`);
+  }
+}
+
+function deleteTemplate() {
+  const idx = $('tplSelect').value;
+  if (idx === '') return toast('暂无模板');
+  const tpl = state.templates[+idx];
+  if (!tpl) return;
+  if (!confirm(`确定删除模板「${tpl.name}」？`)) return;
+  state.templates.splice(+idx, 1);
+  persistTemplates();
+  renderTemplates();
+  toast('模板已删除');
+}
+
+/* =========================================================
+   复制
+   ========================================================= */
+function copyText(text, okMsg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => toast(okMsg),
+      () => fallbackCopy(text, okMsg)
+    );
+  } else {
+    fallbackCopy(text, okMsg);
+  }
+}
+function fallbackCopy(text, okMsg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast(okMsg); }
+  catch (e) { toast('复制失败，请手动选择'); }
+  ta.remove();
+}
+
+/** 复制结果表 */
+function copyResultTable() {
+  const rows = getSelectedRows();
+  if (!rows.length) return toast('还没有勾选类目');
+
+  const v = rows.reduce((s, r) => s + r.visitors, 0);
+  const b = rows.reduce((s, r) => s + r.buyers, 0);
+
+  const lines = ['类目名称\t商品访客数\t支付买家数\t转化率'];
+  rows.forEach(r => lines.push([r.cat, r.visitors, r.buyers, fmtPct(r.rate)].join('\t')));
+  lines.push(['合计', v, b, fmtPct(v > 0 ? b / v : null)].join('\t'));
+
+  copyText(lines.join('\n'), '已复制结果表到剪贴板');
+}
+
+/** 复制最终话术 */
+function copyTalk() {
+  const { aOk, bOk, aNum, bNum } = readAB();
+
+  if (!aOk || !bOk) return toast('请先填写「昨天花费目标 a」和「昨天实际花费 b」');
+  if (aNum === 0) return toast('花费目标 a 不能为 0');
+
+  const rate = getOverallRate();
+  if (rate == null) return toast('请至少勾选一个类目，用于计算支付转化率');
+
+  const achStr = (bNum / aNum * 100).toFixed(2) + '%';
+  const rateStr = (rate * 100).toFixed(2) + '%';
+
+  const text =
+    `昨天的花费目标${fmtNum(aNum)}，` +
+    `昨天实际花费${fmtNum(bNum)}，` +
+    `花费目标达成率${achStr}，` +
+    `支付转化率：${rateStr}`;
+
+  copyText(text, '已复制话术到剪贴板');
+}
+
+/* =========================================================
+   文件读取
+   ========================================================= */
+function handleFile(file) {
+  if (!file) return;
+  if (typeof XLSX === 'undefined') return toast('Excel 解析库未加载，请联网后刷新重试');
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+
+      const items = parseAoa(aoa);
+      if (!items) {
+        return toast('未识别到有效数据，请确认表头含「类目名称 / 商品访客数 / 支付买家数」');
+      }
+
+      state.items = items;
+      state.selected = new Set();
+      state.sortKey = null;
+      state.catQuery = '';
+      $('catSearch').value = '';
+      state.fileName = file.name;
+
+      $('fileMeta').innerHTML = `已导入 <b>${esc(file.name)}</b> · <b>${items.length}</b> 个类目`;
+      $('dropZone').classList.add('done');
+      $('dropZone').querySelector('.up-title').textContent = '✅ 导入成功，可重新点击更换文件';
+      $('dropZone').querySelector('.up-sub').innerHTML =
+        `当前文件：<b>${esc(file.name)}</b> · 共 <b>${items.length}</b> 个类目`;
+
+      renderAll();
+      toast(`已导入 ${items.length} 个类目，请从左侧勾选`);
+    } catch (err) {
+      console.error(err);
+      toast('文件解析失败，请检查文件格式');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* =========================================================
+   事件绑定
+   ========================================================= */
+function bindEvents() {
+  /* --- 上传 --- */
+  const dz = $('dropZone');
+  dz.addEventListener('click', () => $('fileInput').click());
+  $('fileInput').addEventListener('change', e => {
+    handleFile(e.target.files && e.target.files[0]);
+    e.target.value = '';
+  });
+  ['dragenter', 'dragover'].forEach(t => dz.addEventListener(t, e => {
+    e.preventDefault(); e.stopPropagation();
+    dz.classList.add('over');
+  }));
+  ['dragleave', 'drop'].forEach(t => dz.addEventListener(t, e => {
+    e.preventDefault(); e.stopPropagation();
+    if (t === 'dragleave' && dz.contains(e.relatedTarget)) return;
+    dz.classList.remove('over');
+  }));
+  dz.addEventListener('drop', e => {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    handleFile(f);
+  });
+
+  /* --- 类目搜索 --- */
+  $('catSearch').addEventListener('input', e => {
+    state.catQuery = e.target.value;
+    renderCatList();
+  });
+
+  /* --- 类目勾选（委托） --- */
+  $('catList').addEventListener('click', e => {
+    const row = e.target.closest('.cat-item');
+    if (!row) return;
+    const id = Number(row.dataset.id);
+    if (state.selected.has(id)) state.selected.delete(id);
+    else state.selected.add(id);
+    renderAll();
+  });
+
+  /* --- 批量按钮（作用于搜索结果） --- */
+  function visibleItems() {
+    const q = state.catQuery.trim().toLowerCase();
+    return state.items.filter(it => !q || it.cat.toLowerCase().includes(q));
+  }
+  $('btnSelAll').addEventListener('click', () => {
+    const list = visibleItems();
+    if (!list.length) return toast('没有可选择的类目');
+    list.forEach(it => state.selected.add(it.id));
+    renderAll();
+    toast(`已选中当前 ${list.length} 个类目`);
+  });
+  $('btnInv').addEventListener('click', () => {
+    visibleItems().forEach(it => {
+      if (state.selected.has(it.id)) state.selected.delete(it.id);
+      else state.selected.add(it.id);
+    });
+    renderAll();
+  });
+  $('btnClr').addEventListener('click', () => {
+    if (!state.selected.size) return;
+    state.selected.clear();
+    renderAll();
+  });
+
+  /* --- 结果表排序 --- */
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.sort;
+      if (state.sortKey === k) state.sortDir = state.sortDir === 1 ? -1 : 1;
+      else {
+        state.sortKey = k;
+        state.sortDir = (k === 'cat') ? 1 : -1;
+      }
+      renderResult();
+      renderSummary();
+      renderTalk();
+    });
+  });
+
+  /* --- 结果表移除 --- */
+  $('resultBody').addEventListener('click', e => {
+    const btn = e.target.closest('[data-del]');
+    if (!btn) return;
+    state.selected.delete(Number(btn.dataset.del));
+    renderAll();
+  });
+
+  /* --- 复制（委托） --- */
+  document.addEventListener('click', e => {
+    if (e.target.closest('#btnCopy')) copyResultTable();
+  });
+
+  /* --- 话术输入 --- */
+  $('inpA').addEventListener('input', renderTalk);
+  $('inpB').addEventListener('input', renderTalk);
+  $('btnCopyTalk').addEventListener('click', copyTalk);
+
+  /* --- 模板 --- */
+  $('btnSaveTpl').addEventListener('click', saveTemplate);
+  $('btnApplyTpl').addEventListener('click', applyTemplate);
+  $('btnDelTpl').addEventListener('click', deleteTemplate);
+}
+
+/* =========================================================
+   启动
+   ========================================================= */
+(function init() {
+  state.templates = loadTemplates();
+  renderTemplates();
+  bindEvents();
+  renderAll();
+})();
+</script>
+</body>
+</html>

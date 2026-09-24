@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>表格展开 / 合并转换器</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f4f5f7;color:#1f2328;min-height:100vh;
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 18px 48px;}
+header{text-align:center;margin-bottom:26px;}
+h1{font-size:20px;font-weight:600;letter-spacing:.3px;margin-bottom:6px;}
+.sub{color:#8a919b;font-size:13px;}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 24px;margin-bottom:16px;}
+.seg{display:flex;justify-content:center;margin-bottom:22px;}
+.seg button{border:1px solid #d8dbe0;background:#fff;padding:10px 34px;font-size:14px;color:#5b6270;
+  cursor:pointer;font-weight:500;transition:.15s;position:relative;}
+.seg button:first-child{border-radius:9px 0 0 9px;}
+.seg button:last-child{border-radius:0 9px 9px 0;border-left:0;}
+.seg button.on{background:#2563eb;border-color:#2563eb;color:#fff;z-index:1;}
+.upload-zone{border:2px dashed #d0d5dd;border-radius:12px;padding:38px 20px;text-align:center;
+  cursor:pointer;transition:.2s;background:#fafbfc;}
+.upload-zone:hover,.upload-zone.drag{border-color:#2563eb;background:#f0f5ff;}
+.upload-zone .icon{font-size:36px;margin-bottom:10px;opacity:.5;}
+.upload-zone .txt{color:#5b6270;font-size:14px;}
+.upload-zone .hint{color:#9aa1ab;font-size:12px;margin-top:6px;}
+.upload-zone input{display:none;}
+.file-info{display:none;align-items:center;gap:12px;padding:12px 16px;background:#f0f5ff;
+  border-radius:9px;margin-top:14px;font-size:13px;}
+.file-info.show{display:flex;}
+.file-info .name{font-weight:500;color:#1f2328;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-info .size{color:#8a919b;font-size:12px;}
+.file-info .remove{color:#dc2626;cursor:pointer;font-size:12px;background:none;border:0;
+  text-decoration:underline;padding:2px 4px;}
+.options{display:flex;flex-wrap:wrap;gap:14px 26px;margin-top:20px;align-items:center;
+  padding-top:18px;border-top:1px solid #f0f2f5;}
+.opt{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#4b5563;cursor:pointer;user-select:none;}
+.opt input[type=checkbox]{width:16px;height:16px;accent-color:#2563eb;cursor:pointer;}
+.opt select,.opt input[type=text]{border:1px solid #d8dbe0;border-radius:7px;padding:5px 10px;
+  font-size:13px;background:#fff;color:#1f2328;outline:0;font-family:inherit;}
+.opt input[type=text]{width:120px;text-align:center;}
+.opt select:focus,.opt input[type=text]:focus{border-color:#2563eb;}
+
+/* 列角色配置 */
+.col-config-wrap{display:none;margin-top:18px;padding-top:18px;border-top:1px solid #f0f2f5;}
+.col-config-wrap.show{display:block;}
+.cc-header{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
+.cc-title{font-size:13px;font-weight:600;color:#1f2328;}
+.cc-tip{font-size:12px;color:#9aa1ab;}
+.cc-row{display:flex;align-items:center;gap:12px;padding:8px 12px;background:#fafbfc;
+  border:1px solid #eef0f3;border-radius:8px;margin-bottom:6px;font-size:13px;}
+.cc-name{min-width:110px;font-weight:500;color:#1f2328;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cc-select{border:1px solid #d8dbe0;border-radius:6px;padding:4px 8px;font-size:12px;
+  background:#fff;color:#1f2328;outline:0;cursor:pointer;}
+.cc-select:focus{border-color:#2563eb;}
+.cc-sample{color:#9aa1ab;font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.btn{border:1px solid #d8dbe0;background:#fff;border-radius:9px;padding:10px 24px;font-size:14px;
+  color:#333;cursor:pointer;transition:.15s;font-weight:500;}
+.btn:hover{border-color:#2563eb;color:#2563eb;}
+.btn.primary{background:#2563eb;border-color:#2563eb;color:#fff;}
+.btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8;color:#fff;}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.preview-box{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;display:none;}
+.preview-box.show{display:block;}
+.preview-head{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;border-bottom:1px solid #eef0f3;background:#fafbfc;}
+.preview-head .pt{font-weight:600;font-size:13px;}
+.preview-head .stat{color:#9aa1ab;font-size:12px;}
+.preview-scroll{max-height:460px;overflow:auto;}
+table{border-collapse:collapse;width:100%;font-size:13px;}
+th,td{border:1px solid #eef0f3;padding:8px 12px;text-align:left;white-space:nowrap;}
+th{background:#f8f9fb;font-weight:600;color:#4b5563;position:sticky;top:0;z-index:1;font-size:12px;}
+td{color:#1f2328;}
+tr:hover td{background:#f8faff;}
+.toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);background:#1f2328;
+  color:#fff;padding:10px 20px;border-radius:9px;font-size:13px;opacity:0;pointer-events:none;
+  transition:.22s;z-index:99;}
+.toast.on{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>表格展开 / 合并转换器</h1>
+    <p class="sub">上传 Excel · 展开时逐格拆分，合并时可自定义「分组键 / 合并值 / 保留首值 / 忽略」 · 全程本地处理</p>
+  </header>
+
+  <div class="seg" id="seg">
+    <button data-mode="expand" class="on">展开（一对多）</button>
+    <button data-mode="merge">合并（多对一）</button>
+  </div>
+
+  <div class="card">
+    <div class="upload-zone" id="uploadZone">
+      <div class="icon">📂</div>
+      <div class="txt">点击选择文件，或拖拽 Excel 文件到此处</div>
+      <div class="hint">支持 .xlsx / .xls / .csv · 默认取第一个工作表</div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+    </div>
+    <div class="file-info" id="fileInfo">
+      <span>📄</span>
+      <span class="name" id="fileName"></span>
+      <span class="size" id="fileSize"></span>
+      <button class="remove" id="btnRemove">移除</button>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="checkbox" id="optHeader" checked> 第一行为表头</label>
+      <label class="opt"><input type="checkbox" id="optDedupe" checked> 结果去重</label>
+      <label class="opt"><input type="checkbox" id="optTrim" checked> 去除空白</label>
+      <label class="opt">分隔符 <input type="text" id="optSep" value=",，;；、"></label>
+      <label class="opt">输出格式
+        <select id="optFormat">
+          <option value="csv">CSV</option>
+          <option value="xlsx">Excel (.xlsx)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="col-config-wrap" id="colConfigWrap">
+      <div class="cc-header">
+        <span class="cc-title">列角色配置</span>
+        <span class="cc-tip">默认第一列为分组键，其余列为合并值；可手动调整</span>
+      </div>
+      <div id="colConfigList"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="btnProcess" disabled>开始处理</button>
+      <button class="btn" id="btnDownload" disabled>下载结果</button>
+      <button class="btn" id="btnReset">重置</button>
+    </div>
+  </div>
+
+  <div class="preview-box" id="previewBox">
+    <div class="preview-head">
+      <span class="pt">结果预览</span>
+      <span class="stat" id="previewStat"></span>
+    </div>
+    <div class="preview-scroll">
+      <table>
+        <thead id="previewHead"></thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+
+  var state = {
+    mode: 'expand',
+    rawRows: null,
+    header: [],
+    body: [],
+    config: [],   // [{ name, role }]  role: key | merge | keep | ignore
+    result: null,
+    fileName: ''
+  };
+
+  /* ================= 工具 ================= */
+  function toast(msg){
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function(){ t.classList.remove('on'); }, 1800);
+  }
+
+  function splitCell(s, sepChars){
+    var str = String(s == null ? '' : s).trim();
+    if (!str) return [''];
+    if (!sepChars) return [str];
+    var chars = sepChars.split('').map(function(c){
+      return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    });
+    var re = new RegExp('[' + chars.join('') + ']+');
+    var parts = str.split(re).map(function(t){ return t.trim(); }).filter(Boolean);
+    return parts.length > 0 ? parts : [str];
+  }
+
+  function uniq(a){
+    var seen = Object.create(null), out = [];
+    for (var i = 0; i < a.length; i++){
+      if (!seen[a[i]]){ seen[a[i]] = 1; out.push(a[i]); }
+    }
+    return out;
+  }
+
+  function bytesToSize(b){
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1048576).toFixed(1) + ' MB';
+  }
+
+  /* ================= 文件读取 ================= */
+  function readFile(file){
+    state.fileName = file.name;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try{
+        var data = new Uint8Array(e.target.result);
+        var wb = XLSX.read(data, { type: 'array', cellDates: false });
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+        rows = rows.filter(function(r){
+          return r.some(function(c){ return String(c == null ? '' : c).trim() !== ''; });
+        });
+        if (!rows.length){ toast('文件内容为空'); return; }
+
+        state.rawRows = rows;
+        $('fileName').textContent = state.fileName;
+        $('fileSize').textContent = bytesToSize(file.size);
+        $('fileInfo').classList.add('show');
+        $('btnProcess').disabled = false;
+        $('btnDownload').disabled = true;
+        $('previewBox').classList.remove('show');
+        state.result = null;
+
+        rebuildConfig(true);
+        renderColConfig();
+
+        toast('文件已加载，共 ' + rows.length + ' 行');
+      }catch(err){
+        console.error(err);
+        toast('文件解析失败，请确认格式');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /* ================= 重建 header / body / config ================= */
+  function rebuildConfig(resetRoles){
+    var hasHeader = $('optHeader').checked;
+    var rows = state.rawRows || [];
+    if (!rows.length) return;
+
+    var maxCols = 0;
+    for (var r = 0; r < rows.length; r++){
+      if (rows[r].length > maxCols) maxCols = rows[r].length;
+    }
+
+    var header, body;
+    if (hasHeader){
+      header = [];
+      for (var i = 0; i < maxCols; i++){
+        header.push(String(rows[0][i] == null ? '' : rows[0][i]).trim() || ('列' + (i + 1)));
+      }
+      body = rows.slice(1).map(function(r){
+        var c = r.slice();
+        while (c.length < maxCols) c.push('');
+        return c;
+      });
+    } else {
+      header = [];
+      for (var j = 0; j < maxCols; j++) header.push('列' + (j + 1));
+      body = rows.map(function(r){
+        var c = r.slice();
+        while (c.length < maxCols) c.push('');
+        return c;
+      });
+    }
+
+    state.header = header;
+    state.body = body;
+
+    if (resetRoles || state.config.length !== header.length){
+      state.config = header.map(function(name, i){
+        return { name: name, role: i === 0 ? 'key' : 'merge' };
+      });
+    } else {
+      for (var k = 0; k < state.config.length; k++){
+        state.config[k].name = header[k];
+      }
+    }
+  }
+
+  /* ================= 渲染列配置 ================= */
+  function renderColConfig(){
+    var wrap = $('colConfigList');
+    wrap.innerHTML = '';
+    if (!state.config.length) return;
+
+    var LABELS = { key: '分组键', merge: '合并值', keep: '保留首值', ignore: '忽略' };
+    var ORDER  = ['key', 'merge', 'keep', 'ignore'];
+
+    for (var i = 0; i < state.config.length; i++){
+      (function(idx){
+        var cfg = state.config[idx];
+        var row = document.createElement('div');
+        row.className = 'cc-row';
+
+        var nameEl = document.createElement('span');
+        nameEl.className = 'cc-name';
+        nameEl.textContent = cfg.name;
+        nameEl.title = cfg.name;
+        row.appendChild(nameEl);
+
+        var sel = document.createElement('select');
+        sel.className = 'cc-select';
+        ORDER.forEach(function(role){
+          var op = document.createElement('option');
+          op.value = role;
+          op.textContent = LABELS[role];
+          if (role === cfg.role) op.selected = true;
+          sel.appendChild(op);
+        });
+        sel.addEventListener('change', function(){
+          state.config[idx].role = sel.value;
+          if (state.rawRows) process();
+        });
+        row.appendChild(sel);
+
+        var sampleEl = document.createElement('span');
+        sampleEl.className = 'cc-sample';
+        var samples = [];
+        var seen = Object.create(null);
+        for (var j = 0; j < state.body.length && samples.length < 3; j++){
+          var v = String(state.body[j][idx] == null ? '' : state.body[j][idx]).trim();
+          if (v && !seen[v]){ seen[v] = 1; samples.push(v); }
+        }
+        sampleEl.textContent = samples.length ? ('示例：' + samples.join(' / ')) : '';
+        row.appendChild(sampleEl);
+
+        wrap.appendChild(row);
+      })(i);
+    }
+  }
+
+  /* ================= 展开逻辑 ================= */
+  function expandRows(rows, sepChars, dedupe){
+    var out = [];
+    for (var i = 0; i < rows.length; i++){
+      var row = rows[i];
+      var options = [];
+      var hasMulti = false;
+
+      for (var c = 0; c < row.length; c++){
+        var parts = splitCell(row[c], sepChars);
+        if (dedupe) parts = uniq(parts);
+        if (!parts.length) parts = [''];
+        if (parts.length > 1) hasMulti = true;
+        options.push(parts);
+      }
+
+      if (!hasMulti){
+        out.push(row.slice());
+        continue;
+      }
+
+      // 笛卡尔积展开
+      var acc = [[]];
+      for (var c2 = 0; c2 < options.length; c2++){
+        var next = [];
+        for (var a = 0; a < acc.length; a++){
+          for (var v = 0; v < options[c2].length; v++){
+            next.push(acc[a].concat([options[c2][v]]));
+          }
+        }
+        acc = next;
+      }
+      for (var m = 0; m < acc.length; m++) out.push(acc[m]);
+    }
+    return out;
+  }
+
+  /* ================= 合并逻辑 ================= */
+  function mergeRows(rows, config, dedupe){
+    var outputIdx = [];
+    for (var i = 0; i < config.length; i++){
+      if (config[i].role !== 'ignore') outputIdx.push(i);
+    }
+
+    var groupKeyIdx = [];
+    for (var j = 0; j < config.length; j++){
+      if (config[j].role === 'key') groupKeyIdx.push(j);
+    }
+
+    var groups = new Map();
+    var order = [];
+
+    for (var r = 0; r < rows.length; r++){
+      var row = rows[r];
+      var keyParts = [];
+      for (var k = 0; k < groupKeyIdx.length; k++){
+        keyParts.push(String(row[groupKeyIdx[k]] == null ? '' : row[groupKeyIdx[k]]).trim());
+      }
+      var key = keyParts.join('\u0001');
+
+      if (!groups.has(key)){
+        var bucket = {};
+        for (var c = 0; c < config.length; c++){
+          var role = config[c].role;
+          var v = String(row[c] == null ? '' : row[c]).trim();
+          if (role === 'merge') bucket[c] = v ? [v] : [];
+          else                  bucket[c] = v;
+        }
+        groups.set(key, bucket);
+        order.push(key);
+      } else {
+        var bucket2 = groups.get(key);
+        for (var c2 = 0; c2 < config.length; c2++){
+          var role2 = config[c2].role;
+          var v2 = String(row[c2] == null ? '' : row[c2]).trim();
+          if (role2 === 'merge'){
+            if (v2){
+              if (!dedupe || bucket2[c2].indexOf(v2) < 0) bucket2[c2].push(v2);
+            }
+          } else if ((role2 === 'key' || role2 === 'keep') && !bucket2[c2] && v2){
+            bucket2[c2] = v2;
+          }
+        }
+      }
+    }
+
+    var out = [];
+    for (var o = 0; o < order.length; o++){
+      var b = groups.get(order[o]);
+      var outRow = [];
+      for (var oi = 0; oi < outputIdx.length; oi++){
+        var ci = outputIdx[oi];
+        if (config[ci].role === 'merge'){
+          outRow.push(b[ci].join(', '));
+        } else {
+          outRow.push(b[ci] || '');
+        }
+      }
+      out.push(outRow);
+    }
+    return out;
+  }
+
+  /* ================= 处理入口 ================= */
+  function process(){
+    if (!state.rawRows){ toast('请先上传文件'); return; }
+
+    rebuildConfig(false);
+
+    var dedupe    = $('optDedupe').checked;
+    var sepChars  = $('optSep').value || '';
+    var hasHeader = $('optHeader').checked;
+
+    var result = [];
+
+    if (state.mode === 'expand'){
+      if (hasHeader) result.push(state.header.slice());
+      var expanded = expandRows(state.body, sepChars, dedupe);
+      for (var i = 0; i < expanded.length; i++) result.push(expanded[i]);
+    } else {
+      if (hasHeader){
+        var headerOut = [];
+        for (var c = 0; c < state.config.length; c++){
+          if (state.config[c].role !== 'ignore') headerOut.push(state.header[c]);
+        }
+        result.push(headerOut);
+      }
+      var merged = mergeRows(state.body, state.config, dedupe);
+      for (var j = 0; j < merged.length; j++) result.push(merged[j]);
+    }
+
+    state.result = result;
+    renderPreview(result);
+    $('btnDownload').disabled = false;
+    $('previewBox').classList.add('show');
+  }
+
+  /* ================= 预览 ================= */
+  function renderPreview(data){
+    var maxRows = 300;
+    var head = $('previewHead'), body = $('previewBody');
+    head.innerHTML = ''; body.innerHTML = '';
+    if (!data.length) return;
+
+    var htr = document.createElement('tr');
+    data[0].forEach(function(c){
+      var th = document.createElement('th');
+      th.textContent = c == null ? '' : c;
+      htr.appendChild(th);
+    });
+    head.appendChild(htr);
+
+    var limit = Math.min(data.length - 1, maxRows);
+    for (var i = 1; i <= limit; i++){
+      var tr = document.createElement('tr');
+      data[i].forEach(function(c){
+        var td = document.createElement('td');
+        td.textContent = c == null ? '' : c;
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    }
+
+    var total = data.length - 1;
+    $('previewStat').textContent = total > maxRows
+      ? '共 ' + total + ' 行，仅显示前 ' + maxRows + ' 行'
+      : '共 ' + total + ' 行';
+  }
+
+  /* ================= 下载 ================= */
+  function download(){
+    if (!state.result || !state.result.length){ toast('没有可下载的结果'); return; }
+    var fmt = $('optFormat').value;
+    var base = (state.fileName || '结果').replace(/\.[^.]+$/, '');
+    var outName = base + (state.mode === 'expand' ? '_展开' : '_合并');
+
+    if (fmt === 'csv'){
+      var csv = state.result.map(function(row){
+        return row.map(function(c){
+          var s = String(c == null ? '' : c);
+          if (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0){
+            return '"' + s.replace(/"/g, '""') + '"';
+          }
+          return s;
+        }).join(',');
+      }).join('\n');
+      var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+      triggerDownload(blob, outName + '.csv');
+    } else {
+      var ws = XLSX.utils.aoa_to_sheet(state.result);
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '结果');
+      XLSX.writeFile(wb, outName + '.xlsx');
+    }
+    toast('已开始下载');
+  }
+
+  function triggerDownload(blob, filename){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1500);
+  }
+
+  /* ================= 重置 ================= */
+  function reset(){
+    state.rawRows = null;
+    state.header = [];
+    state.body = [];
+    state.config = [];
+    state.result = null;
+    state.fileName = '';
+    $('fileInput').value = '';
+    $('fileInfo').classList.remove('show');
+    $('btnProcess').disabled = true;
+    $('btnDownload').disabled = true;
+    $('previewBox').classList.remove('show');
+    $('previewHead').innerHTML = '';
+    $('previewBody').innerHTML = '';
+    $('colConfigList').innerHTML = '';
+    toast('已重置');
+  }
+
+  /* ================= 模式 UI ================= */
+  function updateModeUI(){
+    var wrap = $('colConfigWrap');
+    if (state.mode === 'merge') wrap.classList.add('show');
+    else                        wrap.classList.remove('show');
+  }
+
+  /* ================= 事件绑定 ================= */
+  var segBtns = document.querySelectorAll('#seg button');
+  for (var i = 0; i < segBtns.length; i++){
+    segBtns[i].addEventListener('click', function(){
+      for (var j = 0; j < segBtns.length; j++) segBtns[j].classList.remove('on');
+      this.classList.add('on');
+      state.mode = this.getAttribute('data-mode');
+      updateModeUI();
+      if (state.rawRows) process();
+    });
+  }
+
+  var zone = $('uploadZone'), fileInput = $('fileInput');
+  zone.addEventListener('click', function(){ fileInput.click(); });
+  zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', function(){ zone.classList.remove('drag'); });
+  zone.addEventListener('drop', function(e){
+    e.preventDefault();
+    zone.classList.remove('drag');
+    var f = e.dataTransfer.files[0];
+    if (f) readFile(f);
+  });
+  fileInput.addEventListener('change', function(){
+    if (fileInput.files[0]) readFile(fileInput.files[0]);
+  });
+
+  $('btnRemove').addEventListener('click', function(e){ e.stopPropagation(); reset(); });
+  $('btnProcess').addEventListener('click', process);
+  $('btnDownload').addEventListener('click', download);
+  $('btnReset').addEventListener('click', reset);
+
+  $('optHeader').addEventListener('change', function(){
+    if (state.rawRows){
+      rebuildConfig(true);
+      renderColConfig();
+      process();
+    }
+  });
+  ['optDedupe','optTrim','optSep'].forEach(function(id){
+    $(id).addEventListener('change', function(){
+      if (state.rawRows) process();
+    });
+  });
+
+  updateModeUI();
+})();
+</script>
+</body>
+</html>

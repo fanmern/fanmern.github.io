@@ -270,7 +270,7 @@
         .card-searchmerge .enter-hint { color: #2563eb; }
         .card-searchmerge:hover { border-color: #93c5fd; }
 
-        /* ===== 新增卡片14：类目转化率计算器 ===== */
+        /* 卡片14 特殊颜色 - 类目转化率计算器 */
         .card-catrate .icon-wrapper {
             background: linear-gradient(135deg, #c026d3, #a21caf);
             box-shadow: 0 8px 16px -6px rgba(192, 38, 211, 0.30);
@@ -278,6 +278,15 @@
         .card-catrate .badge { background: #fdf4ff; border-color: #f5d0fe; color: #86198f; }
         .card-catrate .enter-hint { color: #c026d3; }
         .card-catrate:hover { border-color: #f0abfc; }
+
+        /* 卡片15 特殊颜色 - 表格展开 / 合并 */
+        .card-transform .icon-wrapper {
+            background: linear-gradient(135deg, #475569, #334155);
+            box-shadow: 0 8px 16px -6px rgba(71, 85, 105, 0.30);
+        }
+        .card-transform .badge { background: #f8fafc; border-color: #e2e8f0; color: #334155; }
+        .card-transform .enter-hint { color: #475569; }
+        .card-transform:hover { border-color: #cbd5e1; }
 
         /* 响应式 */
         @media (max-width: 1100px) {
@@ -492,7 +501,7 @@
                 <div class="enter-hint">点击进入 →</div>
             </a>
 
-            <!-- ===== 新增工具14：类目转化率计算器 ===== -->
+            <!-- 工具14：类目转化率计算器 -->
             <a href="tools/category_conversion.html" class="nav-card card-catrate" target="_blank"
                 title="导入 Excel，勾选类目查看转化率，支持模板与话术生成">
                 <div class="icon-wrapper">📐</div>
@@ -503,6 +512,21 @@
                     <span class="badge"><i>📐</i>转化率</span>
                     <span class="badge"><i>💾</i>模板</span>
                     <span class="badge"><i>📋</i>话术</span>
+                </div>
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- 工具15：表格展开 / 合并 -->
+            <a href="tools/table_transform.html" class="nav-card card-transform" target="_blank"
+                title="一行多值拆成多行，多行按分组键合并，列角色可自定义">
+                <div class="icon-wrapper">🔀</div>
+                <h2 class="card-title">表格展开 / 合并</h2>
+                <p class="card-desc">一行多值拆成多行，多行按分组键合并，列角色可自定义。</p>
+                <div class="badge-group">
+                    <span class="badge"><i>📊</i>.xlsx</span>
+                    <span class="badge"><i>↔️</i>展开</span>
+                    <span class="badge"><i>🔗</i>合并</span>
+                    <span class="badge"><i>🧩</i>列角色</span>
                 </div>
                 <div class="enter-hint">点击进入 →</div>
             </a>

@@ -162,6 +162,15 @@
             opacity: 0.8;
         }
 
+        /* 卡片1 特殊颜色 - 文件合并 */
+        .card-merge .icon-wrapper {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.30);
+        }
+        .card-merge .badge { background: #eef4ff; border-color: #c7dbff; color: #1e40af; }
+        .card-merge .enter-hint { color: #2563eb; }
+        .card-merge:hover { border-color: #93c5fd; }
+
         /* 卡片2 特殊颜色 - 文件重命名 */
         .card-rename .icon-wrapper {
             background: linear-gradient(135deg, #0891b2, #0e7490);
@@ -288,6 +297,15 @@
         .card-transform .enter-hint { color: #475569; }
         .card-transform:hover { border-color: #cbd5e1; }
 
+        /* 卡片16 特殊颜色 - 月度数据汇总工具（新增） */
+        .card-monthly .icon-wrapper {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.35);
+        }
+        .card-monthly .badge { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+        .card-monthly .enter-hint { color: #2563eb; }
+        .card-monthly:hover { border-color: #a5b4fc; }
+
         /* 响应式 */
         @media (max-width: 1100px) {
             .card-grid {
@@ -330,7 +348,7 @@
 
         <div class="card-grid">
             <!-- 工具1：文件合并 -->
-            <a href="tools/merge_excel.html" class="nav-card" target="_blank" title="合并多个 Excel 或 CSV 文件">
+            <a href="tools/merge_excel.html" class="nav-card card-merge" target="_blank" title="合并多个 Excel 或 CSV 文件">
                 <div class="icon-wrapper">📂</div>
                 <h2 class="card-title">文件合并</h2>
                 <p class="card-desc">合并多个 Excel 或 CSV 文件，自动添加来源列。</p>
@@ -527,6 +545,21 @@
                     <span class="badge"><i>↔️</i>展开</span>
                     <span class="badge"><i>🔗</i>合并</span>
                     <span class="badge"><i>🧩</i>列角色</span>
+                </div>
+                <div class="enter-hint">点击进入 →</div>
+            </a>
+
+            <!-- 工具16：月度数据汇总工具（新增） -->
+            <a href="tools/monthly_summary.html" class="nav-card card-monthly" target="_blank"
+                title="上传类目映射表、标准类目表、推广商品表，按类目+月份汇总支付金额、去退金额、推广花费">
+                <div class="icon-wrapper">📊</div>
+                <h2 class="card-title">月度数据汇总</h2>
+                <p class="card-desc">按类目×月份汇总，支付金额 / 去退金额 / 推广花费，可存模板。</p>
+                <div class="badge-group">
+                    <span class="badge"><i>📊</i>.xlsx</span>
+                    <span class="badge"><i>🗂️</i>类目归集</span>
+                    <span class="badge"><i>💰</i>金额汇总</span>
+                    <span class="badge"><i>💾</i>模板</span>
                 </div>
                 <div class="enter-hint">点击进入 →</div>
             </a>

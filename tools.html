@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
     <title>工具导航 · 数据工具集</title>
     <style>
         * {
@@ -167,144 +168,340 @@
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.30);
         }
-        .card-merge .badge { background: #eef4ff; border-color: #c7dbff; color: #1e40af; }
-        .card-merge .enter-hint { color: #2563eb; }
-        .card-merge:hover { border-color: #93c5fd; }
+
+        .card-merge .badge {
+            background: #eef4ff;
+            border-color: #c7dbff;
+            color: #1e40af;
+        }
+
+        .card-merge .enter-hint {
+            color: #2563eb;
+        }
+
+        .card-merge:hover {
+            border-color: #93c5fd;
+        }
 
         /* 卡片2 特殊颜色 - 文件重命名 */
         .card-rename .icon-wrapper {
             background: linear-gradient(135deg, #0891b2, #0e7490);
             box-shadow: 0 8px 16px -6px rgba(8, 145, 178, 0.30);
         }
-        .card-rename .badge { background: #ecfeff; border-color: #a5f3fc; color: #155e75; }
-        .card-rename .enter-hint { color: #0891b2; }
-        .card-rename:hover { border-color: #67e8f9; }
+
+        .card-rename .badge {
+            background: #ecfeff;
+            border-color: #a5f3fc;
+            color: #155e75;
+        }
+
+        .card-rename .enter-hint {
+            color: #0891b2;
+        }
+
+        .card-rename:hover {
+            border-color: #67e8f9;
+        }
 
         /* 卡片3 特殊颜色 - 区间聚合 */
         .card-aggregate .icon-wrapper {
             background: linear-gradient(135deg, #059669, #047857);
             box-shadow: 0 8px 16px -6px rgba(5, 150, 105, 0.30);
         }
-        .card-aggregate .badge { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
-        .card-aggregate .enter-hint { color: #059669; }
-        .card-aggregate:hover { border-color: #6ee7b7; }
+
+        .card-aggregate .badge {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #065f46;
+        }
+
+        .card-aggregate .enter-hint {
+            color: #059669;
+        }
+
+        .card-aggregate:hover {
+            border-color: #6ee7b7;
+        }
 
         /* 卡片4 特殊颜色 - JSON 管理 */
         .card-json .icon-wrapper {
             background: linear-gradient(135deg, #7c3aed, #6d28d9);
             box-shadow: 0 8px 16px -6px rgba(124, 58, 237, 0.30);
         }
-        .card-json .badge { background: #f5f3ff; border-color: #c4b5fd; color: #5b21b6; }
-        .card-json .enter-hint { color: #7c3aed; }
-        .card-json:hover { border-color: #a78bfa; }
+
+        .card-json .badge {
+            background: #f5f3ff;
+            border-color: #c4b5fd;
+            color: #5b21b6;
+        }
+
+        .card-json .enter-hint {
+            color: #7c3aed;
+        }
+
+        .card-json:hover {
+            border-color: #a78bfa;
+        }
 
         /* 卡片5 特殊颜色 - 图片嵌入 */
         .card-image .icon-wrapper {
             background: linear-gradient(135deg, #e11d48, #be123c);
             box-shadow: 0 8px 16px -6px rgba(225, 29, 72, 0.30);
         }
-        .card-image .badge { background: #fff1f2; border-color: #fecdd3; color: #9f1239; }
-        .card-image .enter-hint { color: #e11d48; }
-        .card-image:hover { border-color: #fda4af; }
+
+        .card-image .badge {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #9f1239;
+        }
+
+        .card-image .enter-hint {
+            color: #e11d48;
+        }
+
+        .card-image:hover {
+            border-color: #fda4af;
+        }
 
         /* 卡片6 特殊颜色 - 文件夹结构化 */
         .card-folder .icon-wrapper {
             background: linear-gradient(135deg, #d97706, #b45309);
             box-shadow: 0 8px 16px -6px rgba(217, 119, 6, 0.30);
         }
-        .card-folder .badge { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
-        .card-folder .enter-hint { color: #d97706; }
-        .card-folder:hover { border-color: #fbbf24; }
+
+        .card-folder .badge {
+            background: #fffbeb;
+            border-color: #fcd34d;
+            color: #92400e;
+        }
+
+        .card-folder .enter-hint {
+            color: #d97706;
+        }
+
+        .card-folder:hover {
+            border-color: #fbbf24;
+        }
 
         /* 卡片7 特殊颜色 - 文本处理 */
         .card-text .icon-wrapper {
             background: linear-gradient(135deg, #f43f5e, #e11d48);
             box-shadow: 0 8px 16px -6px rgba(244, 63, 94, 0.30);
         }
-        .card-text .badge { background: #fff1f2; border-color: #fecdd3; color: #9f1239; }
-        .card-text .enter-hint { color: #f43f5e; }
-        .card-text:hover { border-color: #fda4af; }
+
+        .card-text .badge {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #9f1239;
+        }
+
+        .card-text .enter-hint {
+            color: #f43f5e;
+        }
+
+        .card-text:hover {
+            border-color: #fda4af;
+        }
 
         /* 卡片8 特殊颜色 - Excel 数据处理 */
         .card-processor .icon-wrapper {
             background: linear-gradient(135deg, #4f46e5, #4338ca);
             box-shadow: 0 8px 16px -6px rgba(79, 70, 229, 0.30);
         }
-        .card-processor .badge { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
-        .card-processor .enter-hint { color: #4f46e5; }
-        .card-processor:hover { border-color: #a5b4fc; }
+
+        .card-processor .badge {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #3730a3;
+        }
+
+        .card-processor .enter-hint {
+            color: #4f46e5;
+        }
+
+        .card-processor:hover {
+            border-color: #a5b4fc;
+        }
 
         /* 卡片9 特殊颜色 - 数据报表展示 */
         .card-report .icon-wrapper {
             background: linear-gradient(135deg, #0d9488, #0f766e);
             box-shadow: 0 8px 16px -6px rgba(13, 148, 136, 0.30);
         }
-        .card-report .badge { background: #f0fdfa; border-color: #99f6e4; color: #115e59; }
-        .card-report .enter-hint { color: #0d9488; }
-        .card-report:hover { border-color: #5eead4; }
+
+        .card-report .badge {
+            background: #f0fdfa;
+            border-color: #99f6e4;
+            color: #115e59;
+        }
+
+        .card-report .enter-hint {
+            color: #0d9488;
+        }
+
+        .card-report:hover {
+            border-color: #5eead4;
+        }
 
         /* 卡片10 特殊颜色 - Excel 横向合并 */
         .card-hmerge .icon-wrapper {
             background: linear-gradient(135deg, #0284c7, #0369a1);
             box-shadow: 0 8px 16px -6px rgba(2, 132, 199, 0.30);
         }
-        .card-hmerge .badge { background: #f0f9ff; border-color: #bae6fd; color: #075985; }
-        .card-hmerge .enter-hint { color: #0284c7; }
-        .card-hmerge:hover { border-color: #7dd3fc; }
+
+        .card-hmerge .badge {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+            color: #075985;
+        }
+
+        .card-hmerge .enter-hint {
+            color: #0284c7;
+        }
+
+        .card-hmerge:hover {
+            border-color: #7dd3fc;
+        }
 
         /* 卡片11 特殊颜色 - 活动日历 */
         .card-calendar .icon-wrapper {
             background: linear-gradient(135deg, #ff6b35, #ff3b1f);
             box-shadow: 0 8px 16px -6px rgba(255, 59, 31, 0.30);
         }
-        .card-calendar .badge { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
-        .card-calendar .enter-hint { color: #ff6b35; }
-        .card-calendar:hover { border-color: #fdba74; }
+
+        .card-calendar .badge {
+            background: #fff7ed;
+            border-color: #fed7aa;
+            color: #9a3412;
+        }
+
+        .card-calendar .enter-hint {
+            color: #ff6b35;
+        }
+
+        .card-calendar:hover {
+            border-color: #fdba74;
+        }
 
         /* 卡片12 特殊颜色 - 电商利润计算器 */
         .card-profit .icon-wrapper {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             box-shadow: 0 8px 16px -6px rgba(245, 158, 11, 0.30);
         }
-        .card-profit .badge { background: #fffbeb; border-color: #fde68a; color: #92400e; }
-        .card-profit .enter-hint { color: #d97706; }
-        .card-profit:hover { border-color: #fcd34d; }
+
+        .card-profit .badge {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .card-profit .enter-hint {
+            color: #d97706;
+        }
+
+        .card-profit:hover {
+            border-color: #fcd34d;
+        }
 
         /* 卡片13 特殊颜色 - 搜索词类型合并 */
         .card-searchmerge .icon-wrapper {
             background: linear-gradient(135deg, #2563eb, #ea580c);
             box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.30);
         }
-        .card-searchmerge .badge { background: #eef4ff; border-color: #c7dbff; color: #1e40af; }
-        .card-searchmerge .enter-hint { color: #2563eb; }
-        .card-searchmerge:hover { border-color: #93c5fd; }
+
+        .card-searchmerge .badge {
+            background: #eef4ff;
+            border-color: #c7dbff;
+            color: #1e40af;
+        }
+
+        .card-searchmerge .enter-hint {
+            color: #2563eb;
+        }
+
+        .card-searchmerge:hover {
+            border-color: #93c5fd;
+        }
 
         /* 卡片14 特殊颜色 - 类目转化率计算器 */
         .card-catrate .icon-wrapper {
             background: linear-gradient(135deg, #c026d3, #a21caf);
             box-shadow: 0 8px 16px -6px rgba(192, 38, 211, 0.30);
         }
-        .card-catrate .badge { background: #fdf4ff; border-color: #f5d0fe; color: #86198f; }
-        .card-catrate .enter-hint { color: #c026d3; }
-        .card-catrate:hover { border-color: #f0abfc; }
+
+        .card-catrate .badge {
+            background: #fdf4ff;
+            border-color: #f5d0fe;
+            color: #86198f;
+        }
+
+        .card-catrate .enter-hint {
+            color: #c026d3;
+        }
+
+        .card-catrate:hover {
+            border-color: #f0abfc;
+        }
 
         /* 卡片15 特殊颜色 - 表格展开 / 合并 */
         .card-transform .icon-wrapper {
             background: linear-gradient(135deg, #475569, #334155);
             box-shadow: 0 8px 16px -6px rgba(71, 85, 105, 0.30);
         }
-        .card-transform .badge { background: #f8fafc; border-color: #e2e8f0; color: #334155; }
-        .card-transform .enter-hint { color: #475569; }
-        .card-transform:hover { border-color: #cbd5e1; }
+
+        .card-transform .badge {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #334155;
+        }
+
+        .card-transform .enter-hint {
+            color: #475569;
+        }
+
+        .card-transform:hover {
+            border-color: #cbd5e1;
+        }
 
         /* 卡片16 特殊颜色 - 月度数据汇总工具（新增） */
         .card-monthly .icon-wrapper {
             background: linear-gradient(135deg, #2563eb, #7c3aed);
             box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.35);
         }
-        .card-monthly .badge { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
-        .card-monthly .enter-hint { color: #2563eb; }
-        .card-monthly:hover { border-color: #a5b4fc; }
+
+        .card-monthly .badge {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #3730a3;
+        }
+
+        .card-monthly .enter-hint {
+            color: #2563eb;
+        }
+
+        .card-monthly:hover {
+            border-color: #a5b4fc;
+        }
+
+        /* 卡片17 特殊颜色 - 商品图墙 */
+        .card-gallery .icon-wrapper {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            box-shadow: 0 8px 16px -6px rgba(139, 92, 246, 0.35);
+        }
+
+        .card-gallery .badge {
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .card-gallery .enter-hint {
+            color: #8b5cf6;
+        }
+
+        .card-gallery:hover {
+            border-color: #c4b5fd;
+        }
 
         /* 响应式 */
         @media (max-width: 1100px) {
@@ -326,14 +523,29 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
-            .page-title h1 { font-size: 22px; }
-            .nav-card { padding: 16px 12px 18px; }
+
+            .page-title h1 {
+                font-size: 22px;
+            }
+
+            .nav-card {
+                padding: 16px 12px 18px;
+            }
         }
 
         @media (max-width: 400px) {
-            body { padding: 12px; }
-            .card-grid { grid-template-columns: 1fr; gap: 10px; }
-            .card-title { font-size: 15px; }
+            body {
+                padding: 12px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .card-title {
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -412,7 +624,8 @@
             </a>
 
             <!-- 工具6：文件夹结构化工具 -->
-            <a href="tools/folder_organizer.html" class="nav-card card-folder" target="_blank" title="通过 TXT 路径列表批量整理文件夹结构">
+            <a href="tools/folder_organizer.html" class="nav-card card-folder" target="_blank"
+                title="通过 TXT 路径列表批量整理文件夹结构">
                 <div class="icon-wrapper">📁</div>
                 <h2 class="card-title">文件夹结构化</h2>
                 <p class="card-desc">导出路径 TXT，编辑后上传执行迁移，自动备份。</p>
@@ -439,7 +652,8 @@
             </a>
 
             <!-- 工具8：Excel 数据处理 -->
-            <a href="tools/excel_data_processor.html" class="nav-card card-processor" target="_blank" title="筛选列、添加计算列、保存模板">
+            <a href="tools/excel_data_processor.html" class="nav-card card-processor" target="_blank"
+                title="筛选列、添加计算列、保存模板">
                 <div class="icon-wrapper">🧮</div>
                 <h2 class="card-title">Excel 数据处理</h2>
                 <p class="card-desc">筛选列、添加计算列、保存模板至 IndexedDB。</p>
@@ -453,7 +667,8 @@
             </a>
 
             <!-- 工具9：数据报表展示 -->
-            <a href="tools/data_report/index.html" class="nav-card card-report" target="_blank" title="上传 Excel/CSV，灵活筛选、排序、展示数据">
+            <a href="tools/data_report/index.html" class="nav-card card-report" target="_blank"
+                title="上传 Excel/CSV，灵活筛选、排序、展示数据">
                 <div class="icon-wrapper">📈</div>
                 <h2 class="card-title">数据报表展示</h2>
                 <p class="card-desc">上传 Excel/CSV，列筛选、排序、拖拽、分页，状态自动保存。</p>
@@ -467,7 +682,8 @@
             </a>
 
             <!-- 工具10：Excel 横向合并 -->
-            <a href="tools/excel_horizontal_merge.html" class="nav-card card-hmerge" target="_blank" title="多表横向合并，支持自定义表头行数">
+            <a href="tools/excel_horizontal_merge.html" class="nav-card card-hmerge" target="_blank"
+                title="多表横向合并，支持自定义表头行数">
                 <div class="icon-wrapper">🔗</div>
                 <h2 class="card-title">Excel 横向合并</h2>
                 <p class="card-desc">多表横向合并，可指定表头行，按勾选列匹配。</p>
@@ -480,7 +696,8 @@
             </a>
 
             <!-- 工具11：活动日历 -->
-            <a href="tools/event_calendar/index.html" class="nav-card card-calendar" target="_blank" title="淘宝天猫活动日历，支持筛选、列表、时间轴视图">
+            <a href="tools/event_calendar/index.html" class="nav-card card-calendar" target="_blank"
+                title="淘宝天猫活动日历，支持筛选、列表、时间轴视图">
                 <div class="icon-wrapper">📅</div>
                 <h2 class="card-title">活动日历</h2>
                 <p class="card-desc">淘宝天猫活动日历，多条件筛选，三种视图切换。</p>
@@ -493,7 +710,8 @@
             </a>
 
             <!-- 工具12：电商利润计算器 -->
-            <a href="tools/profit_calculator.html" class="nav-card card-profit" target="_blank" title="电商利润计算器，支持单次测算与批量 Excel 导入">
+            <a href="tools/profit_calculator.html" class="nav-card card-profit" target="_blank"
+                title="电商利润计算器，支持单次测算与批量 Excel 导入">
                 <div class="icon-wrapper">💰</div>
                 <h2 class="card-title">电商利润计算器</h2>
                 <p class="card-desc">利润测算，PPC/占比两种模式，支持批量 Excel。</p>
@@ -563,9 +781,24 @@
                 </div>
                 <div class="enter-hint">点击进入 →</div>
             </a>
+            <!-- 工具17：商品图墙（新增） -->
+            <a href="tools/image_wall.html" class="nav-card card-gallery" target="_blank"
+                title="导入 Excel 模板，生成商品图片墙，支持列数调节与点击跳转" data-shortcut="G">
+                <div class="icon-wrapper">🖼️</div>
+                <h2 class="card-title">商品图墙</h2>
+                <p class="card-desc">导入模板生成商品图墙，支持列数调节、店铺标签与点击跳转。</p>
+                <div class="badge-group">
+                    <span class="badge"><i>📊</i>.xlsx</span>
+                    <span class="badge"><i>🧱</i>图墙</span>
+                    <span class="badge"><i>🔢</i>列数调节</span>
+                    <span class="badge"><i>🔗</i>跳转</span>
+                </div>
+                <div class="enter-hint">点击进入 →</div>
+            </a>
         </div>
 
-        <div style="text-align: center; margin-top: 24px; font-size: 12px; color: #6b7f9c; border-top: 1px solid #e2ebf6; padding-top: 14px;">
+        <div
+            style="text-align: center; margin-top: 24px; font-size: 12px; color: #6b7f9c; border-top: 1px solid #e2ebf6; padding-top: 14px;">
             🔒 所有数据仅在浏览器本地处理 · 无需上传服务器
         </div>
     </div>

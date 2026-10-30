@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>浏览器自动化特征自检（本地离线）</title>
+<style>
+  /* 单文件、无外部依赖：双击即可打开，断网也能用 */
+  :root {
+    --ok: #12805c; --ok-bg: #e6f4ef;
+    --warn: #8a5a00; --warn-bg: #fdf3dc;
+    --bad: #b41d1d; --bad-bg: #fdeaea;
+    --info: #4a4a4a; --info-bg: #f0f0f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 24px 64px;
+    font: 14px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #1e1e1e; background: #fafafa;
+  }
+  main { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  h2 { font-size: 16px; margin: 36px 0 10px; }
+  .sub { color: #666; margin: 0 0 20px; }
+  .summary {
+    padding: 12px 16px; border-radius: 8px; font-weight: 600;
+    background: var(--info-bg); color: var(--info);
+  }
+  .summary.ok { background: var(--ok-bg); color: var(--ok); }
+  .summary.bad { background: var(--bad-bg); color: var(--bad); }
+  table { width: 100%; border-collapse: collapse; margin-top: 18px; background: #fff; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #ececec; vertical-align: top; }
+  th { font-size: 12px; color: #888; font-weight: 600; letter-spacing: .02em; }
+  td:first-child { white-space: nowrap; }
+  .badge {
+    display: inline-block; padding: 1px 8px; border-radius: 999px;
+    font-size: 12px; font-family: ui-monospace, Menlo, monospace;
+    background: var(--info-bg); color: var(--info); word-break: break-all;
+  }
+  .badge.ok { background: var(--ok-bg); color: var(--ok); }
+  .badge.warn { background: var(--warn-bg); color: var(--warn); }
+  .badge.bad { background: var(--bad-bg); color: var(--bad); font-weight: 700; }
+  .note { color: #666; font-size: 13px; }
+  details { margin-top: 22px; }
+  summary { cursor: pointer; color: #444; }
+  pre {
+    background: #1e1e1e; color: #ddd; padding: 14px; border-radius: 8px;
+    overflow: auto; font-size: 12px; line-height: 1.5;
+  }
+  ol, ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  code { background: #eee; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>浏览器自动化特征自检</h1>
+  <p class="sub">
+    只检查「页面能读到的浏览器端自动化痕迹」。服务端风控（请求频率、行为序列、账号画像）在这里测不出来，
+    所以本页显示全绿，也不代表账号一定安全。
+  </p>
+
+  <div id="summary" class="summary">检测中…</div>
+
+  <table>
+    <thead>
+      <tr><th style="width:30%">项目</th><th style="width:26%">结果</th><th>说明</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <details>
+    <summary>原始结果（JSON，可复制反馈）</summary>
+    <pre id="json" tabindex="0">…</pre>
+  </details>
+
+  <h2>怎么用</h2>
+  <ol>
+    <li>在<b>日常 Chrome</b> 里打开一次，记下结果作为基线。</li>
+    <li>再用<b>专用 profile 的 Chrome</b>（带 <code>--user-data-dir</code> 启动的那个）打开一次。</li>
+    <li>对比两次结果：重点关注「webdriver」「自动化全局变量」「插件数量」是否出现差异，这几项是硬信号。</li>
+    <li>Canvas / Audio / WebGL 的指纹哈希在不同 profile 之间<b>本来就会不同</b>，这是身份隔离的预期结果，不是被识别。</li>
+  </ol>
+  <p class="note">
+    小提示：双击打开时地址栏是 <code>file://</code>，通知权限状态不具参考性，本页会自动标注。
+    想要更真实的环境，可在本目录执行 <code>python3 -m http.server 8899</code> 后访问
+    <code>http://127.0.0.1:8899/</code>。
+  </p>
+</main>
+
+<script>
+/* ============================================================================
+ * 浏览器端自动化特征自检
+ *
+ * 设计取舍：
+ *   1. 只做「读取 + 展示」，不修改任何全局对象，避免页面自己暴露额外痕迹。
+ *   2. 硬信号（webdriver / cdc_ / HeadlessChrome / 插件数为 0）标红；软信号标黄或灰。
+ *   3. 所有检查独立 try/catch：任何一个 API 被禁用都不能让整页挂掉。
+ *   4. 不请求任何网络资源，断网可用，也不向第三方泄露结果。
+ * ========================================================================== */
+
+const rowsEl = document.getElementById('rows');
+const summaryEl = document.getElementById('summary');
+const jsonEl = document.getElementById('json');
+const isFileProtocol = location.protocol === 'file:';
+
+/** 累计所有检查结果，用于最后汇总与 JSON 导出 */
+const results = [];
+
+/**
+ * 追加一行结果。
+ * @param {string} label  检查项名称
+ * @param {string} value  展示值（过长会被 CSS 折行）
+ * @param {'ok'|'warn'|'bad'|'info'} verdict 判定
+ * @param {string} note   人话解释
+ */
+function add(label, value, verdict, note) {
+  results.push({ label, value: String(value), verdict, note });
+
+  const tr = document.createElement('tr');
+  const td1 = document.createElement('td');
+  td1.textContent = label;
+
+  const td2 = document.createElement('td');
+  const badge = document.createElement('span');
+  badge.className = 'badge ' + verdict;
+  badge.textContent = String(value);
+  td2.appendChild(badge);
+
+  const td3 = document.createElement('td');
+  td3.className = 'note';
+  td3.textContent = note;
+
+  tr.append(td1, td2, td3);
+  rowsEl.appendChild(tr);
+}
+
+/** 简易 FNV-1a 哈希：指纹类数据只需要稳定可比，不需要密码学强度 */
+function hashString(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
+/** 安全取值：某些属性在受限环境下会抛异常 */
+function safe(fn, fallback) {
+  try { return fn(); } catch (e) { return fallback; }
+}
+
+/* ---------------------------- 1. 核心硬信号 ---------------------------- */
+
+function checkWebdriver() {
+  const v = navigator.webdriver;
+  add(
+    'navigator.webdriver',
+    v === undefined ? 'undefined' : String(v),
+    v === true ? 'bad' : 'ok',
+    v === true
+      ? '标准自动化标志位为 true，任何反爬脚本都能第一时间读到'
+      : '未暴露 webdriver 标志；Chrome 正常人工环境同样为 false'
+  );
+}
+
+function checkHeadlessUA() {
+  const ua = navigator.userAgent;
+  const isHeadless = /HeadlessChrome/i.test(ua);
+  add(
+    'UA 是否含 Headless',
+    isHeadless ? '含 HeadlessChrome' : '否',
+    isHeadless ? 'bad' : 'ok',
+    isHeadless ? '无头模式会直接写进 UA，属于最容易被识别的特征' : 'UA 中无无头标记'
+  );
+}
+
+/**
+ * 扫描常见的自动化框架注入到 window / document 上的全局变量。
+ * ChromeDriver 会留下 cdc_ / $cdc_ 前缀变量，Selenium、PhantomJS、Nightmare、
+ * Playwright、Puppeteer 也各有一组固定名字。
+ */
+function checkAutomationGlobals() {
+  const windowPattern = /^(cdc_|\$cdc_|__selenium|__webdriver|__driver|__fxdriver|_phantom$|callPhantom|__nightmare|__playwright|__puppeteer|__pw_)/i;
+  const documentPattern = /^(cdc_|\$cdc_|\$wdc_)/i;
+
+  const hits = [];
+  safe(() => Object.keys(window).forEach((k) => { if (windowPattern.test(k)) hits.push('window.' + k); }), null);
+  safe(() => Object.keys(document).forEach((k) => { if (documentPattern.test(k)) hits.push('document.' + k); }), null);
+
+  add(
+    '自动化框架全局变量',
+    hits.length ? hits.join(', ') : '未发现',
+    hits.length ? 'bad' : 'ok',
+    hits.length
+      ? '这些变量由 Selenium / Playwright / Puppeteer 等注入，页面可直接检测'
+      : '未发现 cdc_、__selenium、__playwright 等已知变量'
+  );
+}
+
+function checkPlugins() {
+  const count = safe(() => navigator.plugins.length, -1);
+  const names = safe(() => Array.from(navigator.plugins).map((p) => p.name).join(' / '), '');
+  add(
+    '插件数量',
+    String(count),
+    count === 0 ? 'bad' : 'ok',
+    count === 0
+      ? '正常桌面 Chrome 内置 PDF 等插件，数量不会为 0；为 0 是无头/精简环境的典型特征'
+      : names.slice(0, 120)
+  );
+}
+
+function checkLanguages() {
+  const langs = safe(() => (navigator.languages || []).join(','), '');
+  add(
+    '浏览器语言',
+    langs || '(空)',
+    langs ? 'ok' : 'bad',
+    langs ? '语言列表为空同样是自动化环境的常见特征' : '语言列表为空'
+  );
+}
+
+/* --------------------------- 2. 权限一致性 --------------------------- */
+
+async function checkPermissionConsistency() {
+  if (typeof Notification === 'undefined') {
+    add('通知权限一致性', 'API 不可用', 'info', '当前环境没有 Notification API');
+    return;
+  }
+  const perm = Notification.permission;
+  const queried = await new Promise((resolve) => {
+    if (!navigator.permissions || !navigator.permissions.query) return resolve('unavailable');
+    navigator.permissions
+      .query({ name: 'notifications' })
+      .then((s) => resolve(s.state))
+      .catch(() => resolve('error'));
+  });
+
+  if (isFileProtocol) {
+    add(
+      '通知权限一致性',
+      perm + ' / ' + queried,
+      'info',
+      'file:// 下权限状态不具参考性，改用 http://127.0.0.1 打开再测'
+    );
+    return;
+  }
+
+  const mismatch = perm === 'denied' && queried === 'prompt';
+  add(
+    '通知权限一致性',
+    perm + ' / ' + queried,
+    mismatch ? 'bad' : 'ok',
+    mismatch
+      ? '两处权限状态互相矛盾，是无头浏览器或权限补丁的典型痕迹'
+      : 'Notification.permission 与 permissions.query 一致'
+  );
+}
+
+/* ----------------------------- 3. 屏显信息 ----------------------------- */
+
+function checkScreenMetrics() {
+  const s = screen;
+  const text = `屏幕 ${s.width}x${s.height} / 可用 ${s.availWidth}x${s.availHeight} / ` +
+               `窗口外 ${outerWidth}x${outerHeight} / 视口 ${innerWidth}x${innerHeight} / DPR ${devicePixelRatio}`;
+  const zero = safe(() => outerWidth === 0 || s.width === 0 || innerWidth === 0, true);
+  add(
+    '屏幕与窗口尺寸',
+    text,
+    zero ? 'bad' : 'info',
+    zero
+      ? '存在 0 尺寸，常见于无头模式或离屏窗口'
+      : '正常有头窗口应有非零的外框与视口尺寸'
+  );
+}
+
+function checkViewportRatio() {
+  // 无头模式的默认视口常为 800x600，且与屏幕尺寸比例不符
+  const r = safe(() => (window.innerWidth / window.innerHeight).toFixed(2), '0');
+  const suspicious = safe(() => innerWidth === 800 && innerHeight === 600, false);
+  add(
+    '视口比例',
+    r + (suspicious ? '（800x600）' : ''),
+    suspicious ? 'warn' : 'info',
+    suspicious ? '800x600 是无头浏览器的默认视口，建议改成真实屏幕尺寸' : '仅作环境记录'
+  );
+}
+
+/* --------------------------- 4. 环境与指纹 --------------------------- */
+
+function checkEnv() {
+  const tz = safe(() => Intl.DateTimeFormat().resolvedOptions().timeZone, '未知');
+  const locale = safe(() => Intl.DateTimeFormat().resolvedOptions().locale, '未知');
+  const cores = safe(() => navigator.hardwareConcurrency, '未知');
+  const mem = safe(() => navigator.deviceMemory, '未知');
+  const touch = safe(() => navigator.maxTouchPoints, '未知');
+  add(
+    '时区 / 区域 / 硬件',
+    `${tz} / ${locale} / ${cores} 核 / 内存 ${mem}GB / 触点 ${touch}`,
+    'info',
+    '与账号常用地区不符时，会提高服务端风控评分（本页只展示，不做判断）'
+  );
+}
+
+function checkClientHints() {
+  const uaData = navigator.userAgentData;
+  if (!uaData) {
+    add('Client Hints 品牌', '不可用', 'info', '该浏览器未提供 userAgentData');
+    return;
+  }
+  const brands = safe(() => uaData.brands.map((b) => `${b.brand} ${b.version}`).join(' / '), '');
+  add(
+    'Client Hints 品牌',
+    brands || '(空)',
+    brands ? 'ok' : 'warn',
+    'UA 与 Client Hints 不一致（例如 UA 写 Chrome、hints 写 Chromium）属于伪装痕迹'
+  );
+}
+
+function getWebGLInfo() {
+  return safe(() => {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return { vendor: '不可用', renderer: '不可用', unmasked: '不可用' };
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    return {
+      vendor: gl.getParameter(gl.VENDOR),
+      renderer: gl.getParameter(gl.RENDERER),
+      unmasked: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : '未暴露',
+    };
+  }, { vendor: '异常', renderer: '异常', unmasked: '异常' });
+}
+
+function checkWebGL() {
+  const info = getWebGLInfo();
+  add('WebGL 渲染器', info.unmasked, 'info', `vendor: ${info.vendor} / 显卡型号可被服务端用于设备聚类`);
+}
+
+function checkCanvas() {
+  const hash = safe(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 240;
+    canvas.height = 60;
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'top';
+    ctx.font = '16px "PingFang SC", Arial, sans-serif';
+    ctx.fillStyle = '#f60';
+    ctx.fillRect(0, 0, 240, 60);
+    ctx.fillStyle = '#069';
+    ctx.fillText('生意参谋 数据 123', 4, 8);
+    ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+    ctx.fillText('abcdefg', 40, 30);
+    return hashString(canvas.toDataURL());
+  }, '异常');
+  add('Canvas 指纹', hash, 'info', '同一 profile 内应保持稳定；跨 profile 不同属正常隔离，不代表被识别');
+}
+
+async function checkAudio() {
+  const hash = await (async () => {
+    try {
+      const Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      if (!Ctx) return '不可用';
+      const ctx = new Ctx(1, 5000, 44100);
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = 10000;
+      const comp = ctx.createDynamicsCompressor();
+      osc.connect(comp);
+      comp.connect(ctx.destination);
+      osc.start(0);
+      const buffer = await ctx.startRendering();
+      const data = buffer.getChannelData(0);
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 100) sum += Math.abs(data[i]);
+      return hashString(String(sum));
+    } catch (e) {
+      return '异常';
+    }
+  })();
+  add('Audio 指纹', hash, 'info', '硬件相关的音频渲染差异，仅用于设备聚类，不是自动化判据');
+}
+
+/* ------------------------------ 5. 汇总 ------------------------------ */
+
+function finish() {
+  const bad = results.filter((r) => r.verdict === 'bad');
+  if (bad.length === 0) {
+    summaryEl.className = 'summary ok';
+    summaryEl.textContent = '未发现常见浏览器端自动化特征（仍不代表不会被风控）';
+  } else {
+    summaryEl.className = 'summary bad';
+    summaryEl.textContent =
+      '命中 ' + bad.length + ' 项自动化特征：' + bad.map((r) => r.label).join('、');
+  }
+
+  jsonEl.textContent = JSON.stringify(
+    {
+      checkedAt: new Date().toISOString(),
+      url: location.href,
+      protocol: location.protocol,
+      userAgent: navigator.userAgent,
+      results,
+    },
+    null,
+    2
+  );
+}
+
+/* ------------------------------ 6. 执行 ------------------------------ */
+
+(async function main() {
+  checkWebdriver();
+  checkHeadlessUA();
+  checkAutomationGlobals();
+  checkPlugins();
+  checkLanguages();
+  await checkPermissionConsistency();
+  checkScreenMetrics();
+  checkViewportRatio();
+  checkEnv();
+  checkClientHints();
+  checkWebGL();
+  checkCanvas();
+  await checkAudio();
+  finish();
+})();
+</script>
+</body>
+</html>

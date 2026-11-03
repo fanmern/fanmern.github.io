@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<title>月度数据汇总工具 · 支付金额 / 去退金额 / 推广花费</title>
+<!-- 引入 SheetJS -->
+<script src="https://cdn.staticfile.org/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- 引入 Markdown 解析库 -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root{
+  --primary:#3b82f6; --primary-dark:#2563eb; --primary-light:#dbeafe; --primary-soft:#eff6ff;
+  --success:#10b981; --success-dark:#059669; --success-light:#d1fae5;
+  --warning:#f59e0b; --danger:#ef4444;
+  --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1;
+  --slate-400:#94a3b8; --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155;
+  --slate-800:#1e293b; --slate-900:#0f172a;
+  --radius:12px; --radius-lg:20px;
+  --shadow:0 4px 12px rgba(15,23,42,.08);
+  --shadow-lg:0 20px 60px rgba(15,23,42,.10);
+  --shadow-primary:0 8px 20px -4px rgba(59,130,246,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+  background:linear-gradient(160deg,#f0f4f8 0%,#e6edf5 60%,#dde7f2 100%);
+  color:var(--slate-800); line-height:1.6; min-height:100vh;
+  padding:24px 16px 48px; -webkit-font-smoothing:antialiased;
+}
+.app{max-width:1400px; margin:0 auto; background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); overflow:hidden}
+.header{
+  background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#3b82f6 100%);
+  padding:26px 32px; color:#fff; display:flex; align-items:center;
+  justify-content:space-between; gap:16px; flex-wrap:wrap; position:relative; overflow:hidden;
+}
+.header::before{content:"";position:absolute;right:-40px;top:-60px;width:240px;height:240px;
+  background:radial-gradient(circle,rgba(255,255,255,.14) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.header-left{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.header-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.25);flex-shrink:0}
+.header h1{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
+.header p{font-size:13px;opacity:.85}
+.header-actions{display:flex; align-items:center; gap:10px; position:relative; z-index:1;}
+.header-back{
+  color:#fff; text-decoration:none; font-size:13.5px;
+  padding:8px 16px; border-radius:10px; background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.22); transition:all .18s; white-space:nowrap;
+  cursor:pointer; font-family:inherit;
+}
+.header-back:hover{background:rgba(255,255,255,.24);transform:translateX(-2px)}
+
+.card{padding:26px 32px;border-bottom:1px solid var(--slate-100)}
+.card:last-child{border-bottom:none}
+.step-title{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.step-num{width:28px;height:28px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#3b82f6,#2563eb);
+  box-shadow:0 4px 10px -2px rgba(59,130,246,.4);flex-shrink:0}
+.step-title h2{font-size:16px;font-weight:650;color:var(--slate-900);letter-spacing:-.2px}
+.step-hint{font-size:12.5px;color:var(--slate-400);margin-left:auto}
+
+.upload-area{
+  position:relative; border:2px dashed var(--slate-300); border-radius:var(--radius);
+  padding:32px 20px; text-align:center; background:var(--slate-50);
+  transition:all .22s ease; cursor:pointer; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px; min-height:160px;
+}
+.upload-area:hover{border-color:var(--primary);background:var(--primary-soft);transform:translateY(-1px)}
+.upload-area.drag{border-color:var(--primary);background:var(--primary-light);box-shadow:var(--shadow-primary)}
+.upload-area .up-icon{font-size:40px;line-height:1}
+.upload-area .up-title{font-size:16px;font-weight:650;color:var(--slate-800)}
+.upload-area .up-desc{font-size:12.5px;color:var(--slate-500);max-width:620px}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.file-list{margin-top:14px;display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto}
+.file-item{
+  display:flex; align-items:center; gap:10px; padding:8px 14px; background:#fff;
+  border-radius:10px; border:1px solid var(--slate-200); font-size:13px;
+}
+.file-item .fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item .ftype{
+  font-size:11px;padding:2px 10px;border-radius:20px;background:var(--slate-100);
+  color:var(--slate-600);font-weight:600;
+}
+.file-item .ftype.cat{background:#dbeafe;color:#1e40af}
+.file-item .ftype.std{background:#d1fae5;color:#065f46}
+.file-item .ftype.ad{background:#e0e7ff;color:#3730a3}
+.file-item .ftype.unknown{background:#fee2e2;color:#991b1b}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 20px;border-radius:10px;font-size:13.5px;font-weight:600;
+  border:none;cursor:pointer;transition:all .18s ease;white-space:nowrap;font-family:inherit}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;box-shadow:var(--shadow-primary)}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 24px -4px rgba(59,130,246,.45)}
+.btn-success{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 8px 20px -4px rgba(16,185,129,.35)}
+.btn-success:hover:not(:disabled){transform:translateY(-1px)}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 8px 20px -4px rgba(239,68,68,.35)}
+.btn-danger:hover:not(:disabled){transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--slate-600);border:1.5px solid var(--slate-200)}
+.btn-ghost:hover:not(:disabled){background:var(--slate-50);border-color:var(--slate-300)}
+.btn-lg{padding:12px 28px;font-size:14.5px;border-radius:12px}
+.btn-sm{padding:5px 13px;font-size:12.5px;border-radius:8px}
+
+.action-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.status-text{font-size:13px;color:var(--slate-500);margin-left:4px}
+
+.picker{
+  display:flex; flex-wrap:wrap; gap:9px; padding:16px;
+  background:var(--slate-50); border:1px solid var(--slate-200);
+  border-radius:var(--radius); margin-bottom:14px;
+}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; padding:7px 14px;
+  border:1.5px solid var(--slate-200); border-radius:10px; cursor:pointer;
+  background:#fff; font-size:13px; color:var(--slate-600); font-weight:500;
+  user-select:none; transition:all .16s ease;
+}
+.chip:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
+.chip.on{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border-color:transparent;
+  box-shadow:0 4px 12px -2px rgba(59,130,246,.4)}
+.chip.on:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+
+.tpl-bar{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px;
+  padding:14px 16px; background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+  border-radius:var(--radius); border:1px solid var(--slate-200);
+}
+.tpl-input{
+  flex:1 1 180px; min-width:140px; padding:9px 13px; border:1.5px solid var(--slate-200);
+  border-radius:9px; font-size:13.5px; font-family:inherit; background:#fff;
+  transition:border-color .18s, box-shadow .18s; color:var(--slate-700);
+}
+.tpl-input:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(59,130,246,.13)}
+.tpl-select{
+  flex:1 1 180px; min-width:140px; padding:9px 13px; border:1.5px solid var(--slate-200);
+  border-radius:9px; font-size:13.5px; font-family:inherit; background:#fff;
+  color:var(--slate-700); cursor:pointer; transition:border-color .18s, box-shadow .18s;
+}
+.tpl-select:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(59,130,246,.13)}
+
+.table-wrap{overflow:auto;border:1px solid var(--slate-200);border-radius:var(--radius);
+  background:#fff;max-height:640px}
+.data-table{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%}
+.data-table th,.data-table td{padding:10px 14px;text-align:right;white-space:nowrap;
+  border-bottom:1px solid var(--slate-100);border-right:1px solid var(--slate-100)}
+.data-table thead th{background:linear-gradient(180deg,#f8fafc,#f1f5f9);color:var(--slate-700);
+  font-weight:650;font-size:12px;text-align:center;position:sticky;top:0;z-index:3;
+  border-bottom:2px solid var(--slate-200)}
+.data-table thead tr:nth-child(2) th{top:40px;z-index:2;font-size:11.5px;color:var(--slate-500)}
+.data-table th:first-child,.data-table td:first-child{position:sticky;left:0;text-align:left;
+  font-weight:650;color:var(--slate-800);background:#fff;z-index:5;
+  box-shadow:2px 0 0 var(--slate-200);font-size:13px;min-width:130px}
+.data-table thead th:first-child{background:linear-gradient(180deg,#f8fafc,#f1f5f9);
+  z-index:6;color:var(--slate-700)}
+.data-table tbody tr:hover td{background:#fafcff}
+.data-table tbody tr:hover td:first-child{background:#fafcff}
+.data-table tbody tr:nth-child(even) td{background:#fbfdff}
+.data-table tbody tr:nth-child(even) td:first-child{background:#fbfdff}
+.data-table tfoot td{background:#f8fafc;font-weight:700;color:var(--slate-800);
+  border-top:2px solid var(--slate-200)}
+.data-table .zero{color:#cbd5e1}
+.data-table .pay{color:#0369a1}
+.data-table .net{color:#059669}
+.data-table .ad{color:#7c3aed}
+
+.log-box{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+  line-height:1.75;background:var(--slate-900);color:#cbd5e1;padding:16px 18px;
+  border-radius:var(--radius);max-height:220px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.log-box::-webkit-scrollbar{width:8px}
+.log-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:8px}
+.log-box .ok{color:#4ade80}
+.log-box .warn{color:#fbbf24}
+.log-box .err{color:#f87171}
+.log-box .info{color:#60a5fa}
+.log-box .dim{color:#64748b}
+
+/* Modal 弹窗样式 */
+.modal-overlay{
+  position: fixed; inset: 0; background: rgba(15,23,42,.6); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center; z-index: 10000;
+  opacity: 0; transition: opacity .2s ease;
+}
+.modal-overlay.show{ display: flex; opacity: 1; }
+.modal-content{
+  background: #fff; border-radius: var(--radius-lg); width: 90%; max-width: 800px;
+  max-height: 85vh; display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,.2);
+  transform: translateY(20px); transition: transform .2s ease;
+}
+.modal-overlay.show .modal-content{ transform: translateY(0); }
+.modal-header{
+  padding: 18px 24px; border-bottom: 1px solid var(--slate-200);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h3{ font-size: 18px; color: var(--slate-900); margin: 0; }
+.modal-close{
+  background: transparent; border: none; font-size: 24px; color: var(--slate-400);
+  cursor: pointer; transition: color .15s; line-height: 1;
+}
+.modal-close:hover{ color: var(--danger); }
+.modal-body{
+  padding: 24px 32px; overflow-y: auto; color: var(--slate-700); line-height: 1.8;
+  font-size: 14.5px;
+}
+/* Markdown 渲染出的样式 */
+.modal-body h1, .modal-body h2, .modal-body h3 { margin-top: 24px; margin-bottom: 12px; color: var(--slate-900); }
+.modal-body h1 { font-size: 22px; border-bottom: 1px solid var(--slate-200); padding-bottom: 8px; }
+.modal-body h2 { font-size: 18px; margin-top: 20px; }
+.modal-body h3 { font-size: 16px; }
+.modal-body p { margin-bottom: 14px; }
+.modal-body ul, .modal-body ol { margin-bottom: 14px; padding-left: 24px; }
+.modal-body li { margin-bottom: 6px; }
+.modal-body code { background: var(--slate-100); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: var(--danger); }
+.modal-body pre { background: var(--slate-900); color: #fff; padding: 14px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; }
+.modal-body pre code { background: transparent; padding: 0; color: inherit; }
+.modal-body table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+.modal-body th, .modal-body td { border: 1px solid var(--slate-300); padding: 8px 12px; text-align: left; }
+.modal-body th { background: var(--slate-100); }
+.modal-body blockquote { border-left: 4px solid var(--primary); margin: 0 0 16px 0; padding: 8px 16px; background: var(--primary-soft); color: var(--slate-600); }
+
+.toast-wrap{position:fixed;bottom:26px;right:26px;display:flex;flex-direction:column;gap:10px;z-index:9999;max-width:380px}
+.toast{padding:13px 20px;border-radius:12px;background:var(--slate-900);color:#fff;
+  font-size:13.5px;font-weight:500;box-shadow:0 16px 40px rgba(0,0,0,.22);
+  display:flex;align-items:center;gap:10px;animation:toastIn .3s cubic-bezier(.22,1,.36,1)}
+.toast.success{background:linear-gradient(135deg,#10b981,#059669)}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.toast.info{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+@media(max-width:720px){
+  body{padding:12px 10px 32px}
+  .card{padding:20px 18px}
+  .header{padding:20px 18px}
+  .header h1{font-size:18px}
+  .header-icon{width:42px;height:42px;font-size:21px;border-radius:13px}
+  .step-hint{display:none}
+  .toast-wrap{left:14px;right:14px;bottom:14px;max-width:none}
+  .data-table th,.data-table td{padding:8px 10px;font-size:11.5px}
+  .tpl-bar{padding:12px}
+  .modal-body { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="header">
+    <div class="header-left">
+      <div class="header-icon">📊</div>
+      <div>
+        <h1>月度数据汇总工具</h1>
+        <p>类目对照表（xlsx / json）+ 标准类目 + 推广商品 · 按类目汇总 · 支持类目模板</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-back" id="btnHelp">📖 使用说明</button>
+      <a href="../tools.html" class="header-back">← 返回工具集</a>
+    </div>
+  </header>
+
+  <!-- 步骤 1：上传 -->
+  <section class="card">
+    <div class="step-title">
+      <span class="step-num">1</span>
+      <h2>上传数据文件</h2>
+      <span class="step-hint">支持 .xlsx / .xls / .csv / .json · 一次可多选</span>
+    </div>
+
+    <div class="upload-area" id="uploadArea">
+      <div class="up-icon">📂</div>
+      <div class="up-title">点击或拖拽上传多个文件</div>
+      <div class="up-desc">
+        包含「类目对照表」「品类-标准类目」「推广商品明细」<br>
+        类目对照表支持 Excel（含「商品ID」及「类目」或「叶子类目名称」）或 JSON（<code>[{id, node}, ...]</code>）<br>
+        工具会自动根据文件名和表头识别每个文件的类型
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.json" multiple>
+    </div>
+
+    <div class="file-list" id="fileList"></div>
+
+    <div class="action-bar">
+      <button class="btn btn-primary btn-lg" id="btnRun" disabled>▶ 开始解析</button>
+      <button class="btn btn-ghost" id="btnReset">清空全部</button>
+      <span class="status-text" id="runStatus"></span>
+    </div>
+  </section>
+
+  <!-- 步骤 2：类目选择（含模板） -->
+  <section class="card" id="catSection" style="display:none">
+    <div class="step-title">
+      <span class="step-num">2</span>
+      <h2>选择需要导出的类目</h2>
+      <span class="step-hint" id="catHint"></span>
+    </div>
+    <div class="tools">
+      <button class="btn btn-sm btn-ghost" id="btnAllCat">全选</button>
+      <button class="btn btn-sm btn-ghost" id="btnNoneCat">全不选</button>
+      <button class="btn btn-sm btn-ghost" id="btnInvertCat">反选</button>
+    </div>
+    <div class="picker" id="catPicker"></div>
+
+    <div class="tpl-bar">
+      <input type="text" class="tpl-input" id="tplName" placeholder="模板名称，如：核心六大类目">
+      <button class="btn btn-success" id="btnSaveTpl">💾 保存模板</button>
+      <select class="tpl-select" id="tplSelect">
+        <option value="">-- 我的类目模板 --</option>
+      </select>
+      <button class="btn btn-primary" id="btnLoadTpl">📂 载入模板</button>
+      <button class="btn btn-danger" id="btnDelTpl">🗑 删除模板</button>
+    </div>
+  </section>
+
+  <!-- 步骤 3：月份选择 -->
+  <section class="card" id="monthSection" style="display:none">
+    <div class="step-title">
+      <span class="step-num">3</span>
+      <h2>选择需要导出的月份</h2>
+      <span class="step-hint" id="monthHint"></span>
+    </div>
+    <div class="tools">
+      <button class="btn btn-sm btn-ghost" id="btnAllMonth">全选</button>
+      <button class="btn btn-sm btn-ghost" id="btnNoneMonth">全不选</button>
+      <button class="btn btn-sm btn-ghost" id="btnInvertMonth">反选</button>
+    </div>
+    <div class="picker" id="monthPicker"></div>
+  </section>
+
+  <!-- 步骤 4：预览 & 导出 -->
+  <section class="card" id="previewSection" style="display:none">
+    <div class="step-title">
+      <span class="step-num">4</span>
+      <h2>数据预览</h2>
+      <span class="step-hint" id="previewHint"></span>
+    </div>
+    <div class="table-wrap" id="previewWrap"></div>
+    <div class="action-bar">
+      <button class="btn btn-primary btn-lg" id="btnExport">⬇ 导出 Excel</button>
+      <span class="status-text" id="exportStatus"></span>
+    </div>
+  </section>
+
+  <!-- 日志 -->
+  <section class="card">
+    <div class="step-title">
+      <span class="step-num" style="background:linear-gradient(135deg,#64748b,#475569);box-shadow:none">·</span>
+      <h2>运行日志</h2>
+      <span class="step-hint" id="logHint"></span>
+    </div>
+    <div class="log-box" id="logBox">等待上传文件…</div>
+  </section>
+
+</div>
+
+<!-- 说明文档弹窗 -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📖 使用说明</h3>
+      <button class="modal-close" id="btnCloseHelp">&times;</button>
+    </div>
+    <div class="modal-body" id="helpContent">
+      正在加载 readme.md...
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ================================================================
+   状态
+   ================================================================ */
+const state = {
+  catMap: {},
+  data: {},
+  unmatched: {},
+  allCats: new Set(),
+  allMonths: [],
+  selectedCats: new Set(),
+  selectedMonths: new Set(),
+  files: [],
+  fileTypes: {},
+};
+
+/* ================================================================
+   IndexedDB：类目模板
+   ================================================================ */
+const DB_NAME  = 'MonthlySummaryDB_v2'; 
+const DB_STORE = 'categoryTemplates';
+let db = null;
+
+function openDB(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(DB_STORE)){
+        d.createObjectStore(DB_STORE, { keyPath:'id', autoIncrement:true });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+function dbAdd(tpl){
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    const req = tx.objectStore(DB_STORE).add(tpl);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror   = () => reject(req.error);
+  });
+}
+function dbAll(){
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror   = () => reject(req.error);
+  });
+}
+function dbDel(id){
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    const req = tx.objectStore(DB_STORE).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror   = () => reject(req.error);
+  });
+}
+
+/* ================================================================
+   工具函数
+   ================================================================ */
+function $(id){ return document.getElementById(id); }
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function normId(v){
+  if (v == null) return '';
+  if (typeof v === 'number') return String(Math.round(v));
+  let s = String(v).trim();
+  if (/^\d+\.0+$/.test(s)) s = s.split('.')[0];
+  return s.replace(/[^\dA-Za-z]/g,'');
+}
+function toNum(v){
+  if (v == null) return 0;
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  const s = String(v).replace(/[,，\s¥￥$%]/g,'');
+  if (s === '' || s === '-' || s === '--') return 0;
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+function r2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+function fmt(n){
+  if (!n) return '0';
+  return Number(n).toLocaleString('zh-CN', {maximumFractionDigits:2});
+}
+function monthKeyFromName(name){
+  const allDates = name.match(/\d{4}-\d{2}-\d{2}/g);
+  if (allDates && allDates.length) return allDates[allDates.length - 1].slice(0,7);
+  const compact = name.match(/(\d{4})(\d{2})(\d{2})/);
+  if (compact) return compact[1] + '-' + compact[2];
+  const simple = name.match(/(\d{4})-(\d{2})/);
+  if (simple) return simple[1] + '-' + simple[2];
+  return null;
+}
+function monthLabel(key){
+  const m = key.match(/^(\d{4})-(\d{2})$/);
+  return m ? m[1] + '年' + parseInt(m[2]) + '月' : key;
+}
+
+/* ================================================================
+   日志 & Toast
+   ================================================================ */
+function log(msg, cls){
+  const box = $('logBox');
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+function clearLog(){ $('logBox').innerHTML = ''; $('logHint').textContent = ''; }
+function showToast(msg, type){
+  const wrap = $('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || 'info');
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  el.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${esc(msg)}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'all .3s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(8px)';
+    setTimeout(() => el.remove(), 320);
+  }, 2600);
+}
+
+/* ================================================================
+   Excel / JSON 读取
+   ================================================================ */
+function readWorkbook(file){
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = e => {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array' });
+        resolve(wb);
+      } catch (err){ reject(new Error('文件解析失败：' + err.message)); }
+    };
+    fr.onerror = () => reject(new Error('文件读取失败'));
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+function readJSONCatFile(file){
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = e => {
+      try {
+        let data = JSON.parse(e.target.result);
+        if (!Array.isArray(data)){
+          if (data && Array.isArray(data.data)) data = data.data;
+          else if (data && Array.isArray(data.list)) data = data.list;
+          else if (data && Array.isArray(data.items)) data = data.items;
+        }
+        if (!Array.isArray(data)){
+          reject(new Error('JSON 根节点必须是数组（或包含 data/list/items 数组）'));
+          return;
+        }
+        const rows = [['商品ID','类目']];
+        data.forEach(item => {
+          if (!item) return;
+          const id = item.id != null ? item.id
+                    : (item['商品ID'] != null ? item['商品ID'] : item.itemId);
+          const node = item.node != null ? item.node
+                    : (item['类目'] != null ? item['类目'] 
+                    : (item['叶子类目名称'] != null ? item['叶子类目名称'] : item.category));
+          if (id != null && node != null && String(node).trim() !== ''){
+            rows.push([String(id), String(node).trim()]);
+          }
+        });
+        resolve(rows);
+      } catch (err){
+        reject(new Error('JSON 解析失败：' + err.message));
+      }
+    };
+    fr.onerror = () => reject(new Error('文件读取失败'));
+    fr.readAsText(file, 'UTF-8');
+  });
+}
+
+function firstSheetRows(wb){
+  const name = wb.SheetNames[0];
+  const ws = wb.Sheets[name];
+  if (!ws) return [];
+  return XLSX.utils.sheet_to_json(ws, { header:1, raw:true, defval:null, blankrows:false });
+}
+function findHeaderRow(rows, required){
+  const limit = Math.min(rows.length, 30);
+  for (let i = 0; i < limit; i++){
+    const r = (rows[i] || []).map(c => c == null ? '' : String(c).trim());
+    if (required.every(h => r.includes(h))) return i;
+  }
+  return -1;
+}
+
+/* ================================================================
+   文件类型检测
+   ================================================================ */
+function detectFileType(rows){
+  if (findHeaderRow(rows, ['一级类目名称','类目名称','支付金额']) >= 0) return 'std';
+  if (findHeaderRow(rows, ['商品ID','推广消耗']) >= 0) return 'ad';
+  
+  const hi = findHeaderRow(rows, ['商品ID']);
+  if (hi >= 0) {
+    const header = rows[hi].map(c => c == null ? '' : String(c).trim());
+    if (header.includes('类目') || header.includes('叶子类目名称')) return 'cat';
+  }
+  
+  return 'unknown';
+}
+
+/* ================================================================
+   解析：类目对照表
+   ================================================================ */
+function parseCatRows(rows, fileName){
+  const hi = findHeaderRow(rows, ['商品ID']);
+  if (hi < 0) return { ok:false, msg:'未找到「商品ID」列' };
+
+  const header = rows[hi].map(c => c == null ? '' : String(c).trim());
+  const iId = header.indexOf('商品ID');
+  
+  let iCat = header.indexOf('类目');
+  if (iCat < 0) iCat = header.indexOf('叶子类目名称');
+
+  if (iCat < 0) return { ok:false, msg:'未找到「类目」或「叶子类目名称」列' };
+
+  let n = 0;
+  for (let i = hi + 1; i < rows.length; i++){
+    const r = rows[i];
+    if (!r) continue;
+    const id  = normId(r[iId]);
+    const cat = r[iCat] == null ? '' : String(r[iCat]).trim();
+    if (id && cat && !state.catMap[id]){
+      state.catMap[id] = cat;
+      n++;
+    }
+  }
+  return { ok:true, n };
+}
+
+/* ================================================================
+   解析：品类-标准类目
+   ================================================================ */
+function parseStdRows(rows, fileName){
+  const monthKey = monthKeyFromName(fileName);
+  if (!monthKey) return { ok:false, msg:'文件名未识别到月份' };
+
+  const hi = findHeaderRow(rows, ['一级类目名称','类目名称','支付金额']);
+  if (hi < 0) return { ok:false, msg:'未找到标准类目表头' };
+
+  const header = rows[hi].map(c => c == null ? '' : String(c).trim());
+  const col    = n => header.indexOf(n);
+
+  const idx = {
+    l1: col('一级类目名称'),
+    l2: col('二级类目名称'),
+    cat: col('类目名称'),
+    pay: col('支付金额'),
+    refund: col('售中售后成功退款金额'),
+  };
+  if (idx.l1 < 0 || idx.cat < 0 || idx.pay < 0) return { ok:false, msg:'缺少必要列' };
+
+  const hasDetail = new Set();
+  for (let i = hi + 1; i < rows.length; i++){
+    const r = rows[i];
+    if (!r) continue;
+    const l2  = r[idx.l2]  == null ? '' : String(r[idx.l2]).trim();
+    const cat = r[idx.cat] == null ? '' : String(r[idx.cat]).trim();
+    if (cat && l2 && l2 !== cat) hasDetail.add(cat);
+  }
+
+  if (!state.data[monthKey]) state.data[monthKey] = {};
+  const bucket = state.data[monthKey];
+
+  let rowCount = 0;
+  for (let i = hi + 1; i < rows.length; i++){
+    const r = rows[i];
+    if (!r) continue;
+    const l1  = r[idx.l1]  == null ? '' : String(r[idx.l1]).trim();
+    const l2  = r[idx.l2]  == null ? '' : String(r[idx.l2]).trim();
+    const cat = r[idx.cat] == null ? '' : String(r[idx.cat]).trim();
+    if (!cat) continue;
+
+    if (l1 === l2 && l2 === cat) continue;
+    if (l2 === cat && hasDetail.has(cat)) continue;
+
+    const pay    = toNum(r[idx.pay]);
+    const refund = idx.refund >= 0 ? toNum(r[idx.refund]) : 0;
+
+    if (!bucket[cat]) bucket[cat] = { pay:0, refund:0, adCost:0 };
+    bucket[cat].pay    += pay;
+    bucket[cat].refund += refund;
+    state.allCats.add(cat);
+    rowCount++;
+  }
+
+  return { ok:true, monthKey, rowCount };
+}
+
+/* ================================================================
+   解析：推广商品
+   ================================================================ */
+function parseAdRows(rows, fileName){
+  const monthKey = monthKeyFromName(fileName);
+  if (!monthKey) return { ok:false, msg:'文件名未识别到月份' };
+
+  const hi = findHeaderRow(rows, ['商品ID','推广消耗']);
+  if (hi < 0) return { ok:false, msg:'未找到推广商品表头' };
+
+  const header = rows[hi].map(c => c == null ? '' : String(c).trim());
+  const col    = n => header.indexOf(n);
+
+  const idx = {
+    id: col('商品ID'),
+    name: col('商品名称'),
+    cost: col('推广消耗'),
+  };
+
+  if (!state.data[monthKey]) state.data[monthKey] = {};
+  const bucket = state.data[monthKey];
+  if (!state.unmatched[monthKey]) state.unmatched[monthKey] = [];
+
+  const hasCatMap = Object.keys(state.catMap).length > 0;
+  let n = 0, matched = 0, unmatched = 0;
+
+  for (let i = hi + 1; i < rows.length; i++){
+    const r = rows[i];
+    if (!r) continue;
+    const id = normId(r[idx.id]);
+    if (!id) continue;
+    const cost = toNum(r[idx.cost]);
+
+    const cat = hasCatMap ? state.catMap[id] : null;
+    if (cat){
+      if (!bucket[cat]) bucket[cat] = { pay:0, refund:0, adCost:0 };
+      bucket[cat].adCost += cost;
+      state.allCats.add(cat);
+      matched++;
+    } else {
+      const name = idx.name >= 0 && r[idx.name] != null ? String(r[idx.name]) : '';
+      state.unmatched[monthKey].push({ id, name, adCost: cost });
+      unmatched++;
+    }
+    n++;
+  }
+
+  return { ok:true, monthKey, n, matched, unmatched };
+}
+
+/* ================================================================
+   主流程
+   ================================================================ */
+async function run(){
+  if (!state.files.length){
+    showToast('请先上传文件', 'error');
+    return;
+  }
+  const btn = $('btnRun');
+  btn.disabled = true;
+  $('runStatus').textContent = '解析中…';
+  clearLog();
+
+  state.catMap = {};
+  state.data = {};
+  state.unmatched = {};
+  state.allCats = new Set();
+  state.allMonths = [];
+  state.selectedCats = new Set();
+  state.selectedMonths = new Set();
+  state.fileTypes = {};
+
+  try {
+    log('【1/3】读取文件并识别类型…', 'info');
+    const fileData = [];
+    for (const f of state.files){
+      try {
+        const ext = f.name.split('.').pop().toLowerCase();
+        let rows;
+        if (ext === 'json'){
+          rows = await readJSONCatFile(f);
+        } else {
+          const wb = await readWorkbook(f);
+          rows = firstSheetRows(wb);
+        }
+        const type = detectFileType(rows);
+        state.fileTypes[f.name] = type;
+        fileData.push({ file: f, rows, type });
+
+        const typeName = { cat:'类目对照表', std:'标准类目', ad:'推广商品', unknown:'未知' }[type] || '未知';
+        log(`  · ${f.name} → ${typeName}${ext === 'json' ? '（JSON）' : ''}`,
+            type === 'unknown' ? 'warn' : 'dim');
+      } catch(e){
+        log(`  ✗ ${f.name} 读取失败：${e.message}`, 'err');
+      }
+    }
+    updateFileListUI();
+
+    log('', 'dim');
+    log('【2/3】解析数据…', 'info');
+
+    const catFiles = fileData.filter(d => d.type === 'cat');
+    if (catFiles.length){
+      log('  ▸ 类目对照表：', 'dim');
+      let total = 0;
+      for (const d of catFiles){
+        const res = parseCatRows(d.rows, d.file.name);
+        if (res.ok){
+          total += res.n;
+          log(`      ${d.file.name} → ${res.n} 条映射`, 'dim');
+        } else {
+          log(`      ✗ ${d.file.name}：${res.msg}`, 'err');
+        }
+      }
+      log(`      ✓ 共 ${total} 条商品→类目映射`, 'ok');
+    } else {
+      log('  ⚠ 未找到类目对照表，推广数据将无法归集', 'warn');
+    }
+
+    const stdFiles = fileData.filter(d => d.type === 'std');
+    if (stdFiles.length){
+      log('  ▸ 标准类目：', 'dim');
+      for (const d of stdFiles){
+        const res = parseStdRows(d.rows, d.file.name);
+        if (res.ok){
+          log(`      ${d.file.name} → 月份 ${res.monthKey}，${res.rowCount} 行数据`, 'ok');
+        } else {
+          log(`      ✗ ${d.file.name}：${res.msg}`, 'err');
+        }
+      }
+    } else {
+      log('  ⚠ 未找到标准类目文件', 'warn');
+    }
+
+    const adFiles = fileData.filter(d => d.type === 'ad');
+    if (adFiles.length){
+      log('  ▸ 推广商品：', 'dim');
+      for (const d of adFiles){
+        const res = parseAdRows(d.rows, d.file.name);
+        if (res.ok){
+          log(`      ${d.file.name} → 月份 ${res.monthKey}，${res.n} 个商品，匹配 ${res.matched}，未匹配 ${res.unmatched}`, res.unmatched ? 'warn' : 'ok');
+        } else {
+          log(`      ✗ ${d.file.name}：${res.msg}`, 'err');
+        }
+      }
+    } else {
+      log('  ⚠ 未找到推广商品文件', 'warn');
+    }
+
+    state.allMonths = Object.keys(state.data).sort();
+    if (!state.allMonths.length){
+      log('✗ 没有解析到任何月份数据', 'err');
+      showToast('未解析到数据', 'error');
+      return;
+    }
+
+    state.selectedCats = new Set([...state.allCats].sort());
+    state.selectedMonths = new Set(state.allMonths);
+
+    log('', 'dim');
+    log('──────────────────────────────', 'dim');
+    log(`✔ 解析完成　·　共 ${state.allMonths.length} 个月份：${state.allMonths.map(monthLabel).join('、')}`, 'ok');
+    log(`✔ 共 ${state.allCats.size} 个类目`, 'ok');
+
+    renderCatPicker();
+    renderMonthPicker();
+    await refreshTemplateList();
+
+    $('catSection').style.display = '';
+    $('monthSection').style.display = '';
+    $('previewSection').style.display = '';
+
+    refreshPreview();
+
+    $('runStatus').textContent = `已完成 · ${state.allMonths.length} 个月份 · ${state.allCats.size} 个类目`;
+    showToast('解析完成', 'success');
+
+  } catch (e){
+    log('✗ ' + (e && e.message ? e.message : e), 'err');
+    showToast('解析失败：' + (e.message || e), 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ================================================================
+   类目选择器
+   ================================================================ */
+function renderCatPicker(){
+  const cats = [...state.allCats].sort();
+  const box = $('catPicker');
+  box.innerHTML = cats.map(c => {
+    const on = state.selectedCats.has(c) ? 'on' : '';
+    return `<div class="chip ${on}" data-cat="${esc(c)}">${esc(c)}</div>`;
+  }).join('');
+
+  box.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const cat = chip.dataset.cat;
+      if (state.selectedCats.has(cat)) state.selectedCats.delete(cat);
+      else state.selectedCats.add(cat);
+      chip.classList.toggle('on');
+      refreshPreview();
+    });
+  });
+
+  $('catHint').textContent = `已选 ${state.selectedCats.size} / ${cats.length} 个类目`;
+}
+
+/* ================================================================
+   月份选择器
+   ================================================================ */
+function renderMonthPicker(){
+  const box = $('monthPicker');
+  box.innerHTML = state.allMonths.map(k => {
+    const on = state.selectedMonths.has(k) ? 'on' : '';
+    return `<div class="chip ${on}" data-month="${esc(k)}">${esc(monthLabel(k))}</div>`;
+  }).join('');
+
+  box.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const m = chip.dataset.month;
+      if (state.selectedMonths.has(m)) state.selectedMonths.delete(m);
+      else state.selectedMonths.add(m);
+      chip.classList.toggle('on');
+      refreshPreview();
+    });
+  });
+
+  $('monthHint').textContent = `已选 ${state.selectedMonths.size} / ${state.allMonths.length} 个月`;
+}
+
+/* ================================================================
+   刷新预览
+   ================================================================ */
+function refreshPreview(){
+  $('catHint').textContent = `已选 ${state.selectedCats.size} / ${state.allCats.size} 个类目`;
+  $('monthHint').textContent = `已选 ${state.selectedMonths.size} / ${state.allMonths.length} 个月`;
+
+  const cats   = [...state.selectedCats].sort();
+  const months = [...state.selectedMonths].sort();
+  const wrap   = $('previewWrap');
+
+  if (!cats.length || !months.length){
+    wrap.innerHTML = '<div style="padding:40px;text-align:center;color:#94a3b8">请至少选择一个类目和一个月份</div>';
+    $('previewHint').textContent = '';
+    return;
+  }
+
+  let h1 = '<tr><th rowspan="2">类目</th>';
+  let h2 = '<tr>';
+  months.forEach(m => {
+    h1 += `<th colspan="3">${esc(monthLabel(m))}</th>`;
+    h2 += '<th>支付金额</th><th>去退金额</th><th>推广花费</th>';
+  });
+  h1 += '</tr>';
+  h2 += '</tr>';
+
+  const totals = months.map(() => ({ pay:0, net:0, ad:0 }));
+
+  let body = '';
+  cats.forEach(cat => {
+    let row = `<tr><td>${esc(cat)}</td>`;
+    months.forEach((m, idx) => {
+      const d = (state.data[m] || {})[cat] || { pay:0, refund:0, adCost:0 };
+      const net = d.pay - d.refund;
+      totals[idx].pay += d.pay;
+      totals[idx].net += net;
+      totals[idx].ad  += d.adCost;
+      row += `<td class="pay ${d.pay ? '' : 'zero'}">${fmt(r2(d.pay))}</td>`;
+      row += `<td class="net ${net ? '' : 'zero'}">${fmt(r2(net))}</td>`;
+      row += `<td class="ad ${d.adCost ? '' : 'zero'}">${fmt(r2(d.adCost))}</td>`;
+    });
+    row += '</tr>';
+    body += row;
+  });
+
+  let foot = '<tr><td>合计</td>';
+  totals.forEach(t => {
+    foot += `<td>${fmt(r2(t.pay))}</td>`;
+    foot += `<td>${fmt(r2(t.net))}</td>`;
+    foot += `<td>${fmt(r2(t.ad))}</td>`;
+  });
+  foot += '</tr>';
+
+  wrap.innerHTML = `<table class="data-table">
+    <thead>${h1}${h2}</thead>
+    <tbody>${body}</tbody>
+    <tfoot>${foot}</tfoot>
+  </table>`;
+
+  $('previewHint').textContent = `${cats.length} 个类目 × ${months.length} 个月份`;
+}
+
+/* ================================================================
+   类目模板
+   ================================================================ */
+async function refreshTemplateList(){
+  try {
+    const list = await dbAll();
+    const sel  = $('tplSelect');
+    const cur  = sel.value;
+    sel.innerHTML = '<option value="">-- 我的类目模板 --</option>';
+    list.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = `${t.name}（${(t.cats || []).length} 个类目）`;
+      sel.appendChild(opt);
+    });
+    if (cur && list.some(t => String(t.id) === cur)) sel.value = cur;
+  } catch (e){
+    console.error('刷新模板列表失败', e);
+  }
+}
+
+async function saveTemplate(){
+  const name = $('tplName').value.trim();
+  if (!name){ showToast('请输入模板名称', 'error'); $('tplName').focus(); return; }
+  if (!state.selectedCats.size){ showToast('请至少勾选一个类目', 'error'); return; }
+
+  const tpl = {
+    name,
+    cats: [...state.selectedCats],
+    createdAt: Date.now(),
+  };
+
+  try {
+    const exists = (await dbAll()).find(t => t.name === name);
+    if (exists){
+      if (!confirm(`模板「${name}」已存在，是否覆盖？`)) return;
+      await dbDel(exists.id);
+    }
+    await dbAdd(tpl);
+    await refreshTemplateList();
+    $('tplSelect').value = '';
+    showToast(`模板「${name}」已保存`, 'success');
+    log(`✔ 模板已保存：${name}（${tpl.cats.length} 个类目）`, 'ok');
+  } catch (e){
+    showToast('保存失败：' + e.message, 'error');
+  }
+}
+
+async function loadTemplate(){
+  const id = $('tplSelect').value;
+  if (!id){ showToast('请先选择一个模板', 'error'); return; }
+
+  try {
+    const list = await dbAll();
+    const tpl  = list.find(t => String(t.id) === id);
+    if (!tpl){ showToast('模板不存在', 'error'); return; }
+
+    const exist = [...state.allCats];
+    const keep  = (tpl.cats || []).filter(c => exist.includes(c));
+    const miss  = (tpl.cats || []).filter(c => !exist.includes(c));
+
+    state.selectedCats = new Set(keep.length ? keep : exist);
+    renderCatPicker();
+    refreshPreview();
+
+    if (miss.length){
+      log(`⚠ 模板「${tpl.name}」中有 ${miss.length} 个类目当前数据不存在，已忽略：${miss.join('、')}`, 'warn');
+      showToast(`已载入，忽略 ${miss.length} 个不存在的类目`, 'info');
+    } else {
+      showToast(`已载入模板「${tpl.name}」`, 'success');
+    }
+    log(`✔ 载入模板：${tpl.name}（命中 ${keep.length} 个类目）`, 'ok');
+
+  } catch (e){
+    showToast('载入失败：' + e.message, 'error');
+  }
+}
+
+async function deleteTemplate(){
+  const id = $('tplSelect').value;
+  if (!id){ showToast('请先选择一个模板', 'error'); return; }
+  if (!confirm('确认删除该模板？此操作不可恢复。')) return;
+  try {
+    await dbDel(Number(id));
+    await refreshTemplateList();
+    showToast('模板已删除', 'success');
+    log('✔ 模板已删除', 'ok');
+  } catch (e){
+    showToast('删除失败：' + e.message, 'error');
+  }
+}
+
+/* ================================================================
+   导出 Excel
+   ================================================================ */
+function exportExcel(){
+  const cats   = [...state.selectedCats].sort();
+  const months = [...state.selectedMonths].sort();
+
+  if (!cats.length || !months.length){
+    showToast('请至少勾选一个类目和一个月', 'error');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  /* Sheet1：汇总宽表 */
+  const h1 = ['类目'];
+  const h2 = [''];
+  months.forEach(m => { h1.push(monthLabel(m), '', ''); h2.push('支付金额','去退金额','推广花费'); });
+  const aoa = [h1, h2];
+
+  const totals = months.map(() => ({ pay:0, net:0, ad:0 }));
+  cats.forEach(cat => {
+    const row = [cat];
+    months.forEach((m, idx) => {
+      const d = (state.data[m] || {})[cat] || { pay:0, refund:0, adCost:0 };
+      const net = d.pay - d.refund;
+      totals[idx].pay += d.pay;
+      totals[idx].net += net;
+      totals[idx].ad  += d.adCost;
+      row.push(r2(d.pay), r2(net), r2(d.adCost));
+    });
+    aoa.push(row);
+  });
+  const totalRow = ['合计'];
+  totals.forEach(t => totalRow.push(r2(t.pay), r2(t.net), r2(t.ad)));
+  aoa.push(totalRow);
+
+  const ws1 = XLSX.utils.aoa_to_sheet(aoa);
+  const merges = [{ s:{r:0,c:0}, e:{r:1,c:0} }];
+  months.forEach((m, idx) => {
+    const c = 1 + idx * 3;
+    merges.push({ s:{r:0,c:c}, e:{r:0,c:c+2} });
+  });
+  ws1['!merges'] = merges;
+  const cols = [{ wch:16 }];
+  months.forEach(() => cols.push({ wch:14 }, { wch:14 }, { wch:14 }));
+  ws1['!cols'] = cols;
+  XLSX.utils.book_append_sheet(wb, ws1, '汇总宽表');
+
+  /* Sheet2：明细长表 */
+  const long = [['类目','月份','支付金额','去退金额','推广花费']];
+  cats.forEach(cat => {
+    months.forEach(m => {
+      const d = (state.data[m] || {})[cat] || { pay:0, refund:0, adCost:0 };
+      const net = d.pay - d.refund;
+      long.push([cat, monthLabel(m), r2(d.pay), r2(net), r2(d.adCost)]);
+    });
+  });
+  const ws2 = XLSX.utils.aoa_to_sheet(long);
+  ws2['!cols'] = [{ wch:16 },{ wch:14 },{ wch:14 },{ wch:14 },{ wch:14 }];
+  XLSX.utils.book_append_sheet(wb, ws2, '明细长表');
+
+  /* Sheet3：未匹配商品 */
+  const missRows = [['月份','商品ID','商品名称','推广消耗']];
+  let hasMiss = false;
+  months.forEach(m => {
+    (state.unmatched[m] || []).forEach(x => {
+      missRows.push([monthLabel(m), x.id, x.name, r2(x.adCost)]);
+      hasMiss = true;
+    });
+  });
+  if (hasMiss){
+    const ws3 = XLSX.utils.aoa_to_sheet(missRows);
+    ws3['!cols'] = [{ wch:14 },{ wch:16 },{ wch:50 },{ wch:14 }];
+    XLSX.utils.book_append_sheet(wb, ws3, '未匹配商品');
+  }
+
+  const fname = `月度汇总_${months[0]}_至_${months[months.length-1]}.xlsx`;
+  XLSX.writeFile(wb, fname);
+
+  $('exportStatus').textContent = '已导出：' + fname;
+  showToast('导出成功', 'success');
+  log(`✔ 已导出：${fname}（${cats.length} 个类目 × ${months.length} 个月）`, 'ok');
+}
+
+/* ================================================================
+   文件上传
+   ================================================================ */
+function updateFileListUI(){
+  const list = $('fileList');
+  if (!state.files.length){
+    list.innerHTML = '';
+    $('btnRun').disabled = true;
+    return;
+  }
+  list.innerHTML = state.files.map(f => {
+    const type = state.fileTypes[f.name] || '';
+    const typeLabel = { cat:'类目对照', std:'标准类目', ad:'推广商品', unknown:'未知' }[type] || '';
+    const ext = f.name.split('.').pop().toLowerCase();
+    const fmtTag = ext === 'json' ? 'JSON' : '';
+    return `<div class="file-item">
+      <span class="fname" title="${esc(f.name)}">${esc(f.name)}</span>
+      ${typeLabel ? `<span class="ftype ${type}">${typeLabel}${fmtTag ? ' · ' + fmtTag : ''}</span>` : ''}
+    </div>`;
+  }).join('');
+  $('btnRun').disabled = false;
+}
+
+function handleFiles(files){
+  const valid = [...files].filter(f => /\.(xlsx|xls|csv|json)$/i.test(f.name));
+  if (!valid.length){
+    showToast('请选择 .xlsx / .xls / .csv / .json 文件', 'error');
+    return;
+  }
+  const existing = new Set(state.files.map(f => f.name));
+  valid.forEach(f => {
+    if (!existing.has(f.name)){
+      state.files.push(f);
+      existing.add(f.name);
+    }
+  });
+  updateFileListUI();
+  showToast(`已添加 ${valid.length} 个文件，共 ${state.files.length} 个`, 'success');
+}
+
+function bindUpload(){
+  const area = $('uploadArea');
+  const input = $('fileInput');
+  input.addEventListener('change', e => {
+    if (e.target.files.length) handleFiles(e.target.files);
+    e.target.value = '';
+  });
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag'); });
+  area.addEventListener('dragleave', () => area.classList.remove('drag'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('drag');
+    if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+  });
+}
+
+/* ================================================================
+   帮助文档
+   ================================================================ */
+async function loadHelpDoc() {
+  const modal = $('helpModal');
+  const content = $('helpContent');
+  
+  modal.classList.add('show');
+  
+  // 如果已经加载过了，就不重复请求
+  if (content.dataset.loaded === 'true') return;
+
+  content.innerHTML = '正在加载 readme.md...';
+  
+  try {
+    const res = await fetch('readme.md');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    
+    // 使用 marked 库将 Markdown 转为 HTML
+    if (window.marked) {
+      content.innerHTML = marked.parse(text);
+    } else {
+      // 降级方案：如果 marked 没加载出来，直接用 pre 显示文本
+      content.innerHTML = `<pre style="white-space:pre-wrap;">${esc(text)}</pre>`;
+    }
+    content.dataset.loaded = 'true';
+  } catch (err) {
+    content.innerHTML = `
+      <div style="color:var(--danger); text-align:center; padding:20px;">
+        <p style="font-size:16px; font-weight:bold; margin-bottom:10px;">无法加载 readme.md</p>
+        <p>错误信息：${esc(err.message)}</p>
+        <p style="margin-top:16px; font-size:13px; color:var(--slate-500);">
+          如果您是直接双击在浏览器中打开此 HTML 文件（地址栏以 file:// 开头），受浏览器跨域安全策略限制，无法读取本地文件。<br>
+          建议使用本地服务器运行（如 VS Code 的 Live Server 插件），或者直接查看同目录下的 readme.md 文件。
+        </p>
+      </div>
+    `;
+  }
+}
+
+function bindHelpEvents() {
+  const modal = $('helpModal');
+  const btnHelp = $('btnHelp');
+  const btnClose = $('btnCloseHelp');
+
+  btnHelp.addEventListener('click', loadHelpDoc);
+  
+  btnClose.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
+  
+  // 点击遮罩层关闭
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('show');
+    }
+  });
+
+  // ESC 键关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('show')) {
+      modal.classList.remove('show');
+    }
+  });
+}
+
+/* ================================================================
+   事件绑定
+   ================================================================ */
+function bindEvents(){
+  bindUpload();
+  bindHelpEvents();
+
+  $('btnRun').addEventListener('click', run);
+
+  $('btnReset').addEventListener('click', () => {
+    state.catMap = {}; state.data = {}; state.unmatched = {};
+    state.allCats = new Set(); state.allMonths = [];
+    state.selectedCats = new Set(); state.selectedMonths = new Set();
+    state.files = []; state.fileTypes = {};
+    updateFileListUI();
+    $('catSection').style.display = 'none';
+    $('monthSection').style.display = 'none';
+    $('previewSection').style.display = 'none';
+    $('runStatus').textContent = '';
+    $('exportStatus').textContent = '';
+    clearLog();
+    log('已清空，等待上传文件…', 'dim');
+    showToast('已清空', 'info');
+  });
+
+  /* 类目 */
+  $('btnAllCat').addEventListener('click', () => {
+    state.selectedCats = new Set(state.allCats);
+    renderCatPicker();
+    refreshPreview();
+  });
+  $('btnNoneCat').addEventListener('click', () => {
+    state.selectedCats = new Set();
+    renderCatPicker();
+    refreshPreview();
+  });
+  $('btnInvertCat').addEventListener('click', () => {
+    const next = new Set();
+    state.allCats.forEach(c => { if (!state.selectedCats.has(c)) next.add(c); });
+    state.selectedCats = next;
+    renderCatPicker();
+    refreshPreview();
+  });
+
+  /* 月份 */
+  $('btnAllMonth').addEventListener('click', () => {
+    state.selectedMonths = new Set(state.allMonths);
+    renderMonthPicker();
+    refreshPreview();
+  });
+  $('btnNoneMonth').addEventListener('click', () => {
+    state.selectedMonths = new Set();
+    renderMonthPicker();
+    refreshPreview();
+  });
+  $('btnInvertMonth').addEventListener('click', () => {
+    const next = new Set();
+    state.allMonths.forEach(m => { if (!state.selectedMonths.has(m)) next.add(m); });
+    state.selectedMonths = next;
+    renderMonthPicker();
+    refreshPreview();
+  });
+
+  /* 模板 */
+  $('btnSaveTpl').addEventListener('click', saveTemplate);
+  $('btnLoadTpl').addEventListener('click', loadTemplate);
+  $('btnDelTpl').addEventListener('click', deleteTemplate);
+  $('tplName').addEventListener('keydown', e => { if (e.key === 'Enter') saveTemplate(); });
+
+  $('btnExport').addEventListener('click', exportExcel);
+}
+
+/* ================================================================
+   初始化
+   ================================================================ */
+async function init(){
+  bindEvents();
+
+  try {
+    await openDB();
+    await refreshTemplateList();
+    console.log('✅ IndexedDB 就绪');
+  } catch (e){
+    console.error('IndexedDB 初始化失败', e);
+  }
+
+  clearLog();
+  log('📊 月度数据汇总工具已就绪', 'info');
+  log('', 'dim');
+  log('使用说明：', 'dim');
+  log('  一次上传多个文件，工具会自动识别：', 'dim');
+  log('    · 类目对照表：Excel（含「商品ID」及「类目」或「叶子类目名称」）或 JSON（[{id, node}, ...]）', 'dim');
+  log('    · 品类-标准类目：含「一级类目名称」「类目名称」「支付金额」', 'dim');
+  log('    · 推广商品明细：含「商品ID」「推广消耗」', 'dim');
+  log('', 'dim');
+  log('💡 解析后勾选类目和月份，点击导出即可。类目勾选可保存为模板。', 'dim');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
